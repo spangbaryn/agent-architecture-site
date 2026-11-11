@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:xlink="http://www.w3.org/1999/xlink">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1.2: The four operations: write, select, compress, isolate</title>
+<style>
+  :root {
+    --ink: #1a1d21; --ink-soft: #4a5058; --paper: #faf8f4; --card: #ffffff; --line: #e5e0d6;
+    --accent: #0f6b5c; --accent-soft: #e3efec; --amber: #a05e0b; --amber-soft: #f9efdd;
+    --current: #0f6b5c; --ascendant: #1a5fa8; --emerging: #7a4fa3; --legacy: #8a8578; --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker { font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft); border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super; font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+  .mental-model { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-size: 21px; line-height: 1.45; }
+  .mental-model .label { display: block; font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .approach { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge { font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px; }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); } .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); } .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+  .callout { background: var(--amber-soft); border-left: 4px solid var(--amber); padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+  .callout .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px; }
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft); margin-top: 10px; text-align: center; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 20px; margin: 12px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+  .done-when { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace; background: #efece4; padding: 1px 5px; border-radius: 4px; }
+  table.ops { width: 100%; border-collapse: collapse; font-size: 15px; margin: 18px 0 24px; background: var(--card); }
+  table.ops th, table.ops td { border: 1px solid var(--line); padding: 9px 12px; vertical-align: top; text-align: left; }
+  table.ops th { font: 700 12px/1.4 -apple-system, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); background: var(--paper); }
+  table.ops td b { color: var(--accent); }
+  .callback { font-size: 15.5px; color: var(--ink-soft); border-left: 3px solid var(--line); padding-left: 14px; margin: 0 0 16px; }
+  .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+  .dg .delta { color: #0f6b5c; }
+  .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+  .dg .loop { stroke-dasharray: 6 4; }
+  .dg .fail { fill: #a05e0b; }
+  .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  .dg .lbl { fill: currentColor; font-size: 12px; }
+  .dg .qbox { fill: #fff; stroke: #4a5058; stroke-width: 1.5; }
+  .dg .leaf { fill: #e3efec; stroke: #0f6b5c; stroke-width: 2; }
+  .dg .leaf-t { fill: #0f6b5c; font-weight: 600; }
+  .dg .notyet { fill: #f9efdd; stroke: #a05e0b; stroke-width: 2; }
+  .dg .notyet-t { fill: #a05e0b; font-weight: 600; }
+  .dg .yn { font-size: 11px; font-weight: 700; fill: #4a5058; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 1 · Topic 1.2</div>
+    <h1>The four operations: write, select, compress, isolate</h1>
+    <p class="standfirst">Name any context failure by the move the harness failed to make, and name the fix by the move it should make on purpose.</p>
+    <div class="meta">Freshness-checked 2026-09-05 · builds on 0.1, 0.3, 0.4, 1.1 · ~13 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>1.1 handed you a diagnosis and no treatment. You now know that every token in the window spends from a finite attention budget, so the question is never "does it fit" but "does this token pay for its seat." Fine. A token has stopped paying for its seat. What, exactly, can you do about it?</p>
+  <p>The answer turned out to be short, and it took the field until mid-2025 to say it out loud. By then every team shipping a long-running agent had independently invented the same handful of tricks under different names: scratchpads, todo files, RAG, tool loadouts, summarizers, "just spawn a fresh agent for that part." Manus had one vocabulary, Cognition another, Anthropic a third. LangChain's July 2025 post collapsed the pile into four verbs (write, select, compress, isolate), and Drew Breunig's June 2025 pair of posts gave the other half: the four ways a window goes bad (poisoning, distraction, confusion, clash). Within a year every vendor write-up cited both lists by name, which is what a vocabulary winning looks like.</p>
+  <p>The pressure that forced this was time. A single call has one window and no history; an agent that runs for hours rewrites its window on every turn, and the harness is the only thing standing between "append everything" and "the model repeats itself at 100k tokens." 0.4 showed you the zero-operation baseline: AutoGPT's "append-everything context with the vector-store bolt-on" was an agent whose harness could not do anything to the window except grow it. 0.1 told you that "the harness is what you get to design." This topic is the list of what the harness can actually do.</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>
+    Between two model calls the harness has exactly four moves on the window: move something out, bring something in, shrink what stays, or wall something off. Every context failure is one of those moves made too late, and every fix is one made on purpose.</div>
+  <p>The four moves are the four operations, restated as what physically happens to the window:</p>
+  <table class="ops">
+    <tr><th>Operation</th><th>The move</th><th>What it looks like in a shipped agent</th></tr>
+    <tr><td><b>Write</b></td><td>Move something out of the window into durable state the model can get back</td><td>Scratchpads, <code>todo.md</code>, memory files, Anthropic's memory tool, Deep Agents offloading a tool result to a file and leaving a path behind</td></tr>
+    <tr><td><b>Select</b></td><td>Bring something into the window, now, because this step needs it</td><td>Retrieval of any kind, tool loadout (only the tools this task needs), skills loaded by name, reading a file the agent wrote earlier</td></tr>
+    <tr><td><b>Compress</b></td><td>Shrink what stays: same window, fewer tokens</td><td>Compaction summaries, tool-result clearing, thinking-block clearing, truncating old tool arguments</td></tr>
+    <tr><td><b>Isolate</b></td><td>Wall something off so it never enters this window at all</td><td>Subagents with fresh contexts, sandboxes that return a string instead of a transcript, separate memory namespaces per concern</td></tr>
+  </table>
+  <p>Notice what the four have in common: each is a decision about a token's relationship to the window (out, in, smaller, never). That is why the list is complete. There is no fifth thing a harness can do to a token between calls; the frontier work you will see below does not add a fifth verb, it makes the existing ones reversible.</p>
+  <p>The failure modes are the same four moves seen from the other side. Breunig's list, and the move that was missing:</p>
+  <table class="ops">
+    <tr><th>Failure</th><th>What you observe</th><th>Missing move</th></tr>
+    <tr><td><b>Poisoning</b></td><td>An error (a hallucinated fact, a bad tool result) enters and gets referenced on every later turn; the agent builds a plan around a goal that cannot be met</td><td>Isolate (quarantine the untrusted step) and, once it is in, compress with intent (prune the bad entry, do not summarize it into permanence)</td></tr>
+    <tr><td><b>Distraction</b></td><td>The window is so long the model leans on its own history and repeats past actions instead of planning; Google's Pokémon-playing Gemini agent did this past 100k tokens</td><td>Write (offload) and compress, and earlier than you think</td></tr>
+    <tr><td><b>Confusion</b></td><td>Superfluous material gets used anyway: the wrong tool out of eighty, an irrelevant document quoted with confidence</td><td>Select (tool loadout, retrieval that returns less)</td></tr>
+    <tr><td><b>Clash</b></td><td>Two things in the window disagree (turn-2 instruction vs turn-9 document, an old note vs a new tool result) and the model picks one for no defensible reason</td><td>Isolate (keep the contradicting sources in separate windows and reconcile above them) and write that overwrites instead of appending</td></tr>
+  </table>
+  <p class="callback">Quotable version for the newsletter: poisoning and distraction are problems of what <i>stays</i>, confusion is a problem of what <i>enters</i>, and clash is a problem of what <i>coexists</i>. The four operations are the four answers, one per axis, with compress covering "stays" from the other direction.</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame">
+    <div class="q">A landscape of: who decides when to make one of the four moves, and whether the move can be undone.</div>
+    <div class="axis">What varies: the trigger (nobody, a harness threshold, the model's own judgment) and the reversibility of what happens when it fires (destroyed vs recoverable). Four answers, from no trigger to a trigger that stops mattering.</div>
+    <div class="legend">Reading the diagrams: gray is shared structure; <span style="color:#0f6b5c;font-weight:600">teal</span> is what makes this approach different from the one above it; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks. The <b>window</b> box is the context window at the moment of the next model call. The dashed <b>harness</b> box is deterministic code, no model inside.</div>
+  </div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-tool"><path d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="40" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">tool</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">store</text></g>
+      <g id="sym-human"><circle cx="20" cy="10" r="8" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M2 40 a18 18 0 0 1 36 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">orchestrator</text></g>
+      <g id="sym-window"><rect x="0" y="0" width="120" height="40" rx="4" fill="#fff" stroke="currentColor" stroke-width="2"/><line x1="0" y1="12" x2="120" y2="12" stroke="currentColor" stroke-width="1"/><text x="60" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">window</text></g>
+      <g id="sym-harness"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">harness</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    </defs>
+  </svg>
+
+  <div class="approach">
+    <h3>Append-only transcript <span class="badge b-legacy">Legacy</span></h3>
+    <p>No operations at all. Every user turn, every tool result, every thought is appended, and the whole transcript is re-sent on every call until the window overflows. This is the 2023 chat-app default and the 0.4 AutoGPT shape, and it is still what you get from any framework the day before you configure it. Champions: nobody on purpose; it is where every agent starts.</p>
+    <p class="tradeoffs"><b>Wins:</b> nothing is ever lost, nothing needs designing, and the prefix is perfectly cacheable because it never changes (1.7). <b>Costs:</b> distraction arrives long before overflow; cost and latency climb every turn; there is no place for a fact to live except "somewhere in the middle."</p>
+    <p class="tradeoffs"><b>Done right:</b> a ten-turn support conversation or a single agentic step that reliably ends inside the window's reliable zone from 1.1. If the task cannot outgrow the window, operations are pure overhead, and the honest design is to not build them.</p>
+    <figure>
+      <svg class="dg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 132" role="img" aria-label="Model appends to a window that only grows; the window is re-read in full every turn.">
+        <use href="#sym-model" xlink:href="#sym-model" x="60" y="40"/>
+        <use href="#sym-window" xlink:href="#sym-window" x="260" y="40"/>
+        <g class="delta"><path class="edge" d="M156 60 H258"/><text class="lbl" x="170" y="52" fill="#0f6b5c">append</text></g>
+        <path class="edge loop" d="M320 40 C320 8 120 8 108 38"/>
+        <text class="lbl" x="150" y="14">re-read all of it, every turn</text>
+        <path class="edge" d="M382 60 H440" stroke-dasharray="2 3"/>
+        <text class="lbl" x="446" y="64">...and grows</text>
+        <circle class="fail" cx="320" cy="96" r="5"/><text class="fail-label" x="330" y="100">rot arrives before overflow does</text>
+      </svg>
+      <figcaption>Free and lossless; degrades silently, then dies.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Harness-triggered operations <span class="badge b-current">Current</span></h3>
+    <p>Deterministic code watches the window and fires a move at a threshold. Anthropic's server-side context editing clears old tool results once N have accumulated, and server-side compaction summarizes the transcript when input crosses a trigger (150,000 tokens by default). LangChain's Deep Agents offloads any tool result over 20,000 tokens to a file and leaves a path plus a ten-line preview in its place, and only summarizes when nothing is left to offload. No model judgment is involved in <i>when</i>; a model may be involved in <i>how</i> (the summary is written by one). Champions: Anthropic's platform, LangChain Deep Agents, every production harness by mid-2026.</p>
+    <p class="tradeoffs"><b>Wins:</b> predictable, testable, and cache-aware (the harness knows exactly when it invalidates a prefix, so it can clear enough at once to be worth it); Anthropic measured a 29% improvement on its agentic-search eval from context editing alone. <b>Costs:</b> a threshold is blind to what mattered; the tool result it clears at N+1 may be the one the next step needed, and a summary written at 150k tokens summarizes whatever happened to be there.</p>
+    <p class="tradeoffs"><b>Done right:</b> a coding agent whose bloat is predictable at build time: big file reads and long tool-call histories. Offload reads over a size, clear old tool results, compact late. The shape of the garbage is known, so a threshold is the right tool.</p>
+    <figure>
+      <svg class="dg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 132" role="img" aria-label="A harness watches the window and, at a threshold, offloads or summarizes into a store, returning a smaller window.">
+        <use href="#sym-model" xlink:href="#sym-model" x="20" y="40"/>
+        <use href="#sym-window" xlink:href="#sym-window" x="180" y="40"/>
+        <path class="edge" d="M116 60 H178"/>
+        <g class="delta">
+          <use href="#sym-harness" xlink:href="#sym-harness" x="370" y="40"/>
+          <path class="edge" d="M302 60 H368"/><text class="lbl" x="306" y="52" fill="#0f6b5c">at threshold</text>
+          <use href="#sym-store" xlink:href="#sym-store" x="540" y="40"/>
+          <path class="edge" d="M468 60 H538"/><text class="lbl" x="470" y="52" fill="#0f6b5c">offload</text>
+          <path class="edge loop" d="M418 40 C418 12 260 12 240 38"/><text class="lbl" x="262" y="16" fill="#0f6b5c">smaller window back</text>
+        </g>
+        <circle class="fail" cx="418" cy="96" r="5"/><text class="fail-label" x="428" y="100">blind to what mattered</text>
+      </svg>
+      <figcaption>Predictable and cacheable; fires on size, not on meaning.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Model-driven operations through tools <span class="badge b-current">Current</span></h3>
+    <p>The model makes the move itself, by calling a tool: writes a note, updates a <code>todo.md</code>, saves to a memory directory, calls <code>compact_conversation</code>, or delegates a subtask to a subagent (isolate as a tool call). Manus's file-as-context and recitation patterns, Anthropic's memory tool, Claude Code's memory directory and subagents, Deep Agents' <code>write_todos</code> and <code>task</code> tools are all this card. The harness supplies the tools; the model supplies the judgment. Anthropic's number for the pairing: 39% on the same eval when the memory tool joins context editing, versus 29% for editing alone. That 10-point gap is what model judgment about <i>which</i> tokens to keep is worth over a threshold that keeps the most recent ones.</p>
+    <p class="tradeoffs"><b>Wins:</b> the move is made by the only party that knows what the next step needs; the notes are inspectable and become memory for free (2.2); the pattern rides the model, so it gets better with each release rather than staler. <b>Costs:</b> the model has to remember to do it, and under pressure it forgets; every write costs a turn; quality is exactly the quality of what it wrote down (0.3's "a tool is a prompt" applies to the tool it uses on itself).</p>
+    <p class="tradeoffs"><b>Done right:</b> a research or planning agent whose important state is semantic, not size-shaped: "we ruled out approach B because of X." No threshold can find that sentence. A model writing it to a plan file, and re-reading the plan at the top of each step, can.</p>
+    <figure>
+      <svg class="dg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 132" role="img" aria-label="The model itself calls a notes or memory tool that writes to a store, and later reads it back into the window.">
+        <use href="#sym-model" xlink:href="#sym-model" x="20" y="40"/>
+        <use href="#sym-window" xlink:href="#sym-window" x="180" y="40"/>
+        <path class="edge" d="M116 60 H178"/>
+        <use href="#sym-store" xlink:href="#sym-store" x="540" y="40"/>
+        <g class="delta">
+          <use href="#sym-tool" xlink:href="#sym-tool" x="380" y="40"/>
+          <path class="edge" d="M68 82 C68 118 300 118 380 84"/><text class="lbl" x="150" y="128" fill="#0f6b5c">calls notes / memory / compact</text>
+          <path class="edge" d="M462 60 H538"/><text class="lbl" x="468" y="52" fill="#0f6b5c">write</text>
+          <path class="edge loop" d="M576 40 C576 10 320 10 302 38"/><text class="lbl" x="330" y="14" fill="#0f6b5c">select back in, on demand</text>
+        </g>
+        <circle class="fail" cx="20" cy="28" r="5"/><text class="fail-label" x="30" y="24">has to remember to</text>
+      </svg>
+      <figcaption>Knows what matters; may not remember to act on it.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Reversible context: the log is the truth, the window is a view <span class="badge b-emerging">Emerging</span></h3>
+    <p>Stop destroying anything. Every event goes to an append-only log outside the window; the window at each call is a <i>selection</i> from that log, transformed by the harness on the way in. Anthropic's Managed Agents (Apr 2026) is the cleanest statement: "the session is not Claude's context window," and the brain interrogates the session through <code>getEvents()</code> slices, rewinding a few events before a moment or rereading what led up to an action. Deep Agents moved the same direction in June 2026: evicted messages are appended to a <code>conversation_history</code> file before the summary replaces them, and the summary embeds the path so the agent can reopen it. Recursive Language Models (1.1's emerging card) are the research version: the prompt is a variable and the model slices it with code.</p>
+    <p class="tradeoffs"><b>Wins:</b> compress becomes a view choice instead of a guillotine; a wrong drop is a re-read, not a lost fact; the harness can change its context policy between runs (or model generations) without touching the record. <b>Costs:</b> someone still has to decide what to reread and when, so it inherits the trigger problem of the two cards above; storage and a real session service; re-reading is a cache miss and a latency hit; as of Sep 2026 it is a hosted product surface and a research pattern, not what most teams run.</p>
+    <p class="tradeoffs"><b>Done right:</b> a multi-hour agent doing audited work, where "why did it do that at step 340" has to be answerable and a lost tool result at step 12 cannot be allowed to silently change step 400. The record must outlive the window, so the record is the design.</p>
+    <figure>
+      <svg class="dg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 132" role="img" aria-label="An external session log is the source of truth; the window is a transformed slice of it, and anything can be re-read.">
+        <use href="#sym-model" xlink:href="#sym-model" x="20" y="40"/>
+        <use href="#sym-window" xlink:href="#sym-window" x="180" y="40"/>
+        <path class="edge" d="M116 60 H178"/>
+        <use href="#sym-harness" xlink:href="#sym-harness" x="370" y="40"/>
+        <path class="edge" d="M302 60 H368"/>
+        <g class="delta">
+          <use href="#sym-store" xlink:href="#sym-store" x="540" y="40"/>
+          <text class="lbl" x="576" y="100" text-anchor="middle" fill="#0f6b5c">session log</text>
+          <path class="edge" d="M468 52 H538"/><text class="lbl" x="470" y="44" fill="#0f6b5c">every event</text>
+          <path class="edge" d="M538 70 H470"/><text class="lbl" x="534" y="93" text-anchor="end" fill="#0f6b5c">any slice, any time</text>
+          <path class="edge loop" d="M418 40 C418 12 260 12 240 38"/><text class="lbl" x="250" y="16" fill="#0f6b5c">transformed view</text>
+        </g>
+        <circle class="fail" cx="180" cy="104" r="5"/><text class="fail-label" x="190" y="108">still has to choose what to reread</text>
+      </svg>
+      <figcaption>Nothing is ever lost; the question moves from "what to keep" to "what to look at."</figcaption>
+    </figure>
+  </div>
+
+  <p>Two things the cards cannot show. First, the two CURRENT cards are not rivals; Anthropic's own docs say to run both: compaction keeps the window small without client-side bookkeeping, and memory preserves what must survive it. The tree below decides which is <i>primary</i>. Second, the field's ordering of the four moves has quietly settled, and it is the reverse of what most teams build first: <b>write before compress</b> (offload, then summarize what is left), <b>select before compress</b> (fix retrieval before shrinking its noise), and <b>compress last</b>, because it is the only move that destroys information. Deep Agents encodes that ordering as literal control flow. The emerging card is what happens when you push it to the limit: never compress at all, only view.</p>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide how the four operations get triggered, and by whom:</p>
+  <figure>
+    <svg class="dg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 372" role="img" aria-label="Decision tree from four yes/no questions to the four landscape cards plus a not-yet leaf.">
+      <rect class="qbox" x="170" y="6" width="300" height="46" rx="8"/>
+      <text class="lbl" x="320" y="26" text-anchor="middle">1. Does the work reliably finish inside</text>
+      <text class="lbl" x="320" y="42" text-anchor="middle">the window's reliable zone (1.1)?</text>
+      <path class="edge" d="M170 30 H86 V70"/><text class="yn" x="94" y="62">yes</text>
+      <rect class="leaf" x="4" y="72" width="162" height="40" rx="8"/>
+      <text class="leaf-t" x="85" y="97" text-anchor="middle" style="font-size:11.5px">Append-only transcript</text>
+      <path class="edge" d="M320 52 V70"/><text class="yn" x="326" y="66">no</text>
+      <rect class="qbox" x="170" y="72" width="300" height="60" rx="8"/>
+      <text class="lbl" x="320" y="92" text-anchor="middle">2. Must a wrong drop be recoverable?</text>
+      <text class="lbl" x="320" y="108" text-anchor="middle">(runs for hours, is audited, or feeds</text>
+      <text class="lbl" x="320" y="124" text-anchor="middle">irreversible actions downstream)</text>
+      <path class="edge" d="M470 102 H555 V150"/><text class="yn" x="561" y="142">yes</text>
+      <rect class="leaf" x="476" y="152" width="160" height="52" rx="8"/>
+      <text class="leaf-t" x="556" y="174" text-anchor="middle" style="font-size:12.5px">Reversible context</text>
+      <text class="leaf-t" x="556" y="192" text-anchor="middle" style="font-weight:400;font-size:10.5px">log is truth, window is view</text>
+      <path class="edge" d="M320 132 V150"/><text class="yn" x="326" y="146">no</text>
+      <rect class="qbox" x="170" y="152" width="300" height="46" rx="8"/>
+      <text class="lbl" x="320" y="172" text-anchor="middle">3. Can you say at build time what will</text>
+      <text class="lbl" x="320" y="188" text-anchor="middle">bloat the window? (big reads, long histories)</text>
+      <path class="edge" d="M170 175 H86 V230"/><text class="yn" x="94" y="222">yes</text>
+      <rect class="leaf" x="8" y="232" width="156" height="52" rx="8"/>
+      <text class="leaf-t" x="86" y="254" text-anchor="middle">Harness-triggered</text>
+      <text class="leaf-t" x="86" y="272" text-anchor="middle" style="font-weight:400;font-size:10.5px">thresholds; compact late</text>
+      <path class="edge" d="M320 198 V230"/><text class="yn" x="326" y="222">no</text>
+      <rect class="qbox" x="170" y="232" width="300" height="46" rx="8"/>
+      <text class="lbl" x="320" y="252" text-anchor="middle">4. Does the model have a durable store it can</text>
+      <text class="lbl" x="320" y="268" text-anchor="middle">write to and read back (files, a memory tool)?</text>
+      <path class="edge" d="M270 278 V312"/><text class="yn" x="248" y="302">yes</text>
+      <rect class="leaf" x="150" y="314" width="230" height="52" rx="8"/>
+      <text class="leaf-t" x="265" y="336" text-anchor="middle">Model-driven through tools</text>
+      <text class="leaf-t" x="265" y="354" text-anchor="middle" style="font-weight:400;font-size:11px">notes, memory, recitation, subagents</text>
+      <path class="edge" d="M420 278 V312"/><text class="yn" x="426" y="302">no</text>
+      <rect class="notyet" x="384" y="314" width="252" height="52" rx="8"/>
+      <text class="notyet-t" x="510" y="336" text-anchor="middle" style="font-size:12.5px">Not yet: give it a filesystem first</text>
+      <text class="notyet-t" x="510" y="354" text-anchor="middle" style="font-weight:400;font-size:11px">a model with no store can only shrink</text>
+    </svg>
+    <figcaption>Question 2 does the most work: it is the 2026 fork between destroying context and viewing it.</figcaption>
+  </figure>
+  <p>Question 2 is load-bearing because it is the one whose answer changed this year. Until Managed Agents and the Deep Agents eviction file, "recoverable" was not on the menu; you picked a threshold or you trusted the model, and either way the dropped tokens were gone. Now the honest first question is whether you can afford to lose anything at all. Most tasks can, and the two CURRENT cards remain the right default for them. Question 3 then splits by whether the garbage has a predictable shape: size-shaped bloat wants a threshold; meaning-shaped bloat wants the model. Question 4's "not yet" leaf is worth taking seriously: an agent with no durable store has exactly one move available, shrink, and shrink is the lossy one.</p>
+
+  <h2><span class="num">5</span>Seen in the wild</h2>
+  <p>Anthropic's <b>Managed Agents</b>, the hosted long-horizon agent service written up in April 2026, is a useful specimen because it was designed <i>around</i> the four operations rather than adding them afterward. Its authors split an agent into three interfaces: a <b>session</b> (append-only log of everything that happened), a <b>harness</b> (the loop that calls Claude and routes tool calls), and a <b>sandbox</b> (where code runs). Each of the four operations lands on a different seam.</p>
+  <figure>
+    <svg class="dg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 250" role="img" aria-label="Managed Agents drawn in the tutorial's grammar: brain, session log, sandbox, with the four operations on the edges.">
+      <rect x="20" y="20" width="300" height="110" rx="12" fill="none" stroke="#4a5058" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text class="lbl" x="34" y="40" style="font-weight:600">brain (stateless; can crash and be re-woken)</text>
+      <use href="#sym-model" xlink:href="#sym-model" x="40" y="60"/>
+      <use href="#sym-harness" xlink:href="#sym-harness" x="200" y="60"/>
+      <path class="edge" d="M136 80 H198"/>
+      <use href="#sym-store" xlink:href="#sym-store" x="440" y="20"/>
+      <text class="lbl" x="476" y="82" text-anchor="middle" style="font-weight:600">session log</text>
+      <g class="delta">
+        <path class="edge" d="M296 66 C340 40 400 30 438 34"/><text class="lbl" x="330" y="14" fill="#0f6b5c">write: emitEvent, every event</text>
+        <path class="edge" d="M438 60 C400 70 350 80 300 88"/><text class="lbl" x="336" y="108" fill="#0f6b5c">select: getEvents(slice)</text>
+        <text class="lbl" x="34" y="120" fill="#0f6b5c">compress: transform the slice on the way in</text>
+      </g>
+      <use href="#sym-tool" xlink:href="#sym-tool" x="400" y="170"/>
+      <text class="lbl" x="490" y="195" style="font-weight:600">sandbox ("hands")</text>
+      <path class="edge" d="M296 96 C330 130 380 180 398 188"/>
+      <text class="lbl" x="290" y="226">isolate: execute(name, input) returns a string</text>
+      <circle class="fail" cx="30" cy="240" r="5"/><text class="fail-label" x="40" y="244">the harness still chooses the slice; a bad choice is a bad window, just a recoverable one</text>
+    </svg>
+    <figcaption>Managed Agents is the emerging card shipped as a product: the window is a transformed slice of a durable log.</figcaption>
+  </figure>
+  <p><b>Write</b> is total and automatic: the harness emits every event to the session as it happens, so nothing has to be "remembered" by a model. <b>Select</b> is positional: the brain asks for slices of the event stream, and can rewind a few events before a decision to see the lead-up. <b>Compress</b> is where the design gets pointed: the transformations that turn a slice into a window (organizing for cache hits, trimming, summarizing) live in the harness, deliberately separated from the durable session, because the authors say they cannot predict what context engineering future models will need. <b>Isolate</b> is the sandbox: the harness calls it exactly like any tool, <code>execute(name, input)</code> returning a string, so the container's transcript, file churn, and failures never enter the brain's window unless the brain asks. If the container dies, the model sees a tool error and decides whether to retry; if the harness dies, a new one wakes with the session ID and reads the log.</p>
+  <p>Two details reward a second look. The post opens by admitting an earlier harness added "context resets" because Sonnet 4.5 wrapped up tasks early when it sensed the limit approaching, and that on Opus 4.5 the resets had become dead weight. You already know this pattern from 0.4: "scaffolding that substitutes for model capability gets eaten by the next model release, while scaffolding that contains consequences survives every one of them." A reset that manages a model's anxiety is substitution; a durable log that survives crashes is containment. Managed Agents is the same team drawing the same line and moving the substitution-shaped context tricks out of the fixed interfaces into the swappable harness. The second detail is the security seam: credentials never reach the sandbox where generated code runs, so a prompt injection has nothing to steal from the environment it can touch. That is isolate doing safety work, which 7.2 will name as a whole stack.</p>
+  <p>One aside, and then we leave it alone: Claude Code is card three almost entirely, with a card-two compaction backstop. Its memory directory, todo list, and subagents are the model making its own moves; auto-compaction is the harness catching whatever the model did not.</p>
+
+  <div class="callout"><span class="label">The misconception</span>
+    "Context management means summarizing when you run out of room." It is the first thing every team builds and the last move the field now recommends. Compress is the only one of the four operations that destroys information, and a summary written at the limit is the mental model's definition of a move made too late: it compresses whatever happened to be in the window, at the moment attention was already thinnest. The production ordering that emerged in 2026 is write first (offload the big tool result and leave a path), select second (fix what enters before shrinking it), compress last and small (clear old tool results before you summarize anything), and, where you can afford it, never compress at all, just view. If the only operation your harness has is a summarizer, you have built the guillotine and skipped the three moves that keep it from being needed.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>A support agent, thirty turns in, asks the customer for the order number it was given on turn three. Your engineer proposes "summarize the conversation every ten turns." Which failure mode, which missing move, and why is the proposal the wrong move?</summary><p>Distraction, with a "lost in the middle" flavor: the fact is in the window but the model is not attending to it. The missing move is <b>write</b>: the harness (or the model, through a tool) should have moved the order number out of the transcript into a small structured state block that sits near the top of every call, then <b>select</b> it back in as a labeled fact. Summarizing every ten turns is compress, which is lossy and may well drop the order number itself; it treats a placement problem as a size problem. Note that this is also the first appearance of 1.5's recitation pattern: a fact that keeps being needed gets re-written near the point of use.</p></details>
+  <details><summary>You wired six MCP servers into a coding agent (eighty-odd tools). It has started calling <code>search_issues</code> when it meant <code>search_code</code>, and occasionally invents a parameter. Which failure mode, which missing move, and what does 0.3 add?</summary><p>Confusion: superfluous tool definitions are being used because they are there. The missing move is <b>select</b>, specifically tool loadout: choose the subset of tools this task needs, per run or per step, rather than preloading all of them. 0.3 already told you why the descriptions are the culprit: "a tool is two things at once: a contract with a deterministic system, and a prompt aimed at a non-deterministic one," and eighty overlapping prompts is eighty chances to pick the wrong one. Breunig cites research that some models degrade past roughly twenty tools. If the loadout itself needs judgment, that is 1.6's progressive disclosure: load names and one-liners always, full definitions on demand.</p></details>
+  <details><summary>A research agent quotes a revenue figure from a search snippet that was itself wrong. Every later draft cites it, and the final report builds a recommendation on it. Which failure mode, which missing move, and what would the emerging card have given you?</summary><p>Poisoning: an error entered and was referenced on every subsequent turn. The primary missing move is <b>isolate</b>: the read step (search, extract, verify) should have run in its own context and returned only findings that passed a check, so an unverified snippet never entered the writer's window in the first place. This is 0.2's "verification as the ceiling on delegation" applied to context: the untrusted read gets a wall, the verified result gets a seat. Once poison is in, compress with intent is the repair, pruning the bad entry rather than summarizing it into permanence. The emerging card would have added a third option: rewind the session to the event before the bad figure entered and re-run from there, because nothing was destroyed. That is exactly the "wrong drop must be recoverable" case from the decision tree.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>
+    Module 1's bar is "given any agent misbehavior, your first three hypotheses are all context hypotheses, and they are usually right." 1.1 gave you the first hypothesis (a token that is not paying for its seat). 1.2 gives you the vocabulary to make the other two: you can name which of the four failure modes you are looking at, name the move that was missing, and say who should have made it (harness threshold, model judgment, or a reversible log) and in what order (write and select before compress). 1.3 through 1.7 supply the mechanisms one move at a time: 1.3 is compress, 1.4 and 1.6 are select, 1.5 is write, and 1.7 is the bill for all of them.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources">
+    <li>LangChain, Context Engineering for Agents (the write / select / compress / isolate taxonomy), Jul 2025: <a href="https://www.langchain.com/blog/context-engineering-for-agents">langchain.com/blog/context-engineering-for-agents</a></li>
+    <li>Drew Breunig, How Long Contexts Fail (poisoning, distraction, confusion, clash), Jun 22 2025: <a href="https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html">dbreunig.com</a>; and How to Fix Your Context, Jun 26 2025: <a href="https://www.dbreunig.com/2025/06/26/how-to-fix-your-context.html">dbreunig.com</a></li>
+    <li>Anthropic, Managing context on the Claude Developer Platform (context editing and the memory tool; the 29% and 39% numbers), Sep 2025: <a href="https://www.anthropic.com/news/context-management">anthropic.com/news/context-management</a></li>
+    <li>Anthropic, Scaling Managed Agents: Decoupling the brain from the hands, Apr 2026: <a href="https://www.anthropic.com/engineering/managed-agents">anthropic.com/engineering/managed-agents</a></li>
+    <li>LangChain, Context Management for Deep Agents (20k offload threshold, eviction file), Jun 2026: <a href="https://www.langchain.com/blog/context-management-for-deepagents">langchain.com/blog/context-management-for-deepagents</a></li>
+    <li>Claude Platform docs, Context editing and compaction (the <code>compact_20260112</code> strategy, 150k default trigger), current: <a href="https://platform.claude.com/docs/en/build-with-claude/context-editing">platform.claude.com/docs/en/build-with-claude/context-editing</a></li>
+  </ul>
+
+</div>
+</body>
+</html>

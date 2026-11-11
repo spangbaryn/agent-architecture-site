@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2.1: The memory vocabulary</title>
+<style>
+  :root {
+    --ink: #1a1d21; --ink-soft: #4a5058; --paper: #faf8f4; --card: #ffffff; --line: #e5e0d6;
+    --accent: #0f6b5c; --accent-soft: #e3efec; --amber: #a05e0b; --amber-soft: #f9efdd;
+    --current: #0f6b5c; --ascendant: #1a5fa8; --emerging: #7a4fa3; --legacy: #8a8578; --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker { font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft); border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super; font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+  .mental-model { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-size: 21px; line-height: 1.45; }
+  .mental-model .label, .callout .label, .done-when .label, .callback .label { display: block; font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+  .mental-model .label { color: var(--accent); }
+  .callback { background: var(--card); border: 1px dashed var(--line); border-radius: 8px; padding: 14px 20px; margin: 18px 0; font-size: 16px; }
+  .callback .label { color: var(--ink-soft); }
+  .approach { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge { font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px; }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); } .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); } .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; text-align: left; }
+  .callout { background: var(--amber-soft); border-left: 4px solid var(--amber); padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+  .callout .label { color: var(--amber); }
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft); margin-top: 10px; text-align: center; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 20px; margin: 12px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+  .done-when { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { color: var(--accent); }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  table.types { width: 100%; border-collapse: collapse; font: 14px/1.45 -apple-system, 'Segoe UI', sans-serif; margin: 20px 0 24px; background: var(--card); }
+  table.types th, table.types td { border: 1px solid var(--line); padding: 8px 10px; vertical-align: top; text-align: left; }
+  table.types th { background: var(--accent-soft); font-weight: 700; }
+  table.types td:first-child { font-weight: 700; white-space: nowrap; }
+  .tablewrap { overflow-x: auto; }
+  .asof { font: 14.5px/1.55 -apple-system, sans-serif; background: #eef3fa; border-left: 4px solid var(--ascendant); padding: 12px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 2 · Topic 2.1</div>
+    <h1>The vocabulary: working, episodic, semantic, procedural</h1>
+    <p class="standfirst">Name the question a memory will answer before you decide where it lives.</p>
+    <div class="meta">Freshness-checked 2026-11-11 · builds on 0.4, 1.1, 1.3, 1.5, 1.6, 1.7 · opens Module 2 · ~13 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>Module 1 was about one session. Everything in it, the attention budget, the four moves, compaction, notes, skills, the cache, assumed the window would eventually close and that was fine. Then products started needing the agent to be better on Tuesday because of what happened on Monday, and "the window closes" stopped being fine.</p>
+  <p>The first answer was one store. AutoGPT bolted a vector database onto its loop in 2023 (0.4 left that thread for 2.8), and a generation of agents copied the shape: embed everything the agent saw or said, retrieve the top few by similarity, paste them back in. It failed in a recognizable way. Ask such an agent for dinner ideas and it retrieves "the user said they are vegetarian" and "the user ordered steak for a guest on March 2" with nearly the same score, because both are about the user and food. One is a standing fact. The other is a one-off event. The store had no way to know the difference, so the ranking could not either.</p>
+  <p>The fix arrived as vocabulary before it arrived as architecture. CoALA (Sumers, Yao, Narasimhan, Griffiths, 2023) borrowed four words from cognitive science and gave builders a way to say what kind of thing they were storing. Ep 11 ended on exactly this teaser: is your agent's memory one thing or four? This lesson is the answer, and the reason the answer is "four questions, not four boxes."</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>
+    A memory type is not a place to store things; it is a question the agent will ask its past: what am I doing (working), what happened (episodic), what is true (semantic), how do I do this (procedural). Each question needs its own write rule and its own way of being found, so one index that answers two of them answers both badly.</div>
+  <p>Read the four as questions and the rest follows. The question decides when you write (every step, every event, only when something is learned, only when someone reviews it), what shape the record takes (a window, a timestamped log, a fact with a validity, an instruction), how it goes stale, and what key you look it up by.</p>
+
+  <div class="tablewrap">
+  <table class="types">
+    <tr><th>Type</th><th>The question</th><th>Written when</th><th>Found by</th><th>Goes wrong by</th><th>Module 1 already taught it as</th></tr>
+    <tr><td>Working</td><td>What am I doing right now?</td><td>Every step</td><td>Attention, over the window</td><td>Rot, distraction</td><td>The whole of Module 1: the window</td></tr>
+    <tr><td>Episodic</td><td>What happened, and when?</td><td>Automatically, every event, append only</td><td>Time and situation</td><td>Growing past use; an episode read as a rule</td><td>1.2's log that is truth; 1.5's farthest reader</td></tr>
+    <tr><td>Semantic</td><td>What is true now?</td><td>When something is learned or consolidated</td><td>Entity or key</td><td>Going stale while still looking current</td><td>1.3's preservation list, kept across sessions</td></tr>
+    <tr><td>Procedural</td><td>How do I do this?</td><td>Rarely, ideally with review</td><td>A trigger</td><td>Drifting from the environment it describes</td><td>1.6's skills and always-on files</td></tr>
+  </table>
+  </div>
+
+  <p>The last column is the point of this lesson's placement. You already own three of the four types; you just learned them as context moves. Working memory is the window, and 1.1's rule still governs it. Procedural memory is 1.6, verbatim:</p>
+  <div class="callback"><span class="label">From 1.6</span>"A skill is the locator-and-payload move applied to instructions instead of data: the description stays in the window as a locator, the procedure stays on disk as a payload, and the whole design lives or dies on whether the description fires at the right moment."</div>
+  <p>And the episodic layer is 1.5's farthest reader made permanent:</p>
+  <div class="callback"><span class="label">From 1.5</span>"A note is a message from the agent to a later, poorer-informed version of itself; how far away that reader is decides what the note carries and how often it gets rewritten."</div>
+  <p>Memory is the case where the reader is in another session entirely. What Module 2 adds is the semantic layer, the one with no Module 1 ancestor, and the discipline of keeping the four apart.</p>
+
+  <h3>The cardinal rule</h3>
+  <p><b>Do not mix memory types in one index with one retrieval strategy.</b> Not because the categories are sacred, but because the four questions disagree on three things at once. Episodes are never wrong about the past, so you append and never overwrite; facts must be overwritten when they change, or the old one keeps winning. Episodes are found by time ("last week's deploy"), facts by entity ("the user's diet"), procedures by trigger ("when asked to deploy"). And they go stale on different clocks. Put two in one index and the ranking has to pick one of those behaviors for both.</p>
+  <p>There is a fresh, first-party demonstration of this. In Anthropic's Nov 6 memory post, a consolidation job writing contract facts into one shared table lost facts to overwrites; when the instruction changed to one page per contract, the share of graded contract facts captured went from 72% to 100%. Same model, same corpus: the only change was not making two kinds of record share one slot.</p>
+
+  <h3>Why the write is the hard part</h3>
+  <div class="callback"><span class="label">From 1.3</span>"A compaction is a bet, placed by something that cannot see the future, on what a future window will need."</div>
+  <p>Every memory write is that bet moved to write time, and with a much longer horizon. Anthropic's post says it in four words: "Memory is, occasionally, a prediction." Their evidence that the bet is hard: an older model playing Pokemon wrote 413 files across 225 folders (per battle, per item) and drowned in stale state; a newer one wrote about ten files of strategy and rules the game never states, and got further. Steering mattered more than rules: telling the model what memory is for beat a fixed "record only failures" rule, which reduced memory gains on every model they tried. The type vocabulary helps exactly here. "Which of the four questions will this answer later?" is a better write test than "is this important?"</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame">
+    <div class="q">A landscape of: where a memory system keeps the difference between kinds of memory.</div>
+    <div class="axis">What varies: where the type distinction lives. Nowhere (one store); in the schema, decided at write time (typed stores); in position, decided by how high a record is promoted (a hierarchy); in a background process that converts one kind into another (consolidation); or in the weights (parametric). Five answers, ordered from the oldest to the newest.</div>
+    <div class="legend">Reading the diagrams: gray is shared structure; <span style="color:#0f6b5c;font-weight:600">teal</span> is what makes this approach different from the one above it; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks.</div>
+  </div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-human"><circle cx="20" cy="10" r="8" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M2 40 a18 18 0 0 1 36 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">dreaming</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"/></marker>
+    </defs>
+  </svg>
+  <style>
+    .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 12.5px; }
+    .dg text { fill: currentColor; }
+    .dg .delta { color: #0f6b5c; }
+    .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .dg .loop { stroke-dasharray: 6 4; }
+    .dg .fail { fill: #a05e0b; }
+    .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+    .dg .leaf { fill: #0f6b5c; font-weight: 600; }
+    .dg .notyet { fill: #a05e0b; font-weight: 600; }
+  </style>
+
+  <div class="approach">
+    <h3>One undifferentiated store <span class="badge b-legacy">Legacy</span></h3>
+    <p>Everything the agent sees or says is embedded into one index and retrieved by similarity. The AutoGPT-era default, and still what "add memory" means in many tutorials. 2.8 gives it the full autopsy; here it is the baseline the other four cards are reacting to.</p>
+    <p class="tradeoffs"><b>Wins:</b> one component, no decisions at write time, works on day one. <b>Costs:</b> similarity cannot tell an event from a fact from an instruction, so a stale fact outranks the current one and a one-off episode gets treated as policy; nothing is ever overwritten, so contradictions accumulate.</p>
+    <p class="tradeoffs"><b>Done right:</b> a documentation assistant whose only memory is the docs themselves. When there is genuinely one kind of thing in the store, there is nothing to mix, and this is just retrieval (1.4).</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="A model writes everything into one store and retrieves by similarity.">
+        <use href="#sym-model" x="60" y="55"/>
+        <g class="delta"><use href="#sym-store" x="430" y="50"/><text x="466" y="118" text-anchor="middle">everything</text></g>
+        <path class="edge" d="M158 65 H426"/>
+        <path class="edge" d="M426 88 H160"/>
+        <text x="250" y="58">write all</text>
+        <text x="220" y="106">top-k by similarity</text>
+        <circle class="fail" cx="380" cy="136" r="5"/><text class="fail-label" x="390" y="140">steak outranks vegetarian</text>
+      </svg>
+      <figcaption>Zero decisions at write time; every decision pushed onto a ranking that cannot make it.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Typed stores by kind <span class="badge b-current">Current</span></h3>
+    <p>The CoALA split taken literally: separate stores for episodes, facts and procedures, each with its own write rule and retrieval key, plus the window as working memory. LangChain's LangMem names its memory semantic, episodic and procedural; Letta's core, recall and archival memory are the same instinct cut by position in the window (2.3 owns that lineage). This is the shape most design docs draw in 2026.</p>
+    <p class="tradeoffs"><b>Wins:</b> each question gets the right key and the right staleness rule; facts can be overwritten without touching history; procedures can be reviewed separately. <b>Costs:</b> someone has to label every write, and the label is a judgment call made in the moment; three stores means three retrieval paths competing for 1.1's budget.</p>
+    <p class="tradeoffs"><b>Done right:</b> a support agent with a customer profile table (semantic, keyed by customer), a ticket history log (episodic, searched by date and product), and playbooks as skills (procedural, fired by trigger). Nobody has ever wanted to find a refund playbook by cosine similarity to a complaint.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="A model writes to three separate stores, each retrieved by a different key.">
+        <use href="#sym-model" x="40" y="55"/>
+        <g class="delta">
+          <use href="#sym-store" x="300" y="4"/><use href="#sym-store" x="300" y="54"/><use href="#sym-store" x="300" y="104"/>
+          <text x="384" y="28">episodes · found by time</text>
+          <text x="384" y="78">facts · found by entity</text>
+          <text x="384" y="128">procedures · found by trigger</text>
+        </g>
+        <path class="edge" d="M138 70 L296 26"/>
+        <path class="edge" d="M138 75 H296"/>
+        <path class="edge" d="M138 80 L296 124"/>
+        <circle class="fail" cx="50" cy="136" r="5"/><text class="fail-label" x="60" y="140">who labels the type at write time?</text>
+      </svg>
+      <figcaption>Right key for each question; the price is a type decision on every write.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>A hierarchy by position <span class="badge b-ascendant">Ascendant</span></h3>
+    <p>Organize memory by how far a record has been promoted, not by what kind it is. Anthropic's Nov 2026 post describes four layers: transcripts (a searchable log), memory notes (written by the model), representations such as linked wiki pages, and a small injected layer loaded into every new session. Claude Code's auto memory is the visible tip: only the first 200 lines or 25 KB of its MEMORY.md index are loaded. The four type words never appear in the post. The types have not disappeared, they have become positions: episodes stay at the bottom, facts get promoted into pages, the few procedures that apply everywhere reach the top.</p>
+    <p class="tradeoffs"><b>Wins:</b> one decision (how high?) instead of a type label; the top layer stays small, which is 1.1's budget and 1.7's stable prefix at once; anything can be checked against the transcript beneath it. <b>Costs:</b> a wrong note that gets promoted is injected into every session afterwards; the injected layer competes with always-on instructions for the same seat (1.6's level 0).</p>
+    <p class="tradeoffs"><b>Done right:</b> a coding agent's memory folder: raw session logs, a handful of notes about the repo's quirks, one index file at the top. Small enough that the model can curate it, and every claim traceable to a session.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="Transcripts, notes, wiki and injected context in a chain of promotion into the model.">
+        <use href="#sym-store" x="18" y="50"/><text x="54" y="118" text-anchor="middle">transcripts</text>
+        <use href="#sym-store" x="148" y="50"/><text x="184" y="118" text-anchor="middle">notes</text>
+        <use href="#sym-store" x="278" y="50"/><text x="314" y="118" text-anchor="middle">wiki pages</text>
+        <g class="delta">
+          <use href="#sym-store" x="408" y="50"/><text x="444" y="118" text-anchor="middle">injected</text>
+          <path class="edge" d="M92 72 H144"/><path class="edge" d="M222 72 H274"/><path class="edge" d="M352 72 H404"/>
+          <text x="96" y="62">promote</text><text x="226" y="62">promote</text><text x="356" y="62">promote</text>
+        </g>
+        <use href="#sym-model" x="528" y="52"/>
+        <path class="edge" d="M482 72 H524"/>
+        <circle class="fail" cx="444" cy="34" r="5"/><text class="fail-label" x="300" y="22">a wrong note promoted reaches every session</text>
+      </svg>
+      <figcaption>Types become heights; the danger moves to the top layer.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Consolidation as the type converter <span class="badge b-current">Current</span></h3>
+    <p>A background process reads the episodic layer and writes the other two: facts distilled from many conversations, corrected notes, occasionally a new procedure. Letta and UC Berkeley named it sleep-time compute; OpenAI ships it in ChatGPT as Dreaming; Anthropic's Nov 2026 post is the first public description of Claude's version. The badge changed this year: in August this was ascendant, by November both big assistants run it in production (2.6 is the full lesson).</p>
+    <p class="tradeoffs"><b>Wins:</b> the hard write decision moves off the hot path to a moment with more information; facts get updated as time passes (a planned trip becomes a past trip); wrong notes get checked against transcripts. Anthropic measured a wiki built over 128 dreaming sessions on about 350,000 files going from 13% to 48% accuracy on its own, and wiki plus search at 61% against search alone at 53%. <b>Costs:</b> it consolidates errors as faithfully as truths; there is a lag before anything lands; it is compute spent on nobody's request.</p>
+    <p class="tradeoffs"><b>Done right:</b> a personal assistant with months of conversations, where the useful facts are scattered across hundreds of chats and none was ever stated as a fact.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="An offline dreaming process reads episodes and writes facts and procedures.">
+        <use href="#sym-model" x="20" y="55"/>
+        <use href="#sym-store" x="180" y="50"/><text x="216" y="118" text-anchor="middle">episodes</text>
+        <path class="edge" d="M118 75 H176"/>
+        <g class="delta">
+          <use href="#sym-orch" x="300" y="55"/>
+          <path class="edge loop" d="M254 75 H296"/>
+          <path class="edge loop" d="M412 66 L476 32"/>
+          <path class="edge loop" d="M412 84 L476 116"/>
+          <text x="318" y="45">offline</text>
+        </g>
+        <use href="#sym-store" x="480" y="4"/><text x="564" y="28">facts</text>
+        <use href="#sym-store" x="480" y="100"/><text x="564" y="124">procedures</text>
+        <circle class="fail" cx="355" cy="110" r="5"/><text class="fail-label" x="300" y="135">consolidates errors too</text>
+      </svg>
+      <figcaption>The type decision made later, with more evidence, by a process nobody is waiting on.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Parametric memory <span class="badge b-emerging">Emerging</span></h3>
+    <p>Experience trained into the weights instead of written to a store. Letta's memory-native RL work (Jun 2026) and the lab practice of training on agent trajectories are the live versions; Anthropic's post explicitly excludes weight changes from its definition of agent memory. Procedural memory is the type that fits here best, since a skill used a million times is a training signal.</p>
+    <p class="tradeoffs"><b>Wins:</b> zero context cost at run time; the procedure is just how the model behaves. <b>Costs:</b> you cannot read it, correct one fact, or delete one user's data; catastrophic forgetting is still the reason production avoids continual weight learning.</p>
+    <p class="tradeoffs"><b>Done right:</b> a lab folding the procedures its coding agent repeats across millions of sessions back into the next model, where nobody needs to inspect a single instance.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="Episodes are trained into the model's weights rather than stored for retrieval.">
+        <use href="#sym-store" x="60" y="50"/><text x="96" y="118" text-anchor="middle">episodes</text>
+        <use href="#sym-model" x="420" y="52"/>
+        <g class="delta">
+          <path class="edge" d="M134 72 H416"/>
+          <text x="250" y="62">train into weights</text>
+          <text x="468" y="112" text-anchor="middle">weights</text>
+        </g>
+        <circle class="fail" cx="200" cy="136" r="5"/><text class="fail-label" x="210" y="140">cannot inspect, cannot delete one fact</text>
+      </svg>
+      <figcaption>The cheapest memory to read and the hardest to fix.</figcaption>
+    </figure>
+  </div>
+
+  <p>These nest the way Module 1's cards did. Working memory is always the window. Most real systems are card two or card three at the core, with card four running over it, and card five happening at the lab, upstream of you. Card one is what you build by accident when you skip this lesson.</p>
+
+  <div class="asof"><b>As of this month.</b> The vocabulary itself is now contested at the top. Anthropic's Nov 6 post builds the whole architecture by layer and never uses the four words. The big Feb 2026 survey (Huang et al., arXiv 2602.06052) keeps them, plus sensory memory, as one of three axes alongside substrate (weights, KV cache, external store) and subject (memory about the user vs memory about the agent's own work). And Hu et al. (arXiv 2512.13564) split by function into factual, experiential and working. Three framings, one agreement: what a memory is for has to be decided somewhere, and the disagreement is only about where.</div>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide how to keep its kinds of memory apart:</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 430" role="img" aria-label="Decision tree for separating memory by kind.">
+      <rect x="10" y="10" width="380" height="50" rx="10" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+      <text x="22" y="31">1. Is everything you store one kind of thing</text><text x="22" y="49">(all documents, or all facts about one entity)?</text>
+      <path class="edge" d="M390 35 H416"/><text x="394" y="27">yes</text>
+      <text class="leaf" x="422" y="40">One undifferentiated store</text>
+      <path class="edge" d="M200 60 V82"/><text x="206" y="76">no</text>
+
+      <rect x="10" y="86" width="380" height="50" rx="10" fill="#fff" stroke="#0f6b5c" stroke-width="2.5"/>
+      <text x="22" y="107">2. For each thing you store, can you name the question</text><text x="22" y="125">it will answer later? (load-bearing)</text>
+      <path class="edge" d="M390 111 H416"/><text x="394" y="103">no</text>
+      <text class="notyet" x="422" y="106">Not yet: write five future</text><text class="notyet" x="422" y="122">queries and label each one</text>
+      <path class="edge" d="M200 136 V158"/><text x="206" y="152">yes</text>
+
+      <rect x="10" y="162" width="380" height="50" rx="10" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+      <text x="22" y="183">3. Is it small enough for the model to curate</text><text x="22" y="201">into a few files read top-down?</text>
+      <path class="edge" d="M390 187 H416"/><text x="394" y="179">yes</text>
+      <text class="leaf" x="422" y="192">A hierarchy by position</text>
+      <path class="edge" d="M200 212 V234"/><text x="206" y="228">no</text>
+      <text class="leaf" x="22" y="254">Typed stores by kind</text>
+
+      <line x1="10" y1="280" x2="630" y2="280" stroke="#e5e0d6" stroke-width="1.5"/>
+      <text x="10" y="302" font-style="italic">Then, on top of either answer to 3:</text>
+
+      <rect x="10" y="314" width="380" height="50" rx="10" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+      <text x="22" y="335">4. Do episodes pile up, or facts change, faster</text><text x="22" y="353">than anyone reviews them?</text>
+      <path class="edge" d="M390 339 H416"/><text x="394" y="331">yes</text>
+      <text class="leaf" x="422" y="344">add Consolidation</text>
+
+      <rect x="10" y="374" width="380" height="50" rx="10" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+      <text x="22" y="395">5. Does one procedure recur at a scale where retraining</text><text x="22" y="413">pays, and nobody needs to inspect it?</text>
+      <path class="edge" d="M390 399 H416"/><text x="394" y="391">yes</text>
+      <text class="leaf" x="422" y="404">add Parametric memory</text>
+    </svg>
+    <figcaption>Question 2 does most of the work: a type you cannot name is a type you cannot store well.</figcaption>
+  </figure>
+  <p>Question 2 is load-bearing because it is the write-time bet made explicit. If you cannot say whether a record will later answer "what happened," "what is true," or "how do I," no architecture choice downstream will rescue it; you will build card one by accident. Question 3 is the one whose answer moved in 2026: newer models curate a small folder well enough that the hierarchy, which needs no type labels, is now a serious option rather than a toy.</p>
+
+  <h2><span class="num">5</span>Seen in the wild: ChatGPT memory</h2>
+  <p>ChatGPT is the memory system with the largest user base, and you have used it, which makes it the right first anchor for Module 2. Read it through the four questions and every feature turns out to be one of them.</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 240" role="img" aria-label="ChatGPT memory drawn in the lesson's grammar: chat window, chat history, memories, instructions, dreaming, and a user-facing summary.">
+      <rect x="230" y="90" width="180" height="56" rx="10" fill="#fff" stroke="currentColor" stroke-width="2"/>
+      <text x="320" y="113" text-anchor="middle">model + this chat</text><text x="320" y="131" text-anchor="middle" font-style="italic">working</text>
+      <use href="#sym-store" x="30" y="150"/><text x="66" y="215" text-anchor="middle">chat history</text><text x="66" y="233" text-anchor="middle" font-style="italic">episodic</text>
+      <path class="edge" d="M104 170 L226 128"/><text x="120" y="160">reference</text>
+      <g class="delta">
+        <use href="#sym-orch" x="20" y="20"/>
+        <path class="edge loop" d="M66 148 V64"/>
+        <path class="edge loop" d="M132 40 H230"/>
+      </g>
+      <use href="#sym-store" x="234" y="10"/><text x="320" y="32">memories</text><text x="320" y="50" font-style="italic">semantic</text>
+      <path class="edge" d="M270 54 V86"/>
+      <text x="280" y="76">injected</text>
+      <use href="#sym-store" x="520" y="94"/><text x="556" y="160" text-anchor="middle">instructions,</text><text x="556" y="175" text-anchor="middle">preferences</text><text x="556" y="86" text-anchor="middle" font-style="italic">procedural</text>
+      <path class="edge" d="M516 118 H414"/>
+      <use href="#sym-human" x="470" y="10"/><text x="516" y="30">memory</text><text x="516" y="46">summary</text>
+      <path class="edge" d="M466 30 H392"/>
+      <circle class="fail" cx="230" cy="68" r="5"/><text class="fail-label" x="222" y="72" text-anchor="end">explicit facts go stale</text>
+    </svg>
+    <figcaption>Every ChatGPT memory feature is one of the four questions; dreaming is the converter between them.</figcaption>
+  </figure>
+  <p><b>Working:</b> the chat itself. <b>Episodic:</b> "reference chat history," which lets the model draw on past conversations without anyone stating a fact. <b>Semantic:</b> saved memories, the explicit facts written when the user says "remember that," and the synthesized memories that Dreaming produces in the background from many conversations. <b>Procedural:</b> the custom instructions and the preference types OpenAI separates out (how ChatGPT should respond, constraints, implicit preferences), which apply to every chat rather than being looked up. Dreaming is card four doing its job: it turns episodes into facts and keeps them current, so a July trip that was a plan becomes a trip that happened. OpenAI reports about a 5x compute cut, which is what lets them extend it to free users.</p>
+  <p>Read through 0.4. The first semantic layer, saved memories written on an explicit cue, is the part OpenAI now describes as going stale; it was the hot-path write, made by something that could not see the future. What survived and grew was the episodic log underneath and the offline process that converts it. That is 0.4's pattern in memory form: the write-time heuristic got eaten by a better process, and the log (the thing that makes correction possible) became more necessary, not less. The memory summary page, where users review and dismiss what the system believes, is the human gate on the semantic layer; 2.7 will argue it is also the only honest answer to deletion. Claude's memory, by Anthropic's own account, makes the same moves with different nouns: transcripts, notes, pages, an injected top layer, and dreaming between them.</p>
+
+  <div class="callout"><span class="label">The misconception</span>
+    "Episodic, semantic, procedural and working are the four boxes you build." They are four questions you design the writes and reads around. Anthropic's newest architecture has no box with any of those names and keeps them apart anyway, by position; a typed-store system can still mix them if every store is searched the same way. The opposite error is now tempting too: "Anthropic dropped the words, so the vocabulary is obsolete." The rule the words encode is exactly what their contract-table result showed: two kinds of record sharing one slot lost facts, separating them fixed it. Drop the labels if you like; never drop the separation.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>A personal finance assistant has to know the user's current salary, their past transactions, and their own rules for categorizing spending. The engineer proposes one vector database for all of it. What do you split, and how does each part get found?</summary>
+    <p>Three questions, three behaviors. Salary is semantic: one record per fact, overwritten when it changes, found by key; in one index the old salary and the new one compete on similarity and the old one has more mentions. Transactions are episodic: append only, never edited, found by date range and merchant, which is a query, not a similarity search. Categorization rules are procedural: few, reviewed, applied on a trigger (a new transaction arrives), so they belong in instructions or a skill, not in a ranking. The one index would let "I used to make 90k" outrank the current salary and let one odd transaction look like a rule.</p></details>
+  <details><summary>A month in, your coding agent's memory folder has 400 files and it keeps acting on notes that are no longer true. Which card are you on, what actually broke, and what is the first fix?</summary>
+    <p>You meant to build card three and built card one in files: every write was saved, nothing was promoted or retired, so the folder is an undifferentiated store with directory names. The broken part is the write test (salience), the same failure Anthropic saw with 413 files. First fix: a small top-layer index with a hard size cap, and a consolidation pass (card four) that checks notes against session logs and deletes or demotes what no longer holds. Second: tell the model what memory is for; Anthropic found that beats rules like "record only failures."</p></details>
+  <details><summary>A teammate says "we use a layered hierarchy like Anthropic's, so we don't need memory types." Where do the types still show up in a layered system?</summary>
+    <p>In two decisions. At write time, the question "which of the four will this answer?" is still the best salience test. At promotion time, the type decides the destination: episodes stay in transcripts, facts get promoted into pages, and only procedures and standing facts that apply to every session earn the injected top layer. The hierarchy removed the labels from the schema, not from the reasoning.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>
+    Module 2's bar: given a product description, pick a memory architecture, justify it against two alternatives, and name its failure modes before they happen. 2.1's share: for any product, list what it must remember, label each item with the question it will answer later, and name the failure that appears if two of them share one index (a stale fact outranks the current one, an episode becomes policy, a procedure gets retrieved in fragments). 2.2 to 2.5 supply the architectures to pick from; 2.6 and 2.7 supply consolidation and forgetting.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources">
+    <li>Sumers, Yao, Narasimhan, Griffiths, Cognitive Architectures for Language Agents (CoALA), arXiv 2309.02427, Sep 2023: arxiv.org/abs/2309.02427</li>
+    <li>Anthropic (Lance Martin), The components of agent memory, Nov 6, 2026: anthropic.com/research/components-of-agent-memory</li>
+    <li>OpenAI, Dreaming: better memory for a more helpful ChatGPT, 2026: openai.com/index/chatgpt-memory-dreaming</li>
+    <li>Huang et al., Rethinking Memory Mechanisms of Foundation Agents in the Second Half: A Survey, arXiv 2602.06052, Feb 2026: arxiv.org/abs/2602.06052</li>
+    <li>Hu et al., Memory in the Age of AI Agents, arXiv 2512.13564, Dec 2025: arxiv.org/abs/2512.13564</li>
+    <li>Lin, Snell et al. (Letta and UC Berkeley), Sleep-time Compute, arXiv 2504.13171, Apr 2025: arxiv.org/abs/2504.13171</li>
+  </ul>
+
+</div>
+</body>
+</html>

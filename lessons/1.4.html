@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1.4: Just-in-time retrieval vs pre-loading</title>
+<style>
+  :root {
+    --ink: #1a1d21; --ink-soft: #4a5058; --paper: #faf8f4; --card: #ffffff; --line: #e5e0d6;
+    --accent: #0f6b5c; --accent-soft: #e3efec; --amber: #a05e0b; --amber-soft: #f9efdd;
+    --current: #0f6b5c; --ascendant: #1a5fa8; --emerging: #7a4fa3; --legacy: #8a8578; --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker { font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft); border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super; font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+  .mental-model { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-size: 21px; line-height: 1.45; }
+  .mental-model .label { display: block; font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .approach { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge { font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px; }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); } .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); } .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+  .callout { background: var(--amber-soft); border-left: 4px solid var(--amber); padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+  .callout .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px; }
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft); margin-top: 10px; text-align: center; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 20px; margin: 12px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+  .done-when { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace; background: #efece4; padding: 1px 5px; border-radius: 4px; }
+  .callback { font-size: 15.5px; color: var(--ink-soft); border-left: 3px solid var(--line); padding-left: 14px; margin: 14px 0 18px; }
+  .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+  .dg .delta { color: #0f6b5c; }
+  .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+  .dg .loop { stroke-dasharray: 6 4; }
+  .dg .fail { fill: #a05e0b; }
+  .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  .dg .lbl { fill: currentColor; font-size: 12px; }
+  .dg .q { fill: #fff; stroke: #4a5058; stroke-width: 1.5; }
+  .dg .leaf { fill: #e3efec; stroke: #0f6b5c; stroke-width: 1.5; }
+  .dg .notyet { fill: #f9efdd; stroke: #a05e0b; stroke-width: 1.5; }
+  .dg .qt { font-size: 12.5px; fill: #1a1d21; }
+  .dg .lt { font-size: 12.5px; fill: #0f6b5c; font-weight: 600; }
+  .dg .nt { font-size: 12.5px; fill: #a05e0b; font-weight: 600; }
+  .dg .yn { font-size: 11px; fill: #4a5058; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 1 · Topic 1.4</div>
+    <h1>Just-in-time retrieval vs pre-loading</h1>
+    <p class="standfirst">Where the pointer lives, who resolves it, and why the coding agents that won hold a path in the window and read the file when a step asks for it.</p>
+    <div class="meta">Freshness-checked 2026-09-07 · builds on 0.2, 0.3, 1.1, 1.2, 1.3 · ~14 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>Your agent is dropped into a repository with three thousand files and asked to fix a bug. Somebody has to decide what it reads. The instinct inherited from chat is to load generously: paste the relevant directories, or run every file through an embedding model and stuff the top twenty chunks in before the first turn. In a single-turn exchange that instinct is rational. You get one shot at context, so you front-load, and the worst case is that the model ignores the excess.</p>
+  <p>An agent breaks that logic three times over. First, a loop re-sends its window on every step, so an unneeded chunk is not billed once, it is billed two hundred times (1.7 will send that invoice). Second, the excess is not ignored: 1.1 taught you that rot is a function of what is in the window, so every pre-loaded chunk that turns out to be irrelevant is paying negative rent on attention. Third, and this is the one nobody notices until a run is twenty minutes old, the repository keeps changing while the agent works on it. A file pasted in at step one is a snapshot; by step forty the agent has edited it, and the copy in the window is now a lie.</p>
+  <p>The deepest problem is epistemic, though. At step one, nobody knows what step forty will need. Not the harness, not a retriever, not the model. 1.3 gave you the vocabulary for exactly this situation: a compaction is a bet placed by something that cannot see the future. Pre-loading is the same bet, placed even earlier, before the task has produced a single clue about where it is going. Just-in-time retrieval is the discovery that the bet gets cheaper every step you wait, because each step reveals what the next one needs.</p>
+  <p class="callback">1.1 promised we would come back to the locator question: where does the pointer to a piece of data live, and who turns it into a payload. This is that lesson. 1.3 handed the select move to this topic and to 1.6; this topic owns select for data, 1.6 owns it for procedures.</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>
+    Keep the locator in the window and the payload in the store: a pre-loaded payload is a relevance bet placed before step one, and a locator lets each step place that bet at the moment the need is actually knowable.</div>
+  <p>Three words are doing the work. A <b>locator</b> is anything small that names data without containing it: a file path, a symbol name, a URL, a stored query, a row id, a one-line description in a catalog. A <b>payload</b> is the data itself. The <b>store</b> is wherever the payload lives and stays true: the filesystem, a database, the web, an index built over one of those. The whole design space of this topic is a set of answers to two questions about the locator: where does it come from, and what resolves it into a payload.</p>
+  <p>This is 1.1's seat-price rule applied to the biggest tenant in the building. "Every token in the window spends from a finite attention budget, so the question is never 'does it fit' but 'does this token pay for its seat.'" A locator costs a handful of tokens and pays for its seat on every step, because it can be resolved at any time. A payload costs thousands and pays only on the steps that use it. Just-in-time retrieval is the policy that says: rent the seat to the locator, and bring the payload in as a guest.</p>
+  <p>It is also 1.2's select move with a rule attached. "Between two model calls the harness has exactly four moves on the window: move something out, bring something in, shrink what stays, or wall something off." Pre-loading is bring-in done once, at the front, by someone who cannot see the task. Retrieval is bring-in done repeatedly, by the step that knows what it needs. The rule this lesson adds is about timing: bring in as late as you can and still act. Anthropic's own phrasing of the approach is that agents "maintain lightweight identifiers (file paths, stored queries, web links, etc.) and use these references to dynamically load data into context at runtime using tools." That sentence is the CURRENT best practice in one line; the rest of this lesson is the option space around it and the evidence for where it bends.</p>
+  <p>One more consequence, because it is the one that surprises people who come from RAG. If the model holds the locator and the tools resolve it, then the model is the retriever. It decides what to look for, reads what came back, and decides again. The 2026 name for that is agentic search, and 0.3 told you why it works: filesystem plus bash are universal tools, so grep and cat are already retrieval tools if the model is good enough to drive them. Which raises the real question of this topic: what does the model need in its hand to drive them well, and when does it need an index under the hood?</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame">
+    <div class="q">A landscape of: when the payload enters the window, and what resolves the locator into it.</div>
+    <div class="axis">What varies: how much data is in the window before step one (everything, a top-k slice, a map, nothing) and who turns a pointer into a payload (nobody, a pipeline, the model reading names, the model driving exact tools, the model driving an index). Five answers, ordered from most pre-loaded to least, with the resolver getting smarter as you go down.</div>
+    <div class="legend">Reading the diagrams: gray is shared structure; <span style="color:#0f6b5c;font-weight:600">teal</span> is what makes this approach different from the one above it; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks. The <b>store</b> is where data stays true; the <b>window</b> is the context.</div>
+  </div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-tool"><path d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="40" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">tool</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">store</text></g>
+      <g id="sym-index"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">index</text></g>
+      <g id="sym-window"><rect x="0" y="0" width="120" height="40" rx="4" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/><text x="60" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">window</text></g>
+      <g id="sym-map"><path d="M0 0 H52 L64 12 V40 H0 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M8 18 H56 M8 26 H48 M8 34 H40" stroke="currentColor" stroke-width="1.5"/><text x="32" y="12" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="currentColor">map</text></g>
+      <g id="sym-human"><circle cx="20" cy="10" r="8" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M2 40 a18 18 0 0 1 36 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">orchestrator</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    </defs>
+  </svg>
+
+  <div class="approach">
+    <h3>Pre-load the payload <span class="badge b-contested">Contested</span></h3>
+    <p>Put the corpus in the window and let attention do the retrieval. You met this in 1.1 as "stuff the window," and the badge has not moved. The case for it got a real data point in January: on SagaScale, a long-context benchmark built from full novels, agentic retrieval beat naive retrieval on nearly every model, but when the text actually fit inside the model's window, long context beat agentic retrieval by 4.4 points on average, and by more on the million-token models. The case against it is 1.1's whole lesson plus a bill: LightOn (who sell retrieval, so weight it) measured retrieval at 8 to 82 times cheaper than long context across enterprise workloads, at roughly half the latency.</p>
+    <p class="tradeoffs"><b>Wins:</b> zero retrieval infrastructure; the model sees relationships a retriever would have cut; nothing to keep fresh because the whole thing is re-sent. <b>Costs:</b> paid on every step of a loop; rot scales with what is in the window, not what is left; the snapshot ages the moment the agent edits the store; a corpus that fits today does not fit after forty tool results.</p>
+    <p class="tradeoffs"><b>Done right:</b> one document that fits comfortably inside the reliable zone, read once, in a workflow with no loop: contract review, a single paper, one transcript. The condition is "fits and read once," not "fits."</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="Whole store copied into the window before the first model call">
+        <use href="#sym-store" x="40" y="50"/>
+        <g class="delta"><use href="#sym-window" x="220" y="50"/><text class="lbl" x="280" y="118" text-anchor="middle" style="fill:#0f6b5c">holds the whole corpus</text></g>
+        <use href="#sym-model" x="460" y="50"/>
+        <path class="edge" d="M114 70 H218"/>
+        <text class="lbl" x="166" y="40" text-anchor="middle">all of it, before step 1</text>
+        <path class="edge" d="M342 70 H458"/>
+        <circle class="fail" cx="342" cy="40" r="5"/><text class="fail-label" x="352" y="44">re-sent every step; rots as it grows; stale after the first edit</text>
+      </svg>
+      <figcaption>Cheapest to build, most expensive to run; right only when it fits and is read once.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Retrieve once, before the call <span class="badge b-legacy">Legacy</span></h3>
+    <p>The 2023 pattern: embed the corpus, embed the query, put the top-k chunks in the prompt, call the model. Retrieval happens outside the loop, before the model has said a word, and the model never gets to ask a follow-up. This is what "RAG" meant for two years, and as an agent's retrieval architecture it is legacy for one structural reason: it places the relevance bet at the worst possible moment, with the least information, and gives the bettor no way to correct it. It survives everywhere as a subroutine (a search tool the agent calls is this pattern, one call at a time), so the vocabulary is still live; the architecture is not.</p>
+    <p class="tradeoffs"><b>Wins:</b> predictable token cost; one call; works with a model too weak to drive tools; the retriever can be tuned offline with a fixed eval set. <b>Costs:</b> a bad top-k is fatal because nothing downstream can notice it; chunking decides what the model can see; the index goes stale the moment the store changes; the query was written by a human, not by the step that needed the data.</p>
+    <p class="tradeoffs"><b>Done right:</b> a single-turn question-answering product with no loop and a stable corpus, where the question is the query and a citation is the deliverable. The moment you add a second step, this card is a tool inside one of the cards below.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="Pipeline retrieves top-k from an index into the window before a single model call">
+        <use href="#sym-store" x="20" y="50"/>
+        <g class="delta"><use href="#sym-index" x="150" y="50"/><text class="lbl" x="186" y="118" text-anchor="middle" style="fill:#0f6b5c">pipeline picks top-k</text></g>
+        <use href="#sym-window" x="290" y="50"/>
+        <use href="#sym-model" x="480" y="50"/>
+        <path class="edge" d="M94 70 H148"/>
+        <text class="lbl" x="121" y="60" text-anchor="middle">embed</text>
+        <path class="edge" d="M224 70 H288"/>
+        <text class="lbl" x="256" y="60" text-anchor="middle">top-k</text>
+        <path class="edge" d="M412 70 H478"/>
+        <circle class="fail" cx="528" cy="110" r="5"/><text class="fail-label" x="538" y="114">cannot ask again</text>
+      </svg>
+      <figcaption>Bets on relevance with the least information and no way to hedge; fine as a tool, dead as an architecture.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Pre-load the map, retrieve the territory <span class="badge b-current">Current</span></h3>
+    <p>Split the corpus into two representations. The locators (paths, names, one-line descriptions, a directory tree, a schema) are cheap enough to pre-load, so put a map in the window before step one. The payloads stay in the store and come in when a step names one. This is what Anthropic actually recommends in the September 2025 post: a hybrid, with some context computed up front for speed and the rest retrieved autonomously. It is also the pattern you already run without naming it: a CLAUDE.md that says where things are rather than what they contain, a skills catalog that loads names and descriptions always and bodies on demand (1.6 owns that half), Manus's todo file (1.5). The June act-context study drew the boundary this card lives on: given the same classes, natural-language summaries answered 9% of behavioral questions that the source answered 60% of the time, identically for a frontier summarizer and a 3B one. Compressed representations can tell you where to look; they cannot tell you what the code does. A map is for finding, and finding is a different job from acting.</p>
+    <p class="tradeoffs"><b>Wins:</b> step one starts oriented instead of blind; the map is tiny and cache-stable (1.7); every payload read is fresh; the map is human-editable, which is where most of the leverage over a coding agent actually lives. <b>Costs:</b> a stale or missing map entry hides a good payload; the map is a curated artifact and someone has to curate it; the same study found that summary-keyed hierarchical descent did not beat flat retrieval on its test set, so a fancier map is not automatically a better one.</p>
+    <p class="tradeoffs"><b>Done right:</b> any coding agent with a project file: tree plus conventions plus pointers, no file contents. The Agentless pipeline in section 5 is this card with the loop removed, so you can see the map and the territory as separate passes.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="A small map of locators is pre-loaded; payloads are read from the store when a step names them">
+        <use href="#sym-store" x="20" y="20"/>
+        <g class="delta"><use href="#sym-map" x="160" y="20"/><text class="lbl" x="192" y="76" text-anchor="middle" style="fill:#0f6b5c">names + one-liners</text></g>
+        <use href="#sym-window" x="290" y="20"/>
+        <use href="#sym-model" x="480" y="20"/>
+        <path class="edge" d="M94 40 H158"/>
+        <text class="lbl" x="126" y="14" text-anchor="middle">before step 1</text>
+        <path class="edge" d="M226 40 H288"/>
+        <path class="edge" d="M412 40 H478"/>
+        <use href="#sym-tool" x="300" y="95"/>
+        <text class="lbl" x="340" y="145" text-anchor="middle">read(path)</text>
+        <path class="edge" d="M528 62 V115 H382"/>
+        <text class="lbl" x="460" y="108" text-anchor="middle">names a locator</text>
+        <path class="edge loop" d="M298 115 H56 V62"/>
+        <text class="lbl" x="170" y="108" text-anchor="middle">payload, at the step</text>
+        <circle class="fail" cx="232" cy="8" r="5"/><text class="fail-label" x="242" y="12">missing entry hides a payload</text>
+      </svg>
+      <figcaption>Orientation up front, truth on demand; only as good as whoever wrote the map.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Agentic search over exact tools <span class="badge b-current">Current</span></h3>
+    <p>No index, no map beyond a directory listing. The model drives grep, glob, find, an AST matcher, a language server, and reads what it finds, then searches again. The locator is whatever the model can name in the corpus's own words: a symbol, a string literal, a filename pattern. This is the pattern Claude Code shipped after trying the alternative; Boris Cherny has said the early versions used a local vector database and that agentic search "outperformed everything, by a lot," and Cat Wu's version of the reason is operational: embeddings have to be continuously re-indexed, and the same accuracy came with a much cleaner deployment story. Amp, Codex CLI, and Cline made the same call. The May 2026 CoREB benchmark explains part of why it works: the short keyword queries that agents actually emit ("auth flow," "handle error") collapse every embedding model it tested to near-zero ranking quality, so the query style that comes naturally to a model in a loop is precisely the style a lexical tool handles best. The structural layer is growing under this card rather than beside it: LARGER (May 2026) delivers graph evidence inside the lexical search result instead of through a separate graph tool.</p>
+    <p class="tradeoffs"><b>Wins:</b> nothing to build, nothing to keep fresh, nothing to secure beyond the sandbox you already need (7.2); always reads the current state, including uncommitted edits; exact, which matters for edits that must match verbatim. <b>Costs:</b> a vocabulary gap is a wall: if the word in the query is not in the file, grep returns nothing; more turns on large corpora, and every turn appends to the window; ContextBench measured that agents favor recall over precision and that much of what they explore goes unused, so the loop reads more than it needs.</p>
+    <p class="tradeoffs"><b>Done right:</b> a coding agent on a repository where the task names its own symbols, which is most tasks: a failing test, a stack trace, a function to change. The trace is the locator.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="The model drives exact search tools against the store in a loop">
+        <use href="#sym-window" x="20" y="20"/>
+        <use href="#sym-model" x="200" y="20"/>
+        <g class="delta"><use href="#sym-tool" x="380" y="20"/><text class="lbl" x="420" y="76" text-anchor="middle" style="fill:#0f6b5c">grep / glob / AST / LSP</text></g>
+        <use href="#sym-store" x="540" y="20"/>
+        <path class="edge" d="M142 40 H198"/>
+        <path class="edge" d="M298 40 H378"/>
+        <text class="lbl" x="338" y="30" text-anchor="middle">exact query</text>
+        <path class="edge" d="M462 40 H538"/>
+        <path class="edge loop" d="M576 62 V120 H248 V62"/>
+        <text class="lbl" x="412" y="113" text-anchor="middle">ids + matching lines, then search again</text>
+        <circle class="fail" cx="462" cy="9" r="5"/><text class="fail-label" x="472" y="13">the word is not in the file</text>
+      </svg>
+      <figcaption>No index to go stale; fails exactly where the query's words and the file's words differ.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Agentic search plus a semantic index <span class="badge b-ascendant">Ascendant</span></h3>
+    <p>Same loop as the card above, with one more tool: a semantic search over an index that a pipeline keeps fresh. The model still holds the locators and still reads the payloads from the store; the index only answers "where might this be" when the model cannot name it. Cursor is the champion with numbers: after training its own embedding model on agent session traces (an LLM looks at a finished session and ranks what should have been retrieved earlier), semantic search alongside grep raised codebase question-answering accuracy by 12.5% on average, 6.5% to 23.5% depending on the model, with the gain concentrated on codebases over a thousand files. The same finding says where this card earns its cost: the query "where do we handle authentication" has to land on <code>middleware/session.ts</code>, a file the word never appears in. The CoREB caveat still applies (short queries collapse; off-the-shelf rerankers were net-negative on code across tasks), which is why the index is one tool in the loop rather than the retriever.</p>
+    <p class="tradeoffs"><b>Wins:</b> bridges the vocabulary gap; fewer turns on large corpora because the first hop lands closer; works on the sources grep cannot read: PDFs, tickets, diagrams, prose that describes code without naming it. <b>Costs:</b> an index is a second system with its own staleness, latency, and security boundary (your code leaves the machine, or you run the embedder); the gain shrinks below a thousand files; an untrained embedding model over code underperforms a trained one by a wide margin, so most teams get a weaker version of Cursor's result.</p>
+    <p class="tradeoffs"><b>Done right:</b> a monorepo where nobody knows the file names, or an enterprise document corpus where customers describe a problem in words the documentation never uses. Cursor at scale; a support agent over a help center.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="The model adds a semantic search tool backed by an index that a pipeline keeps in sync with the store">
+        <use href="#sym-window" x="20" y="20"/>
+        <use href="#sym-model" x="200" y="20"/>
+        <g class="delta"><use href="#sym-tool" x="380" y="20"/><text class="lbl" x="420" y="76" text-anchor="middle" style="fill:#0f6b5c">semantic search</text><use href="#sym-index" x="540" y="20"/></g>
+        <use href="#sym-store" x="540" y="95"/>
+        <path class="edge" d="M142 40 H198"/>
+        <path class="edge" d="M298 40 H378"/>
+        <text class="lbl" x="338" y="30" text-anchor="middle">"where is X"</text>
+        <path class="edge" d="M462 40 H538"/>
+        <path class="edge" d="M576 93 V64"/>
+        <text class="lbl" x="568" y="82" text-anchor="end">re-index</text>
+        <path class="edge loop" d="M538 118 H248 V62"/>
+        <text class="lbl" x="392" y="132" text-anchor="middle">candidates, then read from the store</text>
+        <circle class="fail" cx="612" cy="9" r="5"/><text class="fail-label" x="602" y="13" text-anchor="end">stale between re-indexes</text>
+      </svg>
+      <figcaption>Buys the vocabulary gap with a second system; worth it past a thousand files or a thousand customers' vocabularies.</figcaption>
+    </figure>
+  </div>
+
+  <p>The cards nest rather than compete. The production default is card three around card four: a map in the window, exact tools in the loop, payloads read fresh. Card five is card four with a tool added when the corpus earns it. Cards one and two are what the loop does inside a single step: read a whole file, run one search. Everything the loop reads still goes through 1.3's compactor eventually, which is why this topic and that one are the same discipline from two ends: retrieval decides what enters, compaction decides what stays.</p>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide how data gets into its window: pre-loaded, retrieved once, or retrieved per step, and with which locator.</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 640" role="img" aria-label="Decision tree from corpus size and query vocabulary to the five landscape cards">
+      <rect class="q" x="20" y="16" width="360" height="54" rx="8"/>
+      <text class="qt" x="200" y="38" text-anchor="middle">1. Does the whole corpus fit inside the reliable zone with room</text>
+      <text class="qt" x="200" y="56" text-anchor="middle">for the task, and will it be read once?</text>
+      <path class="edge" d="M380 43 H438"/><text class="yn" x="409" y="36" text-anchor="middle">yes</text>
+      <rect class="leaf" x="440" y="22" width="180" height="42" rx="8"/><text class="lt" x="530" y="48" text-anchor="middle">Pre-load the payload</text>
+      <path class="edge" d="M200 70 V118"/><text class="yn" x="212" y="98">no</text>
+
+      <rect class="q" x="20" y="120" width="360" height="54" rx="8"/>
+      <text class="qt" x="200" y="142" text-anchor="middle">2. Does the model get more than one step?</text>
+      <text class="qt" x="200" y="160" text-anchor="middle">(Is there a loop at all?)</text>
+      <path class="edge" d="M380 147 H438"/><text class="yn" x="409" y="140" text-anchor="middle">no</text>
+      <rect class="leaf" x="440" y="126" width="180" height="42" rx="8"/><text class="lt" x="530" y="152" text-anchor="middle">Retrieve once, before the call</text>
+      <path class="edge" d="M200 174 V222"/><text class="yn" x="212" y="202">yes</text>
+
+      <rect class="q" x="20" y="224" width="360" height="54" rx="8"/>
+      <text class="qt" x="200" y="246" text-anchor="middle">3. Before step one, is there a map in the window: what exists,</text>
+      <text class="qt" x="200" y="264" text-anchor="middle">where, one line each?</text>
+      <path class="edge" d="M380 251 H438"/><text class="yn" x="409" y="244" text-anchor="middle">no</text>
+      <rect class="leaf" x="440" y="222" width="180" height="58" rx="8"/><text class="lt" x="530" y="246" text-anchor="middle">Pre-load the map,</text><text class="lt" x="530" y="264" text-anchor="middle">then come back to 4</text>
+      <path class="edge" d="M200 278 V326"/><text class="yn" x="212" y="306">yes</text>
+
+      <rect class="q" x="20" y="328" width="360" height="54" rx="8"/>
+      <text class="qt" x="200" y="350" text-anchor="middle">4. Can the model name what it needs in the corpus's own</text>
+      <text class="qt" x="200" y="368" text-anchor="middle">words (symbols, paths, exact strings, a stack trace)?</text>
+      <path class="edge" d="M380 355 H438"/><text class="yn" x="409" y="348" text-anchor="middle">yes</text>
+      <rect class="leaf" x="440" y="326" width="180" height="58" rx="8"/><text class="lt" x="530" y="350" text-anchor="middle">Agentic search</text><text class="lt" x="530" y="368" text-anchor="middle">over exact tools</text>
+      <path class="edge" d="M200 382 V430"/><text class="yn" x="212" y="410">no</text>
+
+      <rect class="q" x="20" y="432" width="360" height="54" rx="8"/>
+      <text class="qt" x="200" y="454" text-anchor="middle">5. Can you keep an index fresh, trained on your corpus,</text>
+      <text class="qt" x="200" y="472" text-anchor="middle">and inside your security boundary?</text>
+      <path class="edge" d="M380 459 H438"/><text class="yn" x="409" y="452" text-anchor="middle">yes</text>
+      <rect class="leaf" x="440" y="430" width="180" height="58" rx="8"/><text class="lt" x="530" y="454" text-anchor="middle">Agentic search plus</text><text class="lt" x="530" y="472" text-anchor="middle">a semantic index</text>
+      <path class="edge" d="M200 486 V534"/><text class="yn" x="212" y="514">no</text>
+
+      <rect class="notyet" x="20" y="536" width="360" height="58" rx="8"/>
+      <text class="nt" x="200" y="558" text-anchor="middle">Not yet: narrow the corpus, or write the catalog by hand</text>
+      <text class="qt" x="200" y="578" text-anchor="middle">(a curated map turns question 4 into a yes for most tasks)</text>
+      <text class="yn" x="320" y="622" text-anchor="middle">Question 4 does most of the work: it is the grep-or-embeddings question, and the corpus answers it, not the fashion.</text>
+    </svg>
+    <figcaption>Every card is reachable; the not-yet leaf feeds question 3.</figcaption>
+  </figure>
+  <p>Question four is where grep versus embeddings actually gets decided, and it is a question about the corpus and the task, not about the tools. If the task arrives with its own locators (a stack trace, a failing test, a symbol in the ticket), exact tools win and an index is a second system you pay for and do not use. If the task arrives in a vocabulary the corpus does not share (a customer's description of a bug, a product manager's name for a feature), no amount of grepping crosses that gap, and the honest options are an index or a hand-written map that translates. Notice that the not-yet leaf feeds question three: for most corpora, a curated catalog of a few hundred lines converts question four to a yes, which is why the map card is CURRENT and the index card is merely ascendant.</p>
+
+  <h2><span class="num">5</span>Seen in the wild</h2>
+  <p><b>Agentless</b> (Xia, Deng, Dunn, and Zhang, University of Illinois, July 2024; FSE 2025) is the best place to watch this topic because its authors removed the loop on purpose. In 0.2's terms it is a fixed workflow: three phases, localization, repair, validation, with the model called at each step and no model-directed control flow. That makes it a specimen: every retrieval decision is a visible pipeline stage rather than a move buried in an agent's trajectory. And it mattered, because it matched the agent frameworks of its day on SWE-bench Lite at a fraction of the cost, and ContextBench (February 2026) evaluated it alongside SWE-agent, OpenHands, mini-SWE-agent, and Prometheus and concluded that sophisticated scaffolding yields only marginal gains in context retrieval, the paper's own "bitter lesson."</p>
+  <p>Its localization phase is the landscape drawn as a pipeline. It pre-loads a <b>map</b>: the repository's directory tree, paths only, and asks the model to name suspicious files from the names alone, which is card three with the model as the locator resolver. It also runs a dense retrieval pass (text-embedding-3-small) over the files, after asking the model to exclude irrelevant folders, and merges the two candidate lists: card five in miniature, an index consulted as a second opinion rather than as the retriever. Then it reads the chosen files as <b>skeletons</b>, class and function signatures without bodies, and asks the model to name the relevant elements. Only then does it load full bodies for those elements and ask for edit locations. Three passes, each one reading more of less: paths, then signatures, then code.</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 260" role="img" aria-label="Agentless localization drawn in the landscape grammar: three widening reads with an embedding second opinion and no loop">
+      <use href="#sym-store" x="20" y="20"/><text class="lbl" x="56" y="80" text-anchor="middle">repository</text>
+      <g class="delta"><use href="#sym-map" x="150" y="20"/><text class="lbl" x="182" y="76" text-anchor="middle" style="fill:#0f6b5c">tree, paths only</text></g>
+      <path class="edge" d="M94 40 H148"/>
+      <use href="#sym-model" x="270" y="20"/><text class="lbl" x="318" y="12" text-anchor="middle">picks files by name</text>
+      <path class="edge" d="M216 40 H268"/>
+      <use href="#sym-index" x="150" y="105"/><text class="lbl" x="186" y="160" text-anchor="middle">dense embeddings</text>
+      <path class="edge" d="M56 62 V125 H148"/>
+      <path class="edge loop" d="M224 125 H318 V62"/>
+      <text class="lbl" x="270" y="118" text-anchor="middle">second opinion</text>
+      <g class="delta"><rect x="420" y="20" width="96" height="40" rx="4" fill="#fff" stroke="currentColor" stroke-width="2"/><text class="lbl" x="468" y="45" text-anchor="middle" style="fill:#0f6b5c">skeletons</text></g>
+      <path class="edge" d="M368 40 H418"/>
+      <use href="#sym-model" x="540" y="20"/><text class="lbl" x="588" y="76" text-anchor="middle">picks elements</text>
+      <path class="edge" d="M518 40 H538"/>
+      <g class="delta"><rect x="420" y="180" width="96" height="40" rx="4" fill="#fff" stroke="currentColor" stroke-width="2"/><text class="lbl" x="468" y="205" text-anchor="middle" style="fill:#0f6b5c">full bodies</text></g>
+      <path class="edge" d="M588 62 V200 H518"/>
+      <use href="#sym-model" x="270" y="180"/><text class="lbl" x="318" y="240" text-anchor="middle">edit lines, then patch</text>
+      <path class="edge" d="M418 200 H368"/>
+      <use href="#sym-tool" x="150" y="180"/><text class="lbl" x="190" y="240" text-anchor="middle">tests (validation)</text>
+      <path class="edge" d="M268 200 H232"/>
+      <circle class="fail" cx="420" cy="9" r="5"/><text class="fail-label" x="430" y="13">no loop: a wrong pick is never revisited</text>
+    </svg>
+    <figcaption>Map, skeletons, bodies: three widening reads, an index as a second opinion, and no way back once a pick is wrong.</figcaption>
+  </figure>
+  <p>Two things to take from the specimen. First, the June act-context study explains why the skeleton pass sits where it does: signatures answered 13% of behavioral probes against the source's 60%, so a skeleton can locate an element and cannot support editing it, which is exactly the job Agentless gives it. Compressed representations are locators, not payloads, and the pipeline honors that boundary. Second, the amber dot is 0.2's rule applied to retrieval: with no loop, there is no verification of the localization bet, so a wrong file pick at pass one is carried to the end. Every agent in ContextBench's lineup is, in a sense, Agentless with a loop added so the bet can be corrected, and the paper's finding is that the loop buys less than you would think when the model is strong. That is 0.4's rule in retrieval clothes: the scaffolding that substituted for the model's ability to find things got eaten; the scaffolding that shaped what entered the window survived.</p>
+  <p>Aside: Claude Code is the same three widening reads (glob, grep, read) put inside a loop with no index, card four; Cursor is the same loop with a trained index underneath, card five; and the CLAUDE.md file that most of Claude Code's leverage comes from is the map, card three. The whole landscape is one pipeline with different choices about the loop and the locator.</p>
+
+  <div class="callout"><span class="label">The misconception</span>
+    "Claude Code beat RAG with grep, so embeddings lost." What lost was retrieving before the model could ask: the fixed pipeline, card two, with its bet placed at the worst moment and no correction. Embeddings survived as one locator among several, and the best public measurement of the question, Cursor's, found grep plus a trained index beat grep alone by 12.5%, more on large codebases. The subtler half of the error is why grep looked so decisive: CoREB showed that the short keyword queries a model emits in a loop are exactly the queries that collapse every embedding model, so grep did not win because it is smarter about meaning; it won because the loop's query style is lexical. Change the query style (a customer's paragraph instead of a symbol) or the corpus (documents instead of code) and the ranking flips. The durable lesson is the mental model, not the tool: hold the locator, resolve it at the step, and let the corpus tell you which resolver it needs.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>You are building a support agent over 40,000 help-center articles. The team proposes "RAG": embed everything and put the top five articles in the prompt before each turn. What do you change, and what do you keep?</summary>
+    <p>Keep the index; the corpus earns it, because customers describe problems in words the articles never use (question four is a no) and the corpus is far past the size where a map alone converts it. Change the architecture from retrieve-once to a search tool the agent calls inside its loop: the model writes the query from what the conversation has revealed so far, reads what comes back, and searches again when the first hop misses, which is card five instead of card two. Pre-load a map anyway: the category tree and product names, a few hundred lines, so step one is oriented. And keep identifiers in context, not article bodies: the agent should hold "article 4471" and re-read it when a step needs it, so a compaction (1.3) loses a pointer and not the text. Measure precision as well as recall; ContextBench's finding that agents over-read applies here with a token bill attached.</p>
+  </details>
+  <details><summary>Your coding agent runs on a 200-file repository. An engineer wants to add a vector index "because Cursor measured a 12.5% gain." Do you approve it?</summary>
+    <p>Not yet, and say why with Cursor's own numbers: the gain concentrated on codebases over a thousand files and came from an embedding model trained on Cursor's own agent traces, which you do not have. At 200 files, exact tools plus a map cover question four for nearly every task, and the index buys you a second system (freshness, a security boundary, an embedder to run) for a gap you have not measured. The right sequence: write the CLAUDE.md map, give the agent grep, AST search, and a language server, and log the tasks where it fails to find something. If those failures cluster on vocabulary (the task said "auth," the file says "session"), you have the evidence for the index and the query set to evaluate it on.</p>
+  </details>
+  <details><summary>A legal team wants an agent that answers one question per contract, 60 to 80 pages each, no follow-up questions, thousands of contracts a month. Someone has started building a retrieval pipeline. Is that the right call?</summary>
+    <p>No. Question one is a yes: each contract fits comfortably inside the reliable zone, and each is read once for one question, so pre-loading the payload is the right card. The evidence is SagaScale's condition: when the text fits, long context beat agentic retrieval by 4.4 points, and a retriever that chunks a contract can cut the clause that qualifies the one it returned. The cost objection (LightOn's 8 to 82x) is real for a loop that re-sends the corpus every step and much weaker for one call per document. The moment the product adds follow-ups, or a question that spans contracts, you are back at question two with a yes, and the design changes.</p>
+  </details>
+
+  <div class="done-when"><span class="label">Done when</span>
+    The Module 1 bar: given any agent misbehavior, your first three hypotheses are all context hypotheses, and they are usually right. 1.4's contribution is the select-for-data third of that: when an agent "couldn't find it," "read the wrong file," or "is slow and expensive on reads," you ask where the locator lived, who resolved it, and whether the payload arrived before the step that needed it, and you can say which card the fix lives in. 1.1 supplied the budget, 1.3 the compactor, 1.6 will supply select for procedures, 1.7 the bill.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources">
+    <li>Anthropic, Effective context engineering for AI agents, Sep 2025: <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">anthropic.com/engineering/effective-context-engineering-for-ai-agents</a> (the just-in-time principle and the hybrid recommendation)</li>
+    <li>Cursor, Improving agent with semantic search, Nov 2025: <a href="https://cursor.com/blog/semsearch">cursor.com/blog/semsearch</a> (the 12.5% result; trace-trained embeddings)</li>
+    <li>Xue et al., Beyond Retrieval: A Multitask Benchmark and Model for Code Search (CoREB), arXiv 2605.04615, May 2026: <a href="https://arxiv.org/abs/2605.04615">arxiv.org/abs/2605.04615</a> (short keyword queries collapse every embedding model)</li>
+    <li>Li et al., ContextBench: A Benchmark for Context Retrieval in Coding Agents, arXiv 2602.05892, Feb 2026: <a href="https://arxiv.org/abs/2602.05892">arxiv.org/abs/2602.05892</a> (scaffolding marginal; recall over precision; explored vs used)</li>
+    <li>Sam-Bodden, What Context Does a Coding Agent Actually Need to Act?, arXiv 2607.09691, Jun 2026: <a href="https://arxiv.org/abs/2607.09691">arxiv.org/abs/2607.09691</a> (the find/act boundary; 19k vs 94k tokens per resolve)</li>
+    <li>SagaScale: A Realistic, Scalable, and High-Quality Long-Context Benchmark, arXiv 2601.09723, Jan 2026: <a href="https://arxiv.org/abs/2601.09723">arxiv.org/abs/2601.09723</a> (agentic retrieval beats naive; long context wins when it fits)</li>
+    <li>Xia, Deng, Dunn, Zhang, Agentless: Demystifying LLM-based Software Engineering Agents, arXiv 2407.01489, Jul 2024: <a href="https://arxiv.org/abs/2407.01489">arxiv.org/abs/2407.01489</a></li>
+    <li>LARGER: Lexically Anchored Repository Graph Exploration and Retrieval, arXiv 2605.16352, May 2026: <a href="https://arxiv.org/abs/2605.16352">arxiv.org/abs/2605.16352</a> (structure delivered inside lexical results)</li>
+    <li>LightOn, RAG to Riches, Nov 2025: <a href="https://lighton.ai/lighton-blogs/rag-to-riches">lighton.ai/lighton-blogs/rag-to-riches</a> (vendor; the 8 to 82x cost figure)</li>
+    <li>Boris Cherny on Latent Space (May 2025) and Cat Wu on AI &amp; I: first-party accounts of Claude Code dropping its vector index; podcast primaries, reported secondhand in most write-ups.</li>
+  </ul>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0.4: Where This Came From</title>
+<style>
+  :root {
+    --ink: #1a1d21;
+    --ink-soft: #4a5058;
+    --paper: #faf8f4;
+    --card: #ffffff;
+    --line: #e5e0d6;
+    --accent: #0f6b5c;
+    --accent-soft: #e3efec;
+    --amber: #a05e0b;
+    --amber-soft: #f9efdd;
+    --current: #0f6b5c;  --ascendant: #1a5fa8;  --emerging: #7a4fa3;
+    --legacy: #8a8578;   --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker {
+    font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--accent);
+  }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft);
+          border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super;
+            font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+  .mental-model {
+    background: var(--accent-soft); border-left: 4px solid var(--accent);
+    padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0;
+    font-size: 21px; line-height: 1.45;
+  }
+  .mental-model .label {
+    display: block; font: 700 12px/1 -apple-system, sans-serif;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+  .approach {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 24px; margin: 16px 0;
+  }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em;
+    text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px;
+  }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); }
+  .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); }
+  .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+  .callout {
+    background: var(--amber-soft); border-left: 4px solid var(--amber);
+    padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0;
+  }
+  .callout .label {
+    font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px;
+  }
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line);
+           border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft);
+               margin-top: 10px; text-align: center; }
+  details {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 20px; margin: 12px 0;
+  }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+  .done-when { background: var(--card); border: 2px solid var(--accent);
+               border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+                      text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace;
+         background: #efece4; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 0 · Topic 0.4</div>
+    <h1>Where This Came From</h1>
+    <p class="standfirst">Date-stamp any agent pattern on sight, so a 2023 fossil in a 2026 pitch deck never gets past you.</p>
+    <div class="meta">Landscape topic: history, verified against the field-notes snapshot rather than re-searched · builds on 0.1, 0.2, 0.3 · ~7 min read · closes Module 0</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>Between 2022 and 2024 the field ran a massive natural experiment: what do you have to wrap around a language model to make it <em>do</em> things instead of just <em>say</em> things? Four generations of answers shipped, got hundreds of thousands of GitHub stars, raised money, and then mostly died. You were promised one sitting on this, and one sitting is what it deserves. But you cannot skip it, for two reasons.</p>
+  <p>First, the vocabulary survived the wreckage. ReAct, chain-of-thought, AutoGPT, agent crews: these names show up in every paper, every framework's docs, and every founder pitch you will ever evaluate. Second, and more useful: the failures were not random. They all failed the same way, and that failure mode is alive and well in 2026 products. This lesson gives you a dating technique. When someone shows you an agent architecture, you should be able to say which year it is from, and therefore what will kill it.</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>
+    Agent history is one repeated lesson: scaffolding that substitutes for model capability gets eaten by the next model release, while scaffolding that contains consequences survives every one of them.</div>
+  <p>Every era below built scaffolding, in the 0.1 sense: harness around the model. The question that sorted survivors from fossils was what the scaffolding was <em>for</em>. Hand-written reasoning templates, self-criticism steps, task-decomposition planners, role-play org charts: all of these were prosthetics for judgment the models did not yet have, and each one became dead weight the moment models grew the ability natively. Verifiers, sandboxes, human gates, context discipline: these manage what happens when the model acts, and no model release makes consequences go away. You already met this split at the end of 0.3 as scaffolding that contains consequences versus scaffolding that substitutes for judgment. This lesson is where that distinction came from: it is the autopsy finding from an entire era.</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame">
+    <div class="q">A landscape of: how do you get a text predictor to act on the world?</div>
+    <div class="axis">What varies: where each era located the agency: in the prompt, in the prompt plus a loop, in an unbounded loop, or in a framework's org chart. Four answers, oldest to newest. All four wear the Legacy badge; this is a museum wing, and the plaques explain why each exhibit lost.</div>
+    <div class="legend">Reading the diagrams: gray is shared structure; <span style="color:#0f6b5c;font-weight:600">teal</span> is what this era added; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it broke.</div>
+  </div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-tool"><path d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="40" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">tool</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">store</text></g>
+      <g id="sym-human"><circle cx="20" cy="10" r="8" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M2 40 a18 18 0 0 1 36 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">orchestrator</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    </defs>
+  </svg>
+  <style>
+    .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+    .dg text { fill: #4a5058; }
+    .dg .delta, .dg .delta text { color: #0f6b5c; fill: #0f6b5c; }
+    .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .dg .loop { stroke-dasharray: 6 4; }
+    .dg .fail { fill: #a05e0b; }
+    .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  </style>
+
+  <div class="approach">
+    <h3>Chain-of-thought prompting <span class="badge b-legacy">Legacy</span></h3>
+    <p>January 2022, Wei et al. at Google. The discovery that asking a model to write out intermediate reasoning steps before answering dramatically improves multi-step performance. Agency lives entirely in the prompt; the model still only talks. This is the ancestor of everything: the first proof that you could buy capability with tokens instead of training.</p>
+    <p class="tradeoffs"><b>Wins:</b> unlocked multi-step reasoning for free; made model thinking legible for the first time. <b>Costs:</b> thoughts touch nothing; hand-curated exemplars were brittle; the whole technique was a prosthetic for reasoning the models later grew natively, which is exactly why reasoning models absorbed it and retired the prompt trick.</p>
+    <p class="tradeoffs"><b>Done right:</b> still the right call inside a fixed workflow step (0.2's territory) when you need auditable intermediate work in a specific format from a cheap non-reasoning model, such as a triage step that must show its scoring rubric.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 130" role="img" aria-label="A question goes to the model, which emits a reasoning trace and then an answer; the trace touches nothing external.">
+        <text x="60" y="65" text-anchor="middle">question</text>
+        <use href="#sym-model" x="160" y="40"/>
+        <g class="delta"><rect x="330" y="40" width="110" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="385" y="65" text-anchor="middle">trace</text></g>
+        <text x="555" y="65" text-anchor="middle">answer</text>
+        <path class="edge" d="M100 60 H158"/>
+        <path class="edge" d="M258 60 H328"/>
+        <path class="edge" d="M442 60 H520"/>
+        <circle class="fail" cx="385" cy="102" r="5"/><text class="fail-label" x="395" y="106">thoughts touch nothing</text>
+      </svg>
+      <figcaption>Bought reasoning with tokens; could not act on any of it.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>ReAct <span class="badge b-legacy">Legacy</span></h3>
+    <p>October 2022, Yao et al. at Princeton and Google Brain. Interleave Thought, Action, and Observation in one prompt: the model reasons, emits a text action like <code>Search[query]</code>, the harness parses it, runs the tool, pastes the result back, and the model continues. Recall 0.1: "An agent is a model running in a loop with tools. Everything in the system that is not the model is the harness, and the harness is what you get to design." ReAct is where that loop was born. The paper's prompting pattern is dead; the loop it named is the substrate of every agent you use.</p>
+    <p class="tradeoffs"><b>Wins:</b> grounded reasoning in real observations; halved hallucination on knowledge tasks; gave the field its loop. <b>Costs:</b> actions were regex-parsed free text, so the harness broke on every formatting wobble. In 0.3's terms, "a tool is two things at once: a contract with a deterministic system, and a prompt aimed at a non-deterministic one," and ReAct-era tools had no contract half at all. Native tool calling (structured, schema-validated) killed the pattern in 2023.</p>
+    <p class="tradeoffs"><b>Done right:</b> as a prompting technique, on a small open model with no native tool calling where you need transparent traces on a budget. As an architecture, you use it every day: it is 0.1's loop wearing its maiden name.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 130" role="img" aria-label="Model calls a tool and the observation loops back to the model; the parse step between them is the failure point.">
+        <use href="#sym-model" x="140" y="40"/>
+        <use href="#sym-tool" x="420" y="40"/>
+        <g class="delta">
+          <path class="edge" d="M238 52 H418"/>
+          <path class="edge loop" d="M460 84 Q320 130 200 86"/>
+          <text x="320" y="44" text-anchor="middle">thought, then action</text>
+          <text x="330" y="122" text-anchor="middle">observation</text>
+        </g>
+        <circle class="fail" cx="328" cy="52" r="5"/><text class="fail-label" x="338" y="70">regex parses the action</text>
+      </svg>
+      <figcaption>The loop that ate the world, held together with string parsing.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Autonomous goal loops <span class="badge b-legacy">Legacy</span></h3>
+    <p>Spring 2023: AutoGPT and BabyAGI. Hand the model a goal, let it decompose the goal into a task queue, execute, generate new tasks, and loop until it declares itself done. No human in the loop, no verifier anywhere. AutoGPT became one of the fastest-starred repositories in GitHub history on the strength of demos, and almost nothing built on it shipped.</p>
+    <p class="tradeoffs"><b>Wins:</b> proved enormous demand for delegation; generated the field's best catalog of failure modes. <b>Costs:</b> recall 0.2: "The question is never 'is this an agent.' It is 'how much control flow did I delegate to the model, and can I verify what it does with it?'" AutoGPT was maximum delegation with zero verification: the model graded its own homework, so loops spiraled, costs compounded, and context overflowed until the run drowned in its own transcript.</p>
+    <p class="tradeoffs"><b>Done right:</b> almost never as shipped, but the ambition was correct and returns in today's outer-loop coding agents, where the shape is only safe because a mechanical verifier (the test suite, the compiler) decides "done" instead of the model's self-assessment.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 130" role="img" aria-label="A goal enters the model, which feeds a task queue that loops back into the model forever; nothing can declare the loop finished.">
+        <use href="#sym-human" x="60" y="42"/>
+        <use href="#sym-model" x="200" y="40"/>
+        <g class="delta">
+          <use href="#sym-store" x="430" y="38"/>
+          <text x="466" y="28" text-anchor="middle">task queue</text>
+          <path class="edge" d="M298 55 H426"/>
+          <path class="edge loop" d="M466 90 Q360 135 250 88"/>
+          <text x="362" y="47" text-anchor="middle">new tasks</text>
+        </g>
+        <path class="edge" d="M104 60 H196"/>
+        <text x="150" y="52">goal</text>
+        <circle class="fail" cx="360" cy="120" r="5"/><text class="fail-label" x="370" y="124">nothing can say done</text>
+      </svg>
+      <figcaption>Maximum delegation, zero verification; the loop that could not land.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Role-play framework crews <span class="badge b-legacy">Legacy</span></h3>
+    <p>2023 to 2024: the framework era. LangChain-style agent abstractions first, then multi-agent crews (CrewAI, early AutoGen) that decomposed work by job title: a PM agent writes the spec, an engineer agent implements, a QA agent reviews. Agency lives in the framework's org chart. It felt intuitive because it copied how humans organize, and that was precisely the mistake.</p>
+    <p class="tradeoffs"><b>Wins:</b> onboarded a generation of builders; normalized the idea of agent systems; some graph-shaped descendants survive where auditability matters. <b>Costs:</b> the abstractions leaked, so debugging meant excavating five wrapper layers to find the one prompt that mattered; and job-title splits fragment one task's context across agents that each hold a different partial picture, making conflicting implicit decisions. Anthropic's 2026 guidance names role-play crews a legacy anti-pattern: decompose along context boundaries, never job titles. That fight gets its full treatment in 4.2.</p>
+    <p class="tradeoffs"><b>Done right:</b> the framework instinct, minus the role-play, survives as deterministic graph shells around agentic nodes in compliance-heavy enterprises where every transition must be auditable; that redemption arc is 4.5.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 130" role="img" aria-label="An orchestrator hands work down a chain of three role-named models; context is dropped at each handoff.">
+        <use href="#sym-orch" x="265" y="8"/>
+        <g class="delta">
+          <rect x="60" y="72" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="108" y="97" text-anchor="middle">"PM"</text>
+          <rect x="272" y="72" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="320" y="97" text-anchor="middle">"engineer"</text>
+          <rect x="484" y="72" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="532" y="97" text-anchor="middle">"QA"</text>
+        </g>
+        <path class="edge" d="M290 48 L130 70"/>
+        <path class="edge" d="M320 48 V70"/>
+        <path class="edge" d="M350 48 L510 70"/>
+        <path class="edge" d="M158 92 H270"/>
+        <path class="edge" d="M370 92 H482"/>
+        <circle class="fail" cx="214" cy="92" r="5"/><text class="fail-label" x="176" y="126">context dropped at each handoff</text>
+      </svg>
+      <figcaption>An org chart for software that has no organization problem.</figcaption>
+    </figure>
+  </div>
+
+  <figure>
+    <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="Timeline from 2022 to 2026: chain-of-thought, ReAct, AutoGPT, framework crews, Building Effective Agents, then capable models with consequence-containing harnesses.">
+      <path d="M40 75 H600" stroke="currentColor" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+      <g>
+        <circle cx="75" cy="75" r="5" fill="currentColor"/><text x="75" y="55" text-anchor="middle">CoT</text><text x="75" y="100" text-anchor="middle" font-size="11">Jan 2022</text>
+        <circle cx="165" cy="75" r="5" fill="currentColor"/><text x="165" y="55" text-anchor="middle">ReAct</text><text x="165" y="100" text-anchor="middle" font-size="11">Oct 2022</text>
+        <circle cx="260" cy="75" r="5" fill="currentColor"/><text x="260" y="55" text-anchor="middle">AutoGPT</text><text x="260" y="100" text-anchor="middle" font-size="11">Mar 2023</text>
+        <circle cx="360" cy="75" r="5" fill="currentColor"/><text x="360" y="55" text-anchor="middle">crews</text><text x="360" y="100" text-anchor="middle" font-size="11">2023-24</text>
+        <circle cx="460" cy="75" r="5" fill="#a05e0b"/><text x="460" y="42" text-anchor="middle">"Building</text><text x="460" y="57" text-anchor="middle">Effective Agents"</text><text x="460" y="100" text-anchor="middle" font-size="11">Dec 2024</text>
+        <g class="delta"><circle cx="560" cy="75" r="5" fill="#0f6b5c"/><text x="560" y="55" text-anchor="middle">0.1's loop</text><text x="560" y="100" text-anchor="middle" font-size="11">2025-26</text></g>
+      </g>
+      <text x="320" y="135" text-anchor="middle" font-style="italic">substitution era ............................................. containment era</text>
+    </svg>
+    <figcaption>The turn: Anthropic's December 2024 essay ("find the simplest thing that works") marks where the field stopped scaffolding around weakness and started scaffolding around consequences.</figcaption>
+  </figure>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide whether the pattern in front of you (in a pitch, a paper, or your own product) is live architecture or a 2023 fossil:</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 400" role="img" aria-label="Decision tree of three yes-or-no questions leading to the four landscape cards.">
+      <rect x="170" y="8" width="300" height="44" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/>
+      <text x="320" y="27" text-anchor="middle">Does anything outside the model</text>
+      <text x="320" y="43" text-anchor="middle">verify "done"?</text>
+      <path class="edge" d="M240 52 L130 96"/><text x="160" y="68">no</text>
+      <path class="edge" d="M400 52 L510 96"/><text x="468" y="68">yes</text>
+      <rect x="20" y="98" width="220" height="60" rx="8" fill="#fff" stroke="#a05e0b" stroke-width="2"/>
+      <text x="130" y="120" text-anchor="middle" fill="#a05e0b">Autonomous goal loop</text>
+      <text x="130" y="138" text-anchor="middle" font-size="12" fill="#a05e0b">fossil: build the verifier first,</text>
+      <text x="130" y="152" text-anchor="middle" font-size="12" fill="#a05e0b">or bound the loop</text>
+      <rect x="370" y="98" width="260" height="44" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/>
+      <text x="500" y="117" text-anchor="middle">Are agents split by job title,</text>
+      <text x="500" y="133" text-anchor="middle">sharing one task's context?</text>
+      <path class="edge" d="M430 142 L300 190"/><text x="342" y="162">yes</text>
+      <path class="edge" d="M560 142 L560 190"/><text x="572" y="170">no</text>
+      <rect x="180" y="192" width="230" height="60" rx="8" fill="#fff" stroke="#8a8578" stroke-width="2"/>
+      <text x="295" y="214" text-anchor="middle">Role-play crew</text>
+      <text x="295" y="232" text-anchor="middle" font-size="12">fossil: re-split along context</text>
+      <text x="295" y="246" text-anchor="middle" font-size="12">boundaries (4.2)</text>
+      <rect x="430" y="192" width="200" height="60" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/>
+      <text x="530" y="214" text-anchor="middle">Are you hand-prompting</text>
+      <text x="530" y="230" text-anchor="middle">reasoning steps a reasoning</text>
+      <text x="530" y="246" text-anchor="middle">model does natively?</text>
+      <path class="edge" d="M470 252 L360 300"/><text x="398" y="272">yes</text>
+      <path class="edge" d="M590 252 L590 300"/><text x="602" y="280">no</text>
+      <rect x="240" y="302" width="230" height="60" rx="8" fill="#fff" stroke="#8a8578" stroke-width="2"/>
+      <text x="355" y="324" text-anchor="middle">Chain-of-thought scaffold</text>
+      <text x="355" y="342" text-anchor="middle" font-size="12">fossil: cut it, or keep only for</text>
+      <text x="355" y="356" text-anchor="middle" font-size="12">format-audited workflow steps</text>
+      <g class="delta">
+      <rect x="490" y="302" width="145" height="60" rx="8" fill="#fff" stroke="#0f6b5c" stroke-width="2"/>
+      <text x="562" y="324" text-anchor="middle">ReAct's skeleton</text>
+      <text x="562" y="342" text-anchor="middle" font-size="12">live: this is 0.1's loop</text>
+      <text x="562" y="356" text-anchor="middle" font-size="12">with native tool calls</text>
+      </g>
+    </svg>
+    <figcaption>The first question does most of the work: verification is what separates every fossil from every survivor.</figcaption>
+  </figure>
+  <p>The verifier question carries the tree because it is the same question 0.2 taught you to ask about delegation, pointed backward in time. Every fossil here delegated something the model could not verifiably deliver; every survivor either kept a verifier in the loop or shrank the delegation until one existed. The other two questions just identify which prosthetic you are looking at.</p>
+
+  <h2><span class="num">5</span>Seen in the wild</h2>
+  <p>Put AutoGPT itself on the dissection table, using 0.1's lens: loop, tools, context.</p>
+  <p><b>The loop.</b> AutoGPT ran a genuine loop: gather (read the task queue), act (execute a command), repeat. But hold it against 0.1's four beats and one is missing: there is no verify beat at all. In its place sat a self-criticism step: the model prompted to critique its own plan before acting. That is verification-shaped scaffolding with no grounding, the model grading its own homework, and its descendants die on the same sword in 5.5. The beat structure was right; one beat was faked.</p>
+  <p><b>The tools.</b> A flat command list: browse, write file, spawn agent, execute code. Free-text invocations, string-parsed, un-sandboxed code execution on the user's own machine. Every 0.3 sin in one place: no contract half, no containment, and this is why 7.2's containment stack exists.</p>
+  <p><b>The context.</b> The most instructive failure. AutoGPT appended every thought, action, and result to one ever-growing transcript until it overflowed the tiny windows of 2023. The community's fix was to bolt on a vector database and cosine-retrieve "relevant memories" back into context. That bolt-on became the default memory architecture of an entire era, and its rise and demotion is a story 2.8 tells in full.</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 190" role="img" aria-label="AutoGPT drawn in the shared grammar: goal to model to command list, results appended to a growing transcript with a vector store bolted on; amber dots at the missing verify beat and the overflowing transcript.">
+      <use href="#sym-human" x="40" y="50"/>
+      <use href="#sym-model" x="170" y="48"/>
+      <use href="#sym-tool" x="400" y="48"/>
+      <use href="#sym-store" x="272" y="128"/>
+      <text x="308" y="118" text-anchor="middle">transcript + vector bolt-on</text>
+      <path class="edge" d="M84 68 H166"/><text x="122" y="60">goal</text>
+      <path class="edge" d="M268 68 H396"/><text x="330" y="60">command</text>
+      <path class="edge" d="M440 90 Q400 140 348 142"/><text x="432" y="130">append</text>
+      <path class="edge loop" d="M270 140 Q180 130 210 92"/><text x="196" y="132">retrieve</text>
+      <circle class="fail" cx="330" cy="80" r="5"/><text class="fail-label" x="340" y="96">no verify beat</text>
+      <circle class="fail" cx="308" cy="176" r="5"/><text class="fail-label" x="318" y="180">overflows, then cosine roulette</text>
+    </svg>
+    <figcaption>AutoGPT in the shared grammar: a real loop with a faked verify beat and a drowning context.</figcaption>
+  </figure>
+  <p>Notice what this dissection buys you: AutoGPT was not wrong about the destination. Long-horizon autonomous delegation is exactly what 2026's best agents deliver. It was wrong about what to build first. It built ambition scaffolding on top of missing judgment; the field spent the next three years building verification, containment, and context discipline underneath the same ambition.</p>
+
+  <div class="callout"><span class="label">The misconception</span>
+    "AutoGPT was just early. The models were too weak in 2023, and today's models vindicate the design." Half right, and the wrong half gets remembered. Drop a 2026 frontier model into AutoGPT's harness and you do not get a working agent; you get a more expensive failure, because the harness still has no verifier, no context discipline, and no gate on consequences. The models were weak AND the architecture was wrong, and only one of those problems was fixed by waiting. The clean test for any fossil: if the idea lived at the capability layer (chain-of-thought), model progress absorbed it; if it lived at the consequence layer (verification, containment), model progress made it more necessary, not less.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>A 2026 startup pitches you: "A crew of AI employees: our AI PM writes the spec, the AI engineer implements it, the AI QA agent tests it. Fully autonomous, no humans needed." Date-stamp the architecture and name the one question you would ask first.</summary><p>Two fossils stacked: a role-play crew (2023-24, job-title decomposition that fragments one task's context) wrapped in an autonomous goal loop (spring 2023, "fully autonomous" with no mention of verification). The first question: what, outside your models, decides that the work is done and correct? If the answer is "the QA agent," that is the model grading its own homework with extra steps. A defensible version would decompose along context boundaries and let a test suite or a human gate own "done."</p></details>
+  <details><summary>You find a prompt in your own product that says "First, think step by step. List your reasoning as numbered points, then give your answer." It runs on a frontier reasoning model. Keep or cut?</summary><p>Cut, with one exception. On a reasoning model this is substitution scaffolding aimed at a capability the model already has natively; at best it wastes tokens, at worst it fights the model's own trained reasoning behavior. The exception is when you need the intermediate work in a specific auditable format for a downstream consumer (a log, a reviewer, a parser): then you are buying a format contract, not reasoning, and the instruction should say so explicitly.</p></details>
+  <details><summary>ReAct's prompting pattern died within a year, yet its loop became the substrate of every modern agent. Why did one half survive and not the other?</summary><p>The mental model, applied. The pattern half (free-text actions, regex parsing, hand-built exemplars) substituted for a capability models lacked: structured tool invocation. Native tool calling arrived and ate it. The loop half (act, observe the real result, reason again) is consequence architecture: it grounds the model in what actually happened in the world, and no model release makes the world's feedback unnecessary. Substitution died; containment survived. That split is the whole lesson.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>
+    Module 0's bar is sketching any agent product as loop + tools + context and saying which parts are workflow and which are agent; 0.1 through 0.3 gave you that. This topic contributes the historical layer of the same skill: when you see ReAct, chain-of-thought, AutoGPT, or an agent crew invoked in a paper, a framework, or a pitch, you can date the pattern, say why it lost, and spot its failure mode recurring in a modern design. That closes the module.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources">
+    <li>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models, Wei et al., Jan 2022: arxiv.org/abs/2201.11903</li>
+    <li>ReAct: Synergizing Reasoning and Acting in Language Models, Yao et al., Oct 2022: arxiv.org/abs/2210.03629</li>
+    <li>AutoGPT repository (the primary artifact of the era), Significant Gravitas, Mar 2023: github.com/Significant-Gravitas/AutoGPT</li>
+    <li>Building Effective Agents, Anthropic, Dec 2024 (the essay that closed the era): anthropic.com/engineering/building-effective-agents</li>
+    <li>When to use multi-agent systems, Anthropic, Jan 2026 (names role-play crews a legacy anti-pattern; decompose by context, not job title)</li>
+  </ul>
+
+</div>
+</body>
+</html>

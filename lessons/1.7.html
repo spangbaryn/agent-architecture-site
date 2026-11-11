@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1.7: KV-cache economics</title>
+<style>
+  :root {
+    --ink: #1a1d21;
+    --ink-soft: #4a5058;
+    --paper: #faf8f4;
+    --card: #ffffff;
+    --line: #e5e0d6;
+    --accent: #0f6b5c;
+    --accent-soft: #e3efec;
+    --amber: #a05e0b;
+    --amber-soft: #f9efdd;
+    --current: #0f6b5c;  --ascendant: #1a5fa8;  --emerging: #7a4fa3;
+    --legacy: #8a8578;   --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker {
+    font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--accent);
+  }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft);
+          border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super;
+            font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+  .mental-model {
+    background: var(--accent-soft); border-left: 4px solid var(--accent);
+    padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0;
+    font-size: 21px; line-height: 1.45;
+  }
+  .mental-model .label {
+    display: block; font: 700 12px/1 -apple-system, sans-serif;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+  .approach {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 24px; margin: 16px 0;
+  }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em;
+    text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px;
+  }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); }
+  .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); }
+  .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+  .callout {
+    background: var(--amber-soft); border-left: 4px solid var(--amber);
+    padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0;
+  }
+  .callout .label {
+    font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px;
+  }
+  .note {
+    background: var(--card); border: 1px dashed var(--ascendant); border-radius: 10px;
+    padding: 14px 20px; margin: 20px 0; font-size: 15.5px;
+  }
+  .note .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ascendant); display: block; margin-bottom: 6px; }
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line);
+           border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft);
+               margin-top: 10px; text-align: center; }
+  details {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 20px; margin: 12px 0;
+  }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+  .done-when { background: var(--card); border: 2px solid var(--accent);
+               border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+                      text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace;
+         background: #efece4; padding: 1px 5px; border-radius: 4px; }
+  table.ledger { width: 100%; border-collapse: collapse; font: 14.5px/1.45 -apple-system, 'Segoe UI', sans-serif; margin: 18px 0 24px; }
+  table.ledger th { text-align: left; font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+                    color: var(--ink-soft); border-bottom: 2px solid var(--line); padding: 6px 8px; }
+  table.ledger td { border-bottom: 1px solid var(--line); padding: 8px; vertical-align: top; }
+  table.ledger td:first-child { font-weight: 600; width: 34%; }
+  table.ledger td:nth-child(2) { width: 18%; }
+  .safe { color: var(--accent); font-weight: 600; }
+  .costly { color: var(--amber); font-weight: 600; }
+  @media (max-width: 560px) { h1 { font-size: 31px; } table.ledger { font-size: 13.5px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 1 · Topic 1.7</div>
+    <h1>KV-cache economics</h1>
+    <p class="standfirst">Why the order of your context window is the biggest line on your agent's bill, and how to lay a window out so it only ever changes at the end.</p>
+    <div class="meta">Freshness-checked 14 October 2026 · builds on 1.1 through 1.6 · last lesson of Module 1 · ~15 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>An agent spends most of its life re-reading. Every step sends the whole window so far, tools, system prompt, every earlier tool call and result, plus a little that is new, and gets back a short answer. Manus measured about 100 input tokens for every output token. In the worked example below it is 200 to 1. Read naively, that makes the cost of an agent grow with the square of its step count, because step 60 pays for steps 1 through 59 all over again.</p>
+  <p>Here is the physics that rescues it. When a model reads your prompt, it computes for every token a set of keys and values that later tokens attend to. That computation (the "prefill") is the expensive part of reading, and each token's values depend only on the tokens before it. So if the next request starts with exactly the same tokens, the provider can keep those values (the KV cache) and skip recomputing them. Change one token and every token after it has a different past, so everything after it must be computed again. Three rules fall out, and they are the whole subject: reuse is <b>prefix-only</b>, the match must be <b>exact</b>, and the stored values live <b>briefly</b> (five minutes by default on Anthropic, refreshed each time they are used; at least thirty minutes on OpenAI's newest models).</p>
+  <p>Providers pass the saving on, which turns a byte-level property of your prompt into a pricing tier. OpenAI's Codex team describes the effect as sampling becoming linear rather than quadratic. Claude Code's team says they build their entire harness around it and declare an incident when the cache hit rate drops. That is the pressure: long-horizon agents are only affordable if most of every request is a repeat of the last one.</p>
+  <div class="note"><span class="label">As of this month</span>
+    The field notes this syllabus was written from (August 2026) said cached input costs about a tenth of fresh input. That is still true on most models, but the newest ones widened it: cache reads cost 0.05x the input price on Claude Opus 5.5, Sonnet 5.5 and GPT-6.1 Sol, and 0.025x on Claude Fable 5.1 and Mythos 5.1. The gap went from 10x to 20x and 40x. Everything in this lesson got more important, not less, between the syllabus and today.</div>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>
+    The cache bills you for change, not for size: every token up to the first one that differs from the last call is nearly free, every token after it is paid in full, so a cheap agent is one whose window only ever changes at the end.</div>
+  <p>Three consequences, each worth saying out loud in a design review.</p>
+  <p><b>Position is price.</b> On Opus 5.5 a fresh input token costs $4 per million, writing it into the cache costs $5, and reading it back costs $0.20. The same token is twenty times cheaper if it sits before the first change than after it. Where a token sits in the window now matters more to the bill than whether it is there at all.</p>
+  <p><b>An edit costs everything downstream of it.</b> Changing a line at the tail costs the tail. Changing a line near the top costs the whole window, because every token after it has a new past. "Small edit" is not a property of the edit; it is a property of where the edit lands.</p>
+  <p><b>A broken cache costs more than no cache.</b> Writing into the cache costs 1.25x the base price on Anthropic and on OpenAI's GPT-5.6 and later. If something at the top changes on every call, you pay that premium every call and never collect a read. The chart below runs the same sixty-step agent five ways.</p>
+
+  <figure>
+    <svg class="dg" viewBox="0 0 640 230" role="img" aria-label="Bar chart: the same 5.96 million input tokens cost from $2.62 to $30.37 depending on where changes happen">
+      <g font-family="-apple-system,sans-serif" font-size="13">
+        <text x="0" y="31" fill="#1a1d21">Append-only, stable prefix</text>
+        <rect x="262" y="16" width="28" height="22" rx="3" fill="#0f6b5c"/>
+        <text x="298" y="32" fill="#0f6b5c" font-weight="700">$2.62</text>
+
+        <text x="0" y="71" fill="#1a1d21">One tool-list change at step 30</text>
+        <rect x="262" y="56" width="33" height="22" rx="3" fill="#8a8578"/>
+        <text x="303" y="72" fill="#4a5058">$3.08</text>
+
+        <text x="0" y="111" fill="#1a1d21">Plan rewritten in place each step</text>
+        <rect x="262" y="96" width="253" height="22" rx="3" fill="#8a8578"/>
+        <text x="523" y="112" fill="#4a5058">$23.30</text>
+
+        <text x="0" y="151" fill="#1a1d21">No caching at all</text>
+        <rect x="262" y="136" width="265" height="22" rx="3" fill="#8a8578"/>
+        <text x="535" y="152" fill="#4a5058">$24.42</text>
+
+        <text x="0" y="191" fill="#1a1d21">Timestamp at the top, caching on</text>
+        <rect x="262" y="176" width="330" height="22" rx="3" fill="#fff" stroke="#a05e0b" stroke-width="2"/>
+        <text x="584" y="192" fill="#a05e0b" font-weight="700" text-anchor="end">$30.37</text>
+        <line x1="262" y1="8" x2="262" y2="206" stroke="#4a5058" stroke-width="1"/>
+        <text x="0" y="224" fill="#4a5058" font-size="11.5">Same 60 steps, same 5.96M input tokens, Opus 5.5 list prices; output is $0.60 in every row</text>
+      </g>
+    </svg>
+    <figcaption>An 11x spread for identical tokens. Assumptions: 25k-token prefix (tools, system, project notes), 2.5k tokens appended per step, 500 output tokens per step, every call inside the cache lifetime. The step-30 change costs one 98k-token write ($0.49) instead of a read ($0.02).</figcaption>
+  </figure>
+
+  <h3>The bill for every earlier lesson</h3>
+  <p>Every move you learned in this module lands somewhere in the window, and the cache now puts a price on where. This is the invoice 1.1 through 1.6 kept promising.</p>
+  <table class="ledger">
+    <thead><tr><th>Earlier move</th><th>Where it lands</th><th>Cache price</th></tr></thead>
+    <tbody>
+      <tr><td>Always-on instructions (1.1, 1.6)</td><td>The prefix</td><td><span class="safe">The cheapest tokens you own</span> once stable, read at a tenth to a fortieth of the price every step. They still spend attention: the cache prices dollars, not relevance.</td></tr>
+      <tr><td>Select: just-in-time retrieval (1.4), a skill body (1.6)</td><td>Appended at the tail</td><td><span class="safe">Cache-safe.</span> Loading late is fine.</td></tr>
+      <tr><td>Recitation, harness reminders (1.5)</td><td>Appended at the tail</td><td><span class="safe">Cache-safe</span> when written into the next message. A plan block rewritten in place near the top is the single most expensive habit in the chart above.</td></tr>
+      <tr><td>Write: clearing tool results (1.2, 1.3)</td><td>Cuts the middle</td><td><span class="costly">Re-pays everything after the cut.</span> Clear rarely and in bulk.</td></tr>
+      <tr><td>Compress: compaction (1.3)</td><td>Replaces the middle</td><td><span class="costly">A rewrite after the seam,</span> and the bar for it to pay rises as the price gap widens.</td></tr>
+      <tr><td>Isolate: a subagent (1.2)</td><td>A new window</td><td>Its own cache line: one prefix write per child, nothing broken in the parent.</td></tr>
+      <tr><td>Reversible context (1.2)</td><td>A view rebuilt per call</td><td><span class="safe">Safe</span> only if the view grows at the end; a view re-selected from the log each call is card one below.</td></tr>
+      <tr><td>Pre-loading a payload (1.4)</td><td>The prefix</td><td>Billed at the cached rate each step, so price stops being the argument against it. Rot still is.</td></tr>
+    </tbody>
+  </table>
+  <p>That last row and the first one say the same thing from two sides, and it is worth naming because it is the one place this lesson argues with 1.1. <b>There are two budgets.</b> The attention budget (1.1) prices relevance: does this token pay for its seat. The cache prices position: did this token move. Always-on instructions are cheap in dollars and expensive in attention; a compaction is cheap in attention and expensive in dollars. Most bad agent economics come from optimizing one budget while the other one quietly sends the bill.</p>
+  <p>And Ep 10 left a question hanging: is the cheapest procedure the one you never load, or the one you never move? The cache answers it. <b>The one you never move.</b> Claude's tool search keeps deferred tools out of the prefix and expands a discovered tool inline in the conversation, so, in the docs' words, "the prefix is untouched." A skill body read mid-session is appended the same way. What costs is pruning the tool list per phase or editing the catalog: that is a change at the top, and the top is where every token after it gets re-billed.</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame">
+    <div class="q">A landscape of: how a harness lays out the window and makes its changes, so that each call re-pays as little of it as possible.</div>
+    <div class="axis">What varies: where in the window change is allowed to happen. Anywhere; only at the tail; at the tail, by translating state changes into appends; in the middle, but only at declared seams; or anywhere, because you run the cache yourself. Five answers, ordered from most of each call re-paid to least.</div>
+    <div class="legend">Reading the diagrams: each shows the window on two consecutive calls. Light fill is read from the cache; white is paid in full; <span style="color:#0f6b5c;font-weight:600">teal</span> is what makes this approach different from the one above it; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks.</div>
+  </div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">store</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+      <marker id="arrow-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0f6b5c"/></marker>
+    </defs>
+  </svg>
+  <style>
+    .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+    .dg text { fill: #4a5058; }
+    .dg .seg { fill: #fff; stroke: #4a5058; stroke-width: 1.5; }
+    .dg .hit { fill: #ece8df; stroke: #4a5058; stroke-width: 1.5; }
+    .dg .dseg { fill: #e3efec; stroke: #0f6b5c; stroke-width: 2; }
+    .dg .dtxt { fill: #0f6b5c; font-weight: 600; }
+    .dg .lbl { font-size: 12px; text-anchor: middle; }
+    .dg .row { font-size: 12px; font-weight: 600; }
+    .dg .brk { stroke: #4a5058; stroke-width: 1.2; fill: none; }
+    .dg .brktxt { font-size: 11.5px; text-anchor: middle; }
+    .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .dg .tedge { stroke: #0f6b5c; stroke-width: 2; fill: none; marker-end: url(#arrow-t); }
+    .dg .seam { stroke: #0f6b5c; stroke-width: 4; }
+    .dg .fail { fill: #a05e0b; }
+    .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  </style>
+
+  <!-- CARD 1 -->
+  <div class="approach">
+    <h3>Cache-oblivious window <span class="badge b-legacy">Legacy</span></h3>
+    <p>The prompt is rebuilt every call from current state: a timestamp or session header at the top, a tool list filtered for the current phase, retrieved chunks injected into the system prompt, history edited in place to stay tidy. Nothing matches from one call to the next. This was how 2023 and 2024 frameworks assembled prompts, and it is still what you get by accident when nobody is watching the hit rate.</p>
+    <p class="tradeoffs"><b>Wins:</b> the simplest mental model there is; the prompt always states exactly the current truth; nothing to monitor. <b>Costs:</b> every call pays full price for the whole window; with caching switched on it pays the 1.25x write premium for nothing (the $30.37 row above, worse than no cache at all); time to first token never improves, so the agent also feels slow.</p>
+    <p class="tradeoffs"><b>Done right:</b> a one-shot router or classifier on short prompts, under the minimum cacheable length (512 tokens on Claude's 5.5 models, 1,024 on OpenAI's newest), or a batch where every request is genuinely different. If nothing repeats within the cache lifetime there is nothing to protect, and a cache-oblivious prompt is simply the honest one.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="Two calls whose first token differs because a timestamp leads the prompt, so nothing is reused">
+        <text class="row" x="4" y="45">call n</text>
+        <rect class="dseg" x="70" y="26" width="50" height="28"/><text class="lbl dtxt" x="95" y="45">14:02</text>
+        <rect class="seg" x="120" y="26" width="80" height="28"/><text class="lbl" x="160" y="45">tools</text>
+        <rect class="seg" x="200" y="26" width="90" height="28"/><text class="lbl" x="245" y="45">system</text>
+        <rect class="seg" x="290" y="26" width="260" height="28"/><text class="lbl" x="420" y="45">history</text>
+        <text class="row" x="4" y="95">call n+1</text>
+        <rect class="dseg" x="70" y="76" width="50" height="28"/><text class="lbl dtxt" x="95" y="95">14:03</text>
+        <rect class="seg" x="120" y="76" width="80" height="28"/><text class="lbl" x="160" y="95">tools</text>
+        <rect class="seg" x="200" y="76" width="90" height="28"/><text class="lbl" x="245" y="95">system</text>
+        <rect class="seg" x="290" y="76" width="260" height="28"/><text class="lbl" x="420" y="95">history</text>
+        <rect class="seg" x="550" y="76" width="60" height="28"/><text class="lbl" x="580" y="95">new</text>
+        <path class="brk" d="M70 110 v6 H610 v-6"/><text class="brktxt" x="340" y="130">paid in full, every call</text>
+        <circle class="fail" cx="95" cy="141" r="5"/><text class="fail-label" x="106" y="145">first token differs, so nothing is reused</text>
+      </svg>
+      <figcaption>Always current, always full price.</figcaption>
+    </figure>
+  </div>
+
+  <!-- CARD 2 -->
+  <div class="approach">
+    <h3>Append-only window, stable prefix <span class="badge b-current">Current</span></h3>
+    <p>Order the window from least to most volatile (tools, system prompt, durable project docs, then the conversation) and never edit anything already sent: new state arrives as a new message at the end. Manus wrote the playbook in July 2025 (stable prefix, append-only context, deterministic serialization, an explicit breakpoint at the end of the system prompt). OpenAI's Codex and Anthropic's Claude Code both published the same shape in 2026; Claude Code layers it so the top is shared as widely as possible: system prompt and tools cached across everyone, CLAUDE.md per project, session context per session, then messages.</p>
+    <p class="tradeoffs"><b>Wins:</b> cost becomes linear in steps instead of quadratic, and latency drops with it; the window is naturally a replayable log (1.2's "log is truth"). <b>Costs:</b> the window only grows, so it runs straight into 1.1's attention budget and, eventually, 1.3's compaction; anything that truly must change near the top (the tool set, the model, a wrong fact) costs the whole window; the silent breakers are invisible without monitoring: a JSON serializer that does not guarantee key order, an MCP server that enumerates its tools in a different order on reconnect.</p>
+    <p class="tradeoffs"><b>Done right:</b> when you change Codex's sandbox mode mid-session it appends a new permissions message instead of editing the original, and when you change directory it appends a new environment-context message. The old messages stay wrong and stay put; the newest one wins.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="The second call repeats the first exactly and adds a new segment at the end">
+        <text class="row" x="4" y="45">call n</text>
+        <rect class="seg" x="70" y="26" width="80" height="28"/><text class="lbl" x="110" y="45">tools</text>
+        <rect class="seg" x="150" y="26" width="90" height="28"/><text class="lbl" x="195" y="45">system</text>
+        <rect class="seg" x="240" y="26" width="70" height="28"/><text class="lbl" x="275" y="45">docs</text>
+        <rect class="seg" x="310" y="26" width="240" height="28"/><text class="lbl" x="430" y="45">history</text>
+        <text class="row" x="4" y="95">call n+1</text>
+        <rect class="hit" x="70" y="76" width="80" height="28"/><text class="lbl" x="110" y="95">tools</text>
+        <rect class="hit" x="150" y="76" width="90" height="28"/><text class="lbl" x="195" y="95">system</text>
+        <rect class="hit" x="240" y="76" width="70" height="28"/><text class="lbl" x="275" y="95">docs</text>
+        <rect class="hit" x="310" y="76" width="240" height="28"/><text class="lbl" x="430" y="95">history</text>
+        <rect class="dseg" x="550" y="76" width="60" height="28"/><text class="lbl dtxt" x="580" y="95">new</text>
+        <path class="brk" d="M70 110 v6 H548 v-6"/><text class="brktxt" x="309" y="130">read from cache</text>
+        <path class="brk" d="M552 110 v6 H610 v-6"/><text class="brktxt" x="581" y="130">written</text>
+        <circle class="fail" cx="110" cy="141" r="5"/><text class="fail-label" x="121" y="145">any edit up here re-pays everything to its right</text>
+      </svg>
+      <figcaption>Linear cost, as long as nothing upstream ever moves.</figcaption>
+    </figure>
+  </div>
+
+  <!-- CARD 3 -->
+  <div class="approach">
+    <h3>Change by appending <span class="badge b-ascendant">Ascendant</span></h3>
+    <p>Card two's discipline stretched over the things that look like they must change at the top: the current time, the mode, the permissions, the available tools. The harness translates each one into an appended signal. A reminder inside the next user message (how Claude Code tells the model the date or that a file changed). A mode the model enters by calling a tool (Claude Code's plan mode). A mask over an unchanged tool list (Manus's decoding-level state machine; OpenAI's <code>allowed_tools</code>). A system message or a tool definition sent mid-conversation (Anthropic's mid-conversation system messages and <code>tool_addition</code> blocks). The delta from card two: nothing about the agent's state is allowed to live in the prefix.</p>
+    <p class="tradeoffs"><b>Wins:</b> keeps card two's bill while the agent changes mode, gains tools, and learns the time; as of September and October 2026 both major APIs ship these as request fields rather than harness craft, which is why the badge is rising. <b>Costs:</b> everything stays visible, so masked tools still spend 1.1's attention, and a mask only holds if it is enforced in decoding or by the API (a prompt saying "don't use X" is a request, not a mask); some switches still re-pay part of the window (on Anthropic, changing <code>tool_choice</code> keeps the tools and system cache but re-pays the messages); the primitives exist only on newer models.</p>
+    <p class="tradeoffs"><b>Done right:</b> Manus keeps one tool list for the whole task and names tools with shared prefixes (<code>browser_</code>, <code>shell_</code>), so "only browser tools in this state" is a constraint on decoding, not an edit to the definitions.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="A mode change and a new tool arrive as appended messages; the prefix is untouched">
+        <text class="row" x="4" y="45">call n</text>
+        <rect class="seg" x="70" y="26" width="80" height="28"/><text class="lbl" x="110" y="45">tools</text>
+        <rect class="seg" x="150" y="26" width="90" height="28"/><text class="lbl" x="195" y="45">system</text>
+        <rect class="seg" x="240" y="26" width="70" height="28"/><text class="lbl" x="275" y="45">docs</text>
+        <rect class="seg" x="310" y="26" width="170" height="28"/><text class="lbl" x="395" y="45">history</text>
+        <text class="row" x="4" y="95">call n+1</text>
+        <rect class="hit" x="70" y="76" width="80" height="28"/><text class="lbl" x="110" y="95">tools</text>
+        <rect class="hit" x="150" y="76" width="90" height="28"/><text class="lbl" x="195" y="95">system</text>
+        <rect class="hit" x="240" y="76" width="70" height="28"/><text class="lbl" x="275" y="95">docs</text>
+        <rect class="hit" x="310" y="76" width="170" height="28"/><text class="lbl" x="395" y="95">history</text>
+        <rect class="seg" x="480" y="76" width="40" height="28"/><text class="lbl" x="500" y="95">new</text>
+        <rect class="dseg" x="520" y="76" width="45" height="28"/><text class="lbl dtxt" x="542" y="95">mode</text>
+        <rect class="dseg" x="565" y="76" width="45" height="28"/><text class="lbl dtxt" x="587" y="95">+tool</text>
+        <path class="brk" d="M70 110 v6 H478 v-6"/><text class="brktxt" x="274" y="130">read from cache</text>
+        <path class="brk" d="M482 110 v6 H610 v-6"/><text class="brktxt" x="546" y="130">written</text>
+        <circle class="fail" cx="110" cy="141" r="5"/><text class="fail-label" x="121" y="145">a tool_choice flip still re-pays the messages</text>
+      </svg>
+      <figcaption>Change the state, never the prefix.</figcaption>
+    </figure>
+  </div>
+
+  <!-- CARD 4 -->
+  <div class="approach">
+    <h3>Segmented prefix with seams <span class="badge b-current">Current</span></h3>
+    <p>Accept that some moves must edit the middle (1.2's write and compress, 1.3's compaction, clearing old tool results) and engineer where and how often they happen. Put explicit cache breakpoints at the boundaries of stability (after tools and system prompt, after project docs, on the compaction block) so a change re-pays only what lies after the seam. Make edits rare and big: Anthropic's <code>clear_at_least</code> refuses a clearing pass that would not free enough tokens to be worth breaking the cache. Run compaction as a cache-safe fork: same system prompt, same tools, same messages, with the summarization instruction appended last, so the only new input is the instruction. Use the one-hour lifetime across waits longer than five minutes.</p>
+    <p class="tradeoffs"><b>Wins:</b> this is what makes 1.3 affordable: with a breakpoint at the end of the system prompt, a compaction writes only the summary and the system prompt stays a cache read (Claude docs); layering lets many sessions share the top. <b>Costs:</b> each compaction or clear is still a rewrite of everything after its seam, and the bar for paying it rises with the price gap (SelfCompact found compaction pays only when the trajectory is more than ten times its summary; cheaper reads make keeping the trajectory cheaper, so on the 0.05x models that bar rises, my extrapolation rather than a measured number); query-aware compression rewrites the prefix on every call and never gets a read (Song, July 2026: 40.1% more expensive than doing nothing on tau-bench retail); Anthropic allows four breakpoints and looks back 20 blocks from each.</p>
+    <p class="tradeoffs"><b>Done right:</b> Claude Code's compaction call reuses the parent's exact system prompt, tools and messages and appends one instruction, so a long conversation is read from cache at the very moment it gets summarized. A separate summarizer with its own system prompt would diverge at the first token and pay for the whole conversation fresh.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="A breakpoint after the system prompt means a compaction re-pays only the summary">
+        <text class="row" x="4" y="45">call n</text>
+        <rect class="seg" x="70" y="26" width="80" height="28"/><text class="lbl" x="110" y="45">tools</text>
+        <rect class="seg" x="150" y="26" width="90" height="28"/><text class="lbl" x="195" y="45">system</text>
+        <rect class="seg" x="240" y="26" width="370" height="28"/><text class="lbl" x="425" y="45">history, 150k tokens</text>
+        <line class="seam" x1="240" y1="20" x2="240" y2="110"/>
+        <text class="lbl dtxt" x="240" y="14">breakpoint</text>
+        <text class="row" x="4" y="95">call n+1</text>
+        <rect class="hit" x="70" y="76" width="80" height="28"/><text class="lbl" x="110" y="95">tools</text>
+        <rect class="hit" x="150" y="76" width="90" height="28"/><text class="lbl" x="195" y="95">system</text>
+        <rect class="seg" x="242" y="76" width="90" height="28"/><text class="lbl" x="287" y="95">summary</text>
+        <rect class="seg" x="332" y="76" width="50" height="28"/><text class="lbl" x="357" y="95">new</text>
+        <path class="brk" d="M70 114 v6 H236 v-6"/><text class="brktxt" x="153" y="132">read</text>
+        <path class="brk" d="M244 114 v6 H382 v-6"/><text class="brktxt" x="313" y="132">written: summary only</text>
+        <circle class="fail" cx="250" cy="141" r="5"/><text class="fail-label" x="261" y="145">every compaction re-pays all after the seam</text>
+      </svg>
+      <figcaption>Pay for change at the seams, rarely, in bulk.</figcaption>
+    </figure>
+  </div>
+
+  <!-- CARD 5 -->
+  <div class="approach">
+    <h3>Agent-aware serving <span class="badge b-emerging">Emerging</span></h3>
+    <p>When you run the model yourself (vLLM, SGLang, LMCache), the cache is yours, and 2026 research is moving past "exact prefix, evict the least recent." CacheScout (July 2026) learns an agent workflow's transitions online and uses them to decide what to keep and what to prefetch before the next agent call: hit rate up 10 to 18 points, time to first token down 18 to 45%. ReCache (August 2026) computes tool and skill schemas as blocks that can be reused in any order and combination, the thing prefix caching cannot do: 3.655x faster first token at matching tool-invocation accuracy (82.3 vs 82.4 F1). The delta: reuse no longer depends on byte-identical order.</p>
+    <p class="tradeoffs"><b>Wins:</b> breaks the prefix rule, so dynamic tool sets and retrieved content stop being cache poison; eviction follows the workflow instead of recency, which matters when a reusable system prompt gets evicted during a long tool call. <b>Costs:</b> only if you own the GPUs; blocks computed without their real neighbors are an approximation of attention whose quality cost has to be tested per workload; research-grade, and none of the hosted APIs in this lesson expose it.</p>
+    <p class="tradeoffs"><b>Done right:</b> a platform team serving an open-weight model to a multi-agent workflow where the same few dozen tool schemas recur in different combinations across thousands of calls a minute. That shape is exactly what prefix caching wastes and what composition-invariant blocks recover.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="Tool schema blocks are reused from a KV store even though their order changed between calls">
+        <text class="row" x="4" y="45">call n</text>
+        <rect class="seg" x="70" y="26" width="90" height="28"/><text class="lbl" x="115" y="45">system</text>
+        <rect class="seg" x="160" y="26" width="55" height="28"/><text class="lbl" x="187" y="45">tool A</text>
+        <rect class="seg" x="215" y="26" width="55" height="28"/><text class="lbl" x="242" y="45">tool C</text>
+        <rect class="seg" x="270" y="26" width="200" height="28"/><text class="lbl" x="370" y="45">history</text>
+        <text class="row" x="4" y="95">call n+1</text>
+        <rect class="hit" x="70" y="76" width="90" height="28"/><text class="lbl" x="115" y="95">system</text>
+        <rect class="dseg" x="160" y="76" width="55" height="28"/><text class="lbl dtxt" x="187" y="95">tool C</text>
+        <rect class="dseg" x="215" y="76" width="55" height="28"/><text class="lbl dtxt" x="242" y="95">tool A</text>
+        <rect class="seg" x="270" y="76" width="200" height="28"/><text class="lbl" x="370" y="95">another agent's turn</text>
+        <use href="#sym-store" x="540" y="58"/>
+        <text class="lbl" x="576" y="118">KV blocks</text>
+        <rect x="500" y="6" width="134" height="30" rx="15" fill="#fff" stroke="#4a5058" stroke-width="2" stroke-dasharray="5 3"/>
+        <text class="lbl" x="567" y="26">agent-aware runtime</text>
+        <path class="edge" d="M567 38 V54"/>
+        <path class="tedge" d="M538 80 C 470 66, 330 64, 246 74"/>
+        <text class="brktxt" x="215" y="124">reused out of order</text>
+        <circle class="fail" cx="300" cy="141" r="5"/><text class="fail-label" x="311" y="145">blocks computed without their real neighbors</text>
+      </svg>
+      <figcaption>Rewrite the rules of the cache; requires owning the cache.</figcaption>
+    </figure>
+  </div>
+
+  <p>These nest rather than compete. Card two is the floor. Card three keeps you on the floor when the agent's state changes. Card four is where you pay deliberately for 1.3's compaction and 1.2's clearing. Card five changes the physics, but only if you serve your own model. Card one is what you have if nobody ever looked at the hit rate.</p>
+
+  <figure>
+    <svg class="dg" viewBox="0 0 640 200" role="img" aria-label="Timeline from July 2025 to October 2026: cache discipline moved from harness craft into API primitives">
+      <rect x="30" y="58" width="330" height="10" rx="5" fill="#ece8df"/>
+      <rect x="370" y="58" width="250" height="10" rx="5" fill="#e3efec" stroke="#0f6b5c" stroke-width="1"/>
+      <text x="195" y="50" text-anchor="middle" font-size="12" font-weight="600">craft inside harnesses</text>
+      <text x="495" y="50" text-anchor="middle" font-size="12" font-weight="600" class="dtxt">primitives inside the API</text>
+      <g font-size="11.5">
+        <circle cx="60" cy="63" r="6" fill="#4a5058"/>
+        <text x="60" y="26" text-anchor="middle" font-weight="700">Jul 2025</text>
+        <text x="60" y="92" text-anchor="middle">Manus</text>
+        <text x="60" y="108" text-anchor="middle">stable prefix,</text>
+        <text x="60" y="122" text-anchor="middle">append-only,</text>
+        <text x="60" y="136" text-anchor="middle">mask, don't remove</text>
+
+        <circle cx="185" cy="63" r="6" fill="#4a5058"/>
+        <text x="185" y="26" text-anchor="middle" font-weight="700">Jan 2026</text>
+        <text x="185" y="92" text-anchor="middle">Codex</text>
+        <text x="185" y="108" text-anchor="middle">append, never edit;</text>
+        <text x="185" y="122" text-anchor="middle">cache makes a</text>
+        <text x="185" y="136" text-anchor="middle">stateless agent cheap</text>
+
+        <circle cx="310" cy="63" r="6" fill="#4a5058"/>
+        <text x="310" y="26" text-anchor="middle" font-weight="700">Apr 2026</text>
+        <text x="310" y="92" text-anchor="middle">Claude Code</text>
+        <text x="310" y="108" text-anchor="middle">cache breaks are</text>
+        <text x="310" y="122" text-anchor="middle">incidents; plan mode</text>
+        <text x="310" y="136" text-anchor="middle">as a tool</text>
+
+        <circle cx="440" cy="63" r="6" fill="#0f6b5c"/>
+        <text x="440" y="26" text-anchor="middle" font-weight="700">Sep 2026</text>
+        <text x="440" y="92" text-anchor="middle">Anthropic API</text>
+        <text x="440" y="108" text-anchor="middle">tool_addition beta;</text>
+        <text x="440" y="122" text-anchor="middle">mid-conversation</text>
+        <text x="440" y="136" text-anchor="middle">system messages</text>
+
+        <circle cx="570" cy="63" r="6" fill="#0f6b5c"/>
+        <text x="570" y="26" text-anchor="middle" font-weight="700">Oct 2026</text>
+        <text x="570" y="92" text-anchor="middle">OpenAI API</text>
+        <text x="570" y="108" text-anchor="middle">configuration_update,</text>
+        <text x="570" y="122" text-anchor="middle">allowed_tools; explicit</text>
+        <text x="570" y="136" text-anchor="middle">breakpoints (GPT-5.6+)</text>
+      </g>
+      <text x="320" y="180" text-anchor="middle" font-size="12" font-style="italic">Card three's badge is rising because the APIs absorbed the craft, not because models got smarter.</text>
+    </svg>
+    <figcaption>What Manus did with logit masks in 2025 is a request field in 2026. Oct 2026 marks the docs as read today; the docs do not give release dates for the OpenAI items.</figcaption>
+  </figure>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide how to lay out the window and where its changes are allowed to land:</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 590" role="img" aria-label="Decision tree with five yes or no questions leading to the five landscape cards and a not-yet leaf">
+      <g font-size="12.5">
+        <!-- Q1 -->
+        <rect x="20" y="10" width="380" height="62" rx="8" fill="#fff" stroke="#4a5058" stroke-width="2"/>
+        <text x="34" y="34" fill="#1a1d21" font-weight="600">1. Will this prefix be sent again within the</text>
+        <text x="34" y="52" fill="#1a1d21" font-weight="600">cache lifetime, and is it over the minimum length?</text>
+        <path class="edge" d="M400 41 H438"/><text x="406" y="34" font-size="11.5">no</text>
+        <rect x="440" y="19" width="190" height="44" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/>
+        <text x="535" y="46" text-anchor="middle" class="dtxt">Cache-oblivious window</text>
+        <path class="edge" d="M210 72 V108"/><text x="216" y="94" font-size="11.5">yes</text>
+        <!-- Q2 -->
+        <rect x="20" y="110" width="380" height="62" rx="8" fill="#fff" stroke="#4a5058" stroke-width="2"/>
+        <text x="34" y="134" fill="#1a1d21" font-weight="600">2. Must anything above the newest message change</text>
+        <text x="34" y="152" fill="#1a1d21" font-weight="600">mid-session? (time, mode, tools, model, a fact)</text>
+        <path class="edge" d="M400 141 H438"/><text x="406" y="134" font-size="11.5">no</text>
+        <rect x="440" y="119" width="190" height="44" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/>
+        <text x="535" y="137" text-anchor="middle" class="dtxt">Append-only window,</text>
+        <text x="535" y="154" text-anchor="middle" class="dtxt">stable prefix</text>
+        <path class="edge" d="M210 172 V208"/><text x="216" y="194" font-size="11.5">yes</text>
+        <!-- Q3 -->
+        <rect x="20" y="210" width="380" height="62" rx="8" fill="#fff" stroke="#0f6b5c" stroke-width="3"/>
+        <text x="34" y="234" fill="#1a1d21" font-weight="600">3. Can the change be said as a new message at the</text>
+        <text x="34" y="252" fill="#1a1d21" font-weight="600">tail? (reminder, mode tool, system msg, mask)</text>
+        <path class="edge" d="M400 241 H438"/><text x="406" y="234" font-size="11.5">yes</text>
+        <rect x="440" y="219" width="190" height="44" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/>
+        <text x="535" y="246" text-anchor="middle" class="dtxt">Change by appending</text>
+        <path class="edge" d="M210 272 V308"/><text x="216" y="294" font-size="11.5">no</text>
+        <!-- Q4 -->
+        <rect x="20" y="310" width="380" height="62" rx="8" fill="#fff" stroke="#4a5058" stroke-width="2"/>
+        <text x="34" y="334" fill="#1a1d21" font-weight="600">4. Can you make it rare, in bulk, behind a declared</text>
+        <text x="34" y="352" fill="#1a1d21" font-weight="600">seam? (breakpoint, batch clear, cache-safe fork)</text>
+        <path class="edge" d="M400 341 H438"/><text x="406" y="334" font-size="11.5">yes</text>
+        <rect x="440" y="319" width="190" height="44" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/>
+        <text x="535" y="337" text-anchor="middle" class="dtxt">Segmented prefix</text>
+        <text x="535" y="354" text-anchor="middle" class="dtxt">with seams</text>
+        <path class="edge" d="M210 372 V408"/><text x="216" y="394" font-size="11.5">no</text>
+        <!-- Q5 -->
+        <rect x="20" y="410" width="380" height="62" rx="8" fill="#fff" stroke="#4a5058" stroke-width="2"/>
+        <text x="34" y="434" fill="#1a1d21" font-weight="600">5. Do you run the model and its cache</text>
+        <text x="34" y="452" fill="#1a1d21" font-weight="600">yourself?</text>
+        <path class="edge" d="M400 441 H438"/><text x="406" y="434" font-size="11.5">yes</text>
+        <rect x="440" y="419" width="190" height="44" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/>
+        <text x="535" y="446" text-anchor="middle" class="dtxt">Agent-aware serving</text>
+        <path class="edge" d="M210 472 V508"/><text x="216" y="494" font-size="11.5">no</text>
+        <!-- not yet -->
+        <rect x="20" y="510" width="610" height="62" rx="8" fill="#f9efdd" stroke="#a05e0b" stroke-width="2"/>
+        <text x="34" y="534" fill="#a05e0b" font-weight="700">Not yet: get it out of the shared prefix before you build.</text>
+        <text x="34" y="552" fill="#a05e0b">Give the changing thing its own window (a subagent with its own cache, the way</text>
+        <text x="34" y="567" fill="#a05e0b">Claude Code switches models) or make it a tool result, then run the tree again.</text>
+      </g>
+    </svg>
+    <figcaption>Question 3 does most of the work, and it is the one whose answer changed in 2026.</figcaption>
+  </figure>
+  <p>Question 2 is where most agents discover they have a problem: a timestamp, a tool list that varies by phase, a customer record in the system prompt. Question 3 is where most of those problems dissolve, and the reason it is load-bearing is that its answer moved this year. In 2025, "can I say it at the tail?" meant building Manus-grade machinery; in October 2026, it usually means using a field the API already has. Question 4 is a budgeting decision, not a layout one: you are choosing to pay, so pay rarely and at a seam. The not-yet leaf is the honest outcome for anything that changes constantly and cannot be appended: it does not belong in a prefix you share.</p>
+
+  <h2><span class="num">5</span>Seen in the wild: Codex</h2>
+  <p>In January 2026 OpenAI's Michael Bolin published how the Codex agent loop builds each request, and it reads like a cache design document. The request is ordered from most stable to least: the model's instructions; the tools (the built-in <code>shell</code> and <code>update_plan</code>, web search, and any MCP tools you configured); a developer message describing sandbox and approval rules; your optional developer instructions; a user message that gathers AGENTS.md files (capped at 32 KiB by default) and skill metadata, which is 1.6's catalog sitting in the prefix where it belongs; an environment-context message with the working directory and shell; and only then the conversation. Every follow-up request is the previous one plus new items at the end.</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 175" role="img" aria-label="The Codex request: a stable ordered prefix, the conversation, and appended permission and environment updates">
+      <path class="brk" d="M40 40 v-6 H533 v6"/><text class="brktxt" x="286" y="26">identical on every call in the session: read from cache</text>
+      <text class="brktxt dtxt" x="575" y="26">appended</text>
+      <rect class="hit" x="40" y="50" width="60" height="34"/><text class="lbl" x="70" y="72">instr.</text>
+      <rect class="hit" x="100" y="50" width="80" height="34"/><text class="lbl" x="140" y="72">tools</text>
+      <rect class="hit" x="180" y="50" width="55" height="34"/><text class="lbl" x="207" y="72">perms</text>
+      <rect class="hit" x="235" y="50" width="45" height="34"/><text class="lbl" x="257" y="72">dev</text>
+      <rect class="hit" x="280" y="50" width="85" height="34"/><text class="lbl" x="322" y="65" font-size="11">AGENTS.md</text><text class="lbl" x="322" y="79" font-size="11">+ skills</text>
+      <rect class="hit" x="365" y="50" width="50" height="34"/><text class="lbl" x="390" y="72">env</text>
+      <rect class="hit" x="415" y="50" width="120" height="34"/><text class="lbl" x="475" y="72">conversation</text>
+      <rect class="dseg" x="535" y="50" width="40" height="34"/><text class="lbl dtxt" x="555" y="72">perms</text>
+      <rect class="dseg" x="575" y="50" width="40" height="34"/><text class="lbl dtxt" x="595" y="72">env</text>
+      <circle class="fail" cx="70" cy="106" r="5"/><text class="fail-label" x="81" y="110">switching model changes this slot</text>
+      <circle class="fail" cx="140" cy="130" r="5"/><text class="fail-label" x="151" y="134">MCP tool order shuffled (PR #2611); tools/list_changed mid-session</text>
+      <text x="320" y="162" font-size="11.5">compaction: /responses/compact (card four's territory)</text>
+    </svg>
+    <figcaption>Card two in full, card three for permission and directory changes, card four at compaction. Amber dots are Codex's own published cache-breakers.</figcaption>
+  </figure>
+  <p>Read the post for the incidents, because they are the curriculum. A bug in how MCP tools were enumerated put them in a different order between requests and silently broke the prefix. MCP servers can announce that their tool list changed, and honoring that announcement mid-conversation triggers an expensive miss. Changing the model changes the instructions slot, which sits above everything. And when you change sandbox mode or directory, Codex appends a new message rather than editing the original: card three, by hand, months before the APIs offered it.</p>
+  <p>The most architectural detail is the one about state. Codex deliberately does not use the API's server-side conversation state, so that every request is self-contained and works for zero-data-retention customers. That means the full JSON of the conversation is resent on every call, and the bytes on the wire grow quadratically. What keeps the compute linear is the cache. A stateless agent is affordable only because the provider remembers your prefix for a few minutes. That is the same separation 1.2 taught with Managed Agents (the session is not the window), seen from the bill's side.</p>
+  <p>Read it through 0.4's rule and something new shows up. Cache discipline is not a capability substitute that the next model eats, and it is not a containment boundary either. It got absorbed by the <i>platform</i>: the append-instead-of-edit move Codex made by hand is now a request item in OpenAI's API (<code>configuration_update</code>, for changing reasoning effort mid-conversation), and Manus's logit masks have an API cousin in <code>allowed_tools</code>. The craft is moving into the API; the principle stays in your head, because the API cannot decide for you what belongs at the top.</p>
+  <p>Claude Code, as a one-line aside: same discipline run as an operational metric, with cache-hit-rate alerts that open incidents, plan mode built as a tool so entering it never changes the tool list, and model switches done only through subagents with their own caches (Shihipar, April 2026).</p>
+
+  <div class="callout"><span class="label">The misconception</span>
+    <p><b>"Fewer tokens means a cheaper agent."</b> It is the most natural belief in context engineering and, on a cached API, often false. Weinberger and Hozez analyzed 2,848 provider-billed coding-agent runs across 103 tasks in July 2026: a compression layer that cut tool-output tokens by 38.4% raised the bill by 6.8%, and across tasks the correlation between token reduction and cost change was 0.15. Cache writes and reads made up about 87% of the reconstructed cost. Compressing a tool result changes it, a changed result breaks the prefix, and the rewrite costs more than the tokens saved. Song (July 2026) found the same for query-aware prompt compression: different compressed text per query means no reads, 40.1% more expensive than not compressing at all. The bill is set by where change lands, not by how many tokens there are.</p>
+    <p style="margin-bottom:0">Hold the opposite error in the other hand: "so never compress." Cached tokens are cheap in dollars and still expensive in attention. A 400k-token window that reads at 0.05x still rots (1.1), still loses the goal (1.5), and still needs 1.3's compaction. The answer is not less compaction; it is compaction placed at a seam, run as a fork of the same prefix, and done rarely enough to clear its own bar.</p>
+  </div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>A support agent's harness puts "Current time: 14:32:07 · Customer tier: Gold · Open tickets: 3" at the top of the system prompt each turn, and the product lead now wants a different tool set per customer tier. The cache hit rate is near zero. What do you change, and what do you keep?</summary>
+    <p>Move the volatile header out of the prefix and into a reminder appended to the user turn (card three); that alone restores card two. Do not build per-tier tool lists: keep one stable tool set and restrict per tier with <code>allowed_tools</code>, masking, or deferred loading, so the tool definitions never change. If per-customer facts must sit high, layer them the way Claude Code does: global system and tools first, then a per-session block behind its own breakpoint (card four), so a new customer re-pays only their block. Keep the tier logic; move where it is said.</p></details>
+  <details><summary>Your coding agent compacts at 150k tokens by calling a separate summarizer with its own short system prompt and no tools. Finance says compaction is now the largest line on the bill. Why, and what is the fix?</summary>
+    <p>The summarizer's request diverges from the cached conversation at its first token, so 150k tokens are paid fresh (or written at 1.25x) on every compaction. Make compaction a cache-safe fork: same system prompt, same tools, same messages, with the summarization instruction appended as the last user message, so the only new input is the instruction. Then add a breakpoint at the end of the system prompt so the post-compaction call writes only the summary. And check whether you are compacting for the right reason: compaction is an attention move (1.3), and with reads at 0.05x it has to compress harder to also be a money move.</p></details>
+  <details><summary>A teammate wants to save money by switching a 150k-token Opus 5.5 conversation to Haiku 5.5 for a run of routine steps, then switching back. What do you check before saying yes?</summary>
+    <p>Run the numbers, because "never switch models" is a price ratio, not a law. Staying on Opus reads 150k at $0.20 per million: about $0.03 a step. Switching writes 150k into Haiku's cache at the over-100k rate ($0.625 per million): about $0.09 once, then about $0.0075 a step, so it pays back after roughly three Haiku steps. The trap is the return trip: if more than five minutes pass, the Opus entry expires and coming back re-writes 150k at $5 per million, about $0.75. The cleaner design is Claude Code's: hand the routine work to a Haiku subagent with a few-thousand-token brief (fractions of a cent), and never move the Opus prefix at all.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>
+    <p>Module 1's bar: given any agent misbehavior, your first three hypotheses are context hypotheses, and they are usually right. 1.7 supplies the answers for "it's slow and expensive": (1) something above the tail changes every call (a timestamp, tool order, a mode switch that edits the prompt); (2) the harness edits the middle too often or the wrong way (frequent clears, compaction through a separate prompt, per-query compression); (3) the cache expires or is abandoned (waits past the lifetime, model switches in place). 1.1 supplies "it degraded as the window grew," 1.3 and 1.5 supply "it forgot the goal," and 1.4 and 1.6 supply "it got confused about what to use." With this lesson Module 1 is complete.</p>
+  </div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources">
+    <li>Michael Bolin, <a href="https://openai.com/index/unrolling-the-codex-agent-loop">Unrolling the Codex agent loop</a>, OpenAI, 23 January 2026.</li>
+    <li>Thariq Shihipar, <a href="https://claude.com/blog/lessons-from-building-claude-code-prompt-caching-is-everything">Lessons from building Claude Code: Prompt caching is everything</a>, Claude blog, 30 April 2026.</li>
+    <li>Yichao "Peak" Ji, <a href="https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus">Context Engineering for AI Agents: Lessons from Building Manus</a>, 18 July 2025 (the KV-cache and mask-don't-remove sections).</li>
+    <li>Claude Platform docs: <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching">Prompt caching</a>, <a href="https://platform.claude.com/docs/en/about-claude/pricing">Pricing</a>, <a href="https://platform.claude.com/docs/en/build-with-claude/context-editing">Context editing</a>, <a href="https://platform.claude.com/docs/en/build-with-claude/compaction-threshold">Compaction at a token threshold</a>, <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool">Tool search tool</a>. Read 14 October 2026.</li>
+    <li>OpenAI API docs, <a href="https://developers.openai.com/api/docs/guides/prompt-caching">Prompt caching</a>. Read 14 October 2026.</li>
+    <li>Lumer et al., <a href="https://arxiv.org/abs/2601.06007">Don't Break the Cache: An Evaluation of Prompt Caching for Long-Horizon Agentic Tasks</a>, arXiv 2601.06007, v2 31 January 2026 (41 to 80% cost reductions across three providers; full-context caching can increase latency).</li>
+    <li>Weinberger and Hozez, <a href="https://arxiv.org/abs/2607.12161">Token Reduction Is Not Cost Reduction</a>, arXiv 2607.12161, July 2026.</li>
+    <li>Yan Song, <a href="https://arxiv.org/abs/2607.15516">Cache-Aware Prompt Compression: A Two-Tier Cost Model for LLM API Caching</a>, arXiv 2607.15516, July 2026.</li>
+    <li>Zhang et al., <a href="https://arxiv.org/abs/2608.14624">Learning Agent Execution for KV-Cache Management in Agentic Serving</a> (CacheScout), arXiv 2608.14624, July 2026.</li>
+    <li>Fang et al., <a href="https://arxiv.org/abs/2608.19662">ReCache: Efficient KV Cache Reuse and Compression for Tool-Augmented LLM Agents</a>, arXiv 2608.19662, August 2026.</li>
+    <li>SelfCompact, <a href="https://arxiv.org/abs/2606.23525">arXiv 2606.23525</a>, June 2026 (the compaction break-even, first cited in 1.3).</li>
+  </ul>
+
+</div>
+</body>
+</html>

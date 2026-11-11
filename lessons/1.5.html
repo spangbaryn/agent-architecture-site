@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1.5: Structured note-taking and recitation</title>
+<style>
+  :root {
+    --ink: #1a1d21; --ink-soft: #4a5058; --paper: #faf8f4; --card: #ffffff; --line: #e5e0d6;
+    --accent: #0f6b5c; --accent-soft: #e3efec; --amber: #a05e0b; --amber-soft: #f9efdd;
+    --current: #0f6b5c; --ascendant: #1a5fa8; --emerging: #7a4fa3; --legacy: #8a8578; --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker { font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft); border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super; font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+  .mental-model { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-size: 21px; line-height: 1.45; }
+  .mental-model .label { display: block; font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .approach { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge { font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px; }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); } .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); } .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+  .callout { background: var(--amber-soft); border-left: 4px solid var(--amber); padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+  .callout .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px; }
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft); margin-top: 10px; text-align: center; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 20px; margin: 12px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+  .done-when { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace; background: #efece4; padding: 1px 5px; border-radius: 4px; }
+  .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+  .dg .delta { color: #0f6b5c; }
+  .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+  .dg .loop { stroke-dasharray: 6 4; }
+  .dg .fail { fill: #a05e0b; }
+  .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  .dg .bar { fill: #f1eee7; stroke: #4a5058; stroke-width: 1.5; }
+  .dg .seg { fill: #d8d3c8; }
+  .dg .boundary { stroke: #a05e0b; stroke-width: 2; stroke-dasharray: 4 4; }
+  .dg .lbl { fill: #4a5058; font-size: 12px; }
+  .dg .lbl-d { fill: #0f6b5c; font-size: 12px; font-weight: 600; }
+  .tree text { font-family: -apple-system, sans-serif; font-size: 12.5px; fill: #1a1d21; }
+  .tree .q rect { fill: #fff; stroke: #4a5058; stroke-width: 1.5; rx: 8; }
+  .tree .leaf rect { fill: #e3efec; stroke: #0f6b5c; stroke-width: 2; rx: 8; }
+  .tree .leaf text { fill: #0f6b5c; font-weight: 600; }
+  .tree .notyet rect { fill: #f9efdd; stroke: #a05e0b; stroke-width: 2; rx: 8; }
+  .tree .notyet text { fill: #a05e0b; font-weight: 600; }
+  .tree .e { stroke: #4a5058; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+  .tree .yn { font-size: 11px; fill: #4a5058; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 1 · Topic 1.5</div>
+    <h1>Structured note-taking and recitation</h1>
+    <p class="standfirst">Know who the agent is writing for when it writes something down, and design the note for that reader's distance rather than for the model that is writing it.</p>
+    <div class="meta">Freshness-checked 2026-09-11 · builds on 0.1 to 1.4 · ~13 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>Two failures, one cause. The first is drift. A typical Manus task runs about 50 tool calls, and somewhere around call 40 the agent forgets what call 1 was for. Nothing was compacted; the goal is still in the window. It is just far from the end, in the region 1.1 taught you to distrust, and the model is steering by whatever arrived most recently. The second is the cold start. Anthropic's first long-running harness watched Opus 4.5 try to one-shot a whole web app, run out of context mid-feature, and hand the next window a half-built thing with no explanation; later sessions would look around, see progress, and declare the project finished. Their write-up says it plainly: compaction "isn't sufficient."</p>
+  <p>You already own the pieces. 1.1 gave you the budget: "every token in the window spends from a finite attention budget, so the question is never 'does it fit' but 'does this token pay for its seat.'" 1.3 gave you the loss: "a compaction is a bet, placed by something that cannot see the future, on what a future window will need." What neither lesson told you is who should write down what that future needs, and when. That is this topic. The fix for drift and the fix for cold starts turn out to be the same object at two distances: a note the agent leaves for a reader who does not yet exist.</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>
+    A note is a message from the agent to a later, poorer-informed version of itself; how far away that reader is decides what the note carries and how often it gets rewritten.</div>
+  <p>Three readers, three distances. The <b>next step</b> has the whole transcript but attends unevenly to it, so the note's job is placement: put the goal where attention is highest, which means the end. That is <b>recitation</b>: rewriting the plan into the recent tail of the window, every step, so the global objective is always the newest thing the model sees. Manus's todo.md is the canonical form. The <b>next window</b> has a summary of the transcript, and 1.3 told you what summaries drop: identifiers, standing constraints, decisions with reasons, what was ruled out. The note's job here is survival, so it lives outside the window, as a file, and it is written in the shape of the preservation list. 1.3 promised you would see that list again; this is where it lives when it is kept live instead of reconstructed at compaction time. The <b>next session</b>, or another agent, has nothing. The note's job is orientation: what exists, what is done, what is next, how to run it. Anthropic's <code>claude-progress.txt</code> plus a feature list plus a git log is the canonical form.</p>
+  <p>Distance sets the form (a rewritten tail, a file, a schema), the cadence (every step, at boundaries, once), and the bill. The same note written at the wrong distance is either wasted or lost. 1.2 asked you, without naming it, what to do about an order number that was said at turn 3 and gone by turn 30. That was a note question: who writes it down, and for which reader.</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame">
+    <div class="q">A landscape of: who writes the agent's working state down, and how far away its reader is.</div>
+    <div class="axis">What varies: the writer (the model into its own transcript, the harness, the model into a file, a separate planner, the environment itself) and the reader's distance (the next step, the next window, the next session, another agent). Five answers, ordered from the closest reader to the farthest, with the environment-written note last because it is the one nobody chose to write.</div>
+    <div class="legend">Reading the diagrams: gray is shared structure; <span style="color:#0f6b5c;font-weight:600">teal</span> is what makes this approach different from the one above it; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks.</div>
+  </div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-tool"><path d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="40" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">tool</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">store</text></g>
+      <g id="sym-human"><circle cx="20" cy="10" r="8" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M2 40 a18 18 0 0 1 36 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">orchestrator</text></g>
+      <g id="sym-note"><path d="M0 0 H52 L66 14 V44 H0 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M52 0 V14 H66" fill="none" stroke="currentColor" stroke-width="2"/><text x="33" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">note</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    </defs>
+  </svg>
+
+  <div class="approach">
+    <h3>Recitation in the transcript <span class="badge b-legacy">Legacy</span></h3>
+    <p>The model maintains a plan (a todo list, a goal statement) and rewrites the whole thing into the end of its own transcript at every step, so the objective sits in the recency zone no matter how long the run gets. Manus (Jul 2025) named the pattern and the reason: "it's using natural language to bias its own focus toward the task objective." Claude Code's original TodoWrite and Deep Agents' write_todos are the same move as a tool call. The badge moved this year. Manus found roughly a third of all executor actions were spent updating the list rather than doing the task and moved planning out of the executor (per Lance Martin's notes on Peak Ji's Oct 2025 webinar). Claude Code's docs now say newer models "track multi-step work without a written todo list" and ship the task tools off by default for them. Recency was doing work that the models increasingly do on their own: 0.4's rule, in note form.</p>
+    <p class="tradeoffs"><b>Wins:</b> no infrastructure; the note carries what the model learned this run, not only what it was told; visible in the transcript, so a human can read the plan. <b>Costs:</b> every rewrite is an action and an append, so it spends both the action budget and the cache (1.7 will price this); the list is in the window and dies with it; a model that is already tracking state is being taxed for bookkeeping.</p>
+    <p class="tradeoffs"><b>Done right:</b> a mid-tier or open-weight model on a long tool loop where the observed failure is drift, and no session boundary is expected. The list is the cheapest fix for that specific failure, and you measure its action share to know when to stop.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 140" role="img" aria-label="Model rewrites its plan into the tail of its own transcript every step">
+        <rect class="bar" x="30" y="52" width="400" height="36" rx="6"/>
+        <rect class="seg" x="40" y="60" width="60" height="20"/><rect class="seg" x="108" y="60" width="60" height="20"/><rect class="seg" x="176" y="60" width="60" height="20"/><rect class="seg" x="244" y="60" width="60" height="20"/>
+        <text class="lbl" x="30" y="44">transcript, oldest to newest</text>
+        <g class="delta"><use href="#sym-note" x="356" y="48" transform="scale(1) translate(0,0)"/></g>
+        <use href="#sym-model" x="500" y="50"/>
+        <path class="edge" d="M498 70 H436"/>
+        <text class="lbl" x="440" y="62">reads</text>
+        <path class="edge loop delta" d="M548 50 C 548 10, 400 10, 392 44" style="color:#0f6b5c"/>
+        <text class="lbl-d" x="410" y="22">rewrites the plan every step</text>
+        <circle class="fail" cx="470" cy="112" r="5"/><text class="fail-label" x="480" y="116">a third of actions, and each one appends</text>
+      </svg>
+      <figcaption>Cheapest cure for drift; taxes every step, and the note dies with the window.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Harness-injected reminders <span class="badge b-current">Current</span></h3>
+    <p>The model writes nothing. The harness periodically re-inserts a fixed note (the task, the rules, the classification question) into the transcript, so recency is exploited without spending model actions on it. Claude Code's system-reminder blocks are this. The strongest recent evidence is from monitoring, not coding: in Classifier Context Rot (May 2026), Opus 4.6 with thinking caught an obvious dangerous action 99.7% of the time in a 100k transcript and 69% of the time when the same action was buried in 800k, and inserting periodic reminders of the task into the transcript recovered a significant part of the loss. Frontier models still rot; the reminder still pays.</p>
+    <p class="tradeoffs"><b>Wins:</b> deterministic, free of model actions, tunable per harness; the cadence is a dial you own. <b>Costs:</b> the note is static, so it recites the goal and the rules but cannot carry what the model has learned or decided this run; each insertion is an append with a cache cost; over-reminding is its own distraction.</p>
+    <p class="tradeoffs"><b>Done right:</b> any long-transcript classifier or monitor, and any agent whose standing constraints (safety rules, output schema, scope) are what it forgets. Governance Decay (1.3) showed soft constraints decay fastest; a reminder is the cheapest re-pin.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 140" role="img" aria-label="Harness inserts fixed reminder notes at intervals along the transcript">
+        <rect class="bar" x="30" y="52" width="400" height="36" rx="6"/>
+        <rect class="seg" x="40" y="60" width="50" height="20"/><rect class="seg" x="132" y="60" width="50" height="20"/><rect class="seg" x="224" y="60" width="50" height="20"/><rect class="seg" x="316" y="60" width="50" height="20"/>
+        <g class="delta"><rect x="98" y="58" width="26" height="24" rx="3" fill="#fff" stroke="currentColor" stroke-width="2"/><rect x="190" y="58" width="26" height="24" rx="3" fill="#fff" stroke="currentColor" stroke-width="2"/><rect x="282" y="58" width="26" height="24" rx="3" fill="#fff" stroke="currentColor" stroke-width="2"/><rect x="374" y="58" width="26" height="24" rx="3" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+        <text class="lbl" x="30" y="44">transcript with reminders every N tokens</text>
+        <g class="delta"><use href="#sym-orch" x="60" y="98"/></g>
+        <text class="lbl-d" x="180" y="122">harness inserts the same note; the model never writes it</text>
+        <path class="edge delta" d="M115 96 V90" style="color:#0f6b5c"/>
+        <use href="#sym-model" x="500" y="50"/>
+        <path class="edge" d="M498 70 H436"/>
+        <circle class="fail" cx="470" cy="112" r="5"/><text class="fail-label" x="480" y="116">static: carries the goal, not the progress</text>
+      </svg>
+      <figcaption>Recency without the tax; can only repeat what it was told.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Structured state file <span class="badge b-current">Current</span></h3>
+    <p>The model writes its working state to a file with a schema, outside the window, and the next window (or the next session) reads it back before doing anything. Anthropic's long-running harness (Nov 2025) is the reference: an initializer writes <code>feature_list.json</code> (over 200 features for a claude.ai clone, all marked failing), <code>claude-progress.txt</code>, <code>init.sh</code>, and a first commit; every later session starts with <code>pwd</code>, reads the progress file and the git log, picks one feature, and ends with a commit and a progress update. Two details are the whole design. Coding agents may edit the feature list only by flipping a <code>passes</code> field, under "strongly-worded instructions"; and the list is JSON because the model was "less likely to inappropriately change or overwrite JSON files compared to Markdown." The schema is the constraint. Claude Code's Tasks (on disk in <code>~/.claude/tasks</code>, with dependencies, surviving compaction) are the productized version.</p>
+    <p class="tradeoffs"><b>Wins:</b> survives compaction, resets, and sessions; human-editable and diffable; git gives it a recovery path (1.3's third decision) for free; a schema turns "write good notes" into "fill these fields." <b>Costs:</b> what the writer omits is gone, and the writer cannot see the reader; a stale or optimistic entry (a feature marked passing without a test) misleads every later session; someone has to design the fields.</p>
+    <p class="tradeoffs"><b>Done right:</b> any task that outlives one window: overnight builds, multi-day research, anything with a human away from the keyboard. This tutor is one: the lesson ledger and the profile are the state file, and every run opens by reading them.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 140" role="img" aria-label="Model writes a state file that a later window reads across a boundary">
+        <use href="#sym-model" x="40" y="50"/>
+        <text class="lbl" x="48" y="112">window 1</text>
+        <g class="delta"><use href="#sym-store" x="252" y="42"/></g>
+        <text class="lbl-d" x="222" y="112">state file, schema-shaped</text>
+        <path class="edge delta" d="M138 70 H250" style="color:#0f6b5c"/>
+        <text class="lbl-d" x="160" y="62">writes</text>
+        <line class="boundary" x1="400" y1="20" x2="400" y2="130"/>
+        <text class="lbl" x="352" y="30" fill="#a05e0b" style="fill:#a05e0b">compaction / reset</text>
+        <use href="#sym-model" x="500" y="50"/>
+        <text class="lbl" x="508" y="112">window 2</text>
+        <path class="edge" d="M326 70 H498"/>
+        <text class="lbl" x="430" y="62">reads first</text>
+        <circle class="fail" cx="288" cy="10" r="5"/><text class="fail-label" x="298" y="14">what the writer left out is gone</text>
+      </svg>
+      <figcaption>The only card that crosses the boundary; only as complete as its schema.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Planner-owned plan object <span class="badge b-ascendant">Ascendant</span></h3>
+    <p>A separate context writes the plan and the executor only reads it. Manus's fix for the one-third problem was exactly this: a planner sub-agent decomposes the task and returns a structured plan, the executor acts, and per Phil Schmid's account the plan is injected only when needed rather than rewritten every turn. Anthropic's March 2026 harness added a planner that expands a one-to-four-sentence prompt into a full spec (16 features across ten sprints for a retro game maker) and keeps it at the level of what and why, because a detailed plan that is wrong "would cascade into the downstream implementation." The executor is never the bookkeeper.</p>
+    <p class="tradeoffs"><b>Wins:</b> the executor's actions all advance the task; the plan is written once, in a context with nothing else in it; the plan's schema is enforced at the seam (Manus uses constrained decoding on sub-agent output). <b>Costs:</b> you are now multi-agent, with Module 4's bill and its crux, context sharing between planner and executor; a plan that does not receive results back drifts from reality; a planner that over-specifies poisons the build.</p>
+    <p class="tradeoffs"><b>Done right:</b> a general agent on 50-call tasks where the plan is large and the executor is spending measurable actions on maintaining it; the planner is a tool call the executor makes (Manus) or a first phase (Anthropic), not a peer that chats.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 140" role="img" aria-label="A planner writes the plan; the executor reads it and never rewrites it">
+        <g class="delta"><use href="#sym-orch" x="30" y="50"/></g>
+        <text class="lbl-d" x="36" y="112">planner, own context</text>
+        <g class="delta"><use href="#sym-note" x="220" y="48"/></g>
+        <text class="lbl-d" x="196" y="112">plan object, schema</text>
+        <path class="edge delta" d="M142 70 H218" style="color:#0f6b5c"/>
+        <text class="lbl-d" x="160" y="62">writes</text>
+        <use href="#sym-model" x="400" y="50"/>
+        <text class="lbl" x="400" y="112">executor</text>
+        <path class="edge" d="M288 70 H398"/>
+        <text class="lbl" x="318" y="62">reads</text>
+        <use href="#sym-tool" x="540" y="50"/>
+        <path class="edge" d="M498 70 H538"/>
+        <path class="edge loop" d="M580 92 C 580 130, 460 130, 452 92"/>
+        <text class="lbl" x="470" y="134">all actions advance the task</text>
+        <circle class="fail" cx="330" cy="14" r="5"/><text class="fail-label" x="340" y="18">plan drifts unless results flow back</text>
+      </svg>
+      <figcaption>Executor never bookkeeps; you bought a second context to get that.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Environment-written notes: the failure trace <span class="badge b-contested">Contested</span></h3>
+    <p>The note nobody chose to write. A failed tool call, a stack trace, a wrong answer: the environment wrote it into the transcript and the question is whether to keep it. Manus's position, verbatim: "Leave the wrong turns in." Keep the failed action and its observation, because that is the evidence that updates the model's beliefs and stops the repeat. The syllabus calls this learning from failures mid-task, and SelfCompact's rubric (1.3) encoded the same instinct by refusing to compact a trajectory whose value was dispersed across dead-end queries. The counter-signal arrived in May 2026. Why Retrying Fails models the retry-with-history pattern and fits it to real SWE-bench Verified retries: an independent-attempts model overestimated pass@3 by 17.4 points (98.6% vs 81.2%), and the fit implied a per-step error rate about 7x higher inside a contaminated retry than on a clean one, with a proof that clearing context before a retry strictly reduces attempts needed. It is a model fit, not an ablation, but it names something every Claude Code user has watched: the agent that "repeatedly referenced the same bad endpoint in future attempts because it had learned from its own mistake."</p>
+    <p class="tradeoffs"><b>Wins:</b> free, and it is the only evidence the model has that a path is closed; a trace read once prevents the repeat. <b>Costs:</b> a whole failed attempt in the window is not a lesson, it is a wrong prior with momentum; the model defends its earlier reasoning instead of abandoning it; the contamination compounds across retries.</p>
+    <p class="tradeoffs"><b>Done right:</b> keep the failure, drop the attempt. The error signature, what was tried, and why it failed go into the ruled-out section of the state file (1.3's fourth preservation class); the failed diff and the reasoning that defended it get cleared before the retry. Manus and the contamination paper are both right, about different content.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 140" role="img" aria-label="A tool writes a failure note; the attempt that produced it should be dropped before retry">
+        <use href="#sym-tool" x="40" y="50"/>
+        <text class="lbl" x="40" y="112">environment</text>
+        <g class="delta"><use href="#sym-note" x="200" y="48"/></g>
+        <text class="lbl-d" x="178" y="112">failure: what, why</text>
+        <path class="edge delta" d="M122 70 H198" style="color:#0f6b5c"/>
+        <text class="lbl-d" x="132" y="62">writes</text>
+        <rect x="300" y="52" width="90" height="36" rx="6" fill="#fff" stroke="#a05e0b" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="345" y="75" text-anchor="middle" style="fill:#a05e0b;font-size:12px">attempt</text>
+        <line x1="306" y1="56" x2="384" y2="84" stroke="#a05e0b" stroke-width="2"/><line x1="384" y1="56" x2="306" y2="84" stroke="#a05e0b" stroke-width="2"/>
+        <use href="#sym-model" x="440" y="50"/>
+        <text class="lbl" x="452" y="112">retry</text>
+        <path class="edge" d="M268 70 H438"/>
+        <text class="lbl" x="272" y="44">keep the lesson, drop the wrong diff</text>
+        <circle class="fail" cx="345" cy="124" r="5"/><text class="fail-label" x="355" y="128">whole attempt kept: 7x error on retry</text>
+      </svg>
+      <figcaption>Free evidence that a path is closed; poison when the whole attempt rides along.</figcaption>
+    </figure>
+  </div>
+
+  <p>The cards nest, and the nesting changed in 2026. Production default: a state file (card three) for anything that crosses a boundary, harness reminders (card two) for standing constraints, failures kept as ruled-out lines (card five), a planner (card four) only once the executor is measurably paying for its own bookkeeping, and model recitation (card one) as the thing you reach for on a weaker model and remove when the eval says the model no longer needs it. Retrieval (1.4) decides what enters; compaction (1.3) decides what stays; notes decide what a reader who has neither will still know.</p>
+
+  <figure>
+    <svg class="dg" viewBox="0 0 640 170" role="img" aria-label="Timeline of recitation and note-taking badge changes, 2025 to 2026">
+      <line x1="40" y1="90" x2="600" y2="90" stroke="#4a5058" stroke-width="2"/>
+      <g>
+        <circle cx="80" cy="90" r="6" fill="#8a8578"/><text class="lbl" x="44" y="72">Jul 2025</text><text class="lbl" x="30" y="118">Manus todo.md,</text><text class="lbl" x="30" y="132">"leave the wrong turns in"</text>
+        <circle cx="200" cy="90" r="6" fill="#1a5fa8"/><text class="lbl" x="166" y="72">Oct 2025</text><text class="lbl" x="150" y="118">Manus: a third of actions;</text><text class="lbl" x="150" y="132">planner sub-agent</text>
+        <circle cx="320" cy="90" r="6" fill="#0f6b5c"/><text class="lbl" x="286" y="72">Nov 2025</text><text class="lbl" x="270" y="118">Anthropic: progress file,</text><text class="lbl" x="270" y="132">JSON feature list, resets</text>
+        <circle cx="440" cy="90" r="6" fill="#0f6b5c"/><text class="lbl" x="406" y="72">Mar 2026</text><text class="lbl" x="392" y="118">resets dropped (Opus 4.5);</text><text class="lbl" x="392" y="132">files and evaluator stay</text>
+        <circle cx="560" cy="90" r="6" fill="#a05e0b"/><text class="lbl" x="526" y="72">May 2026</text><text class="lbl" x="500" y="118">reminders still help at 800k;</text><text class="lbl" x="500" y="132">retry contamination fit</text>
+      </g>
+      <text class="lbl" x="40" y="30">What got eaten by model progress: the model rewriting its own plan, and the hard reset. What survived: the file, the schema, the harness reminder, and the ruled-out line.</text>
+    </svg>
+    <figcaption>Fourteen months of badge changes. The capability layer got absorbed; the continuity layer stayed.</figcaption>
+  </figure>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide where its working state should live and who should keep it current:</p>
+  <figure>
+    <svg class="tree" viewBox="0 0 760 560" role="img" aria-label="Decision tree for note-taking and recitation">
+      <defs><marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4a5058"/></marker></defs>
+      <g class="q"><rect x="200" y="16" width="360" height="52"/><text x="380" y="37" text-anchor="middle">1. Will the work cross a context boundary</text><text x="380" y="55" text-anchor="middle">(compaction, reset, new session, another agent)?</text></g>
+      <g class="q"><rect x="20" y="120" width="330" height="52"/><text x="185" y="141" text-anchor="middle">2. Can you name the fields a cold reader needs</text><text x="185" y="159" text-anchor="middle">(done, next, ruled out, how to run it)?</text></g>
+      <g class="q"><rect x="410" y="120" width="330" height="52"/><text x="575" y="141" text-anchor="middle">3. Is the failure drift (forgot the goal)</text><text x="575" y="159" text-anchor="middle">or repetition (retried the same wrong thing)?</text></g>
+      <g class="leaf"><rect x="20" y="230" width="150" height="44"/><text x="95" y="256" text-anchor="middle">Structured state file</text></g>
+      <g class="notyet"><rect x="190" y="230" width="160" height="44"/><text x="270" y="249" text-anchor="middle">Not yet: write the</text><text x="270" y="265" text-anchor="middle">preservation list first</text></g>
+      <g class="q"><rect x="410" y="230" width="330" height="52"/><text x="575" y="251" text-anchor="middle">4. Does the reminder need what the model</text><text x="575" y="269" text-anchor="middle">learned this run, or only what it was told?</text></g>
+      <g class="leaf"><rect x="570" y="340" width="170" height="44"/><text x="655" y="359" text-anchor="middle">Keep the failure,</text><text x="655" y="375" text-anchor="middle">drop the attempt</text></g>
+      <g class="leaf"><rect x="410" y="340" width="150" height="44"/><text x="485" y="366" text-anchor="middle">Harness reminders</text></g>
+      <g class="q"><rect x="20" y="340" width="330" height="52"/><text x="185" y="361" text-anchor="middle">5. Is the executor spending a measurable share</text><text x="185" y="379" text-anchor="middle">of its actions on the list itself?</text></g>
+      <g class="leaf"><rect x="20" y="460" width="160" height="44"/><text x="100" y="479" text-anchor="middle">Recitation in the</text><text x="100" y="495" text-anchor="middle">transcript (measure it)</text></g>
+      <g class="leaf"><rect x="200" y="460" width="150" height="44"/><text x="275" y="486" text-anchor="middle">Planner-owned plan</text></g>
+      <path class="e" d="M300 68 L185 118"/><text class="yn" x="220" y="98">yes</text>
+      <path class="e" d="M460 68 L575 118"/><text class="yn" x="530" y="98">no</text>
+      <path class="e" d="M120 172 L95 228"/><text class="yn" x="80" y="204">yes</text>
+      <path class="e" d="M250 172 L270 228"/><text class="yn" x="272" y="204">no</text>
+      <path class="e" d="M575 172 L575 228"/><text class="yn" x="582" y="204">drift</text>
+      <path class="e" d="M700 172 C 740 200, 740 300, 660 338"/><text class="yn" x="712" y="300">repetition</text>
+      <path class="e" d="M500 282 L485 338"/><text class="yn" x="440" y="312">only told</text>
+      <path class="e" d="M450 282 C 400 300, 300 300, 260 338"/><text class="yn" x="330" y="322">learned</text>
+      <path class="e" d="M120 392 L100 458"/><text class="yn" x="80" y="428">no</text>
+      <path class="e" d="M250 392 L275 458"/><text class="yn" x="278" y="428">yes</text>
+      <path class="e" d="M180 460 C 160 430, 200 300, 170 172" style="stroke-dasharray:4 4"/><text class="yn" x="150" y="300" style="font-weight:400;font-style:italic">the ruled-out line still goes in the file</text>
+    </svg>
+    <figcaption>Question 1 does most of the work: once the reader is on the other side of a boundary, every recency trick is irrelevant and you need a file.</figcaption>
+  </figure>
+  <p>The load-bearing question is the first one, and it is the question 1.3 taught you to ask about compaction pointed at a different move: if a reader will arrive with less than the writer has now, the note has to survive the trip, so it lives outside the window and it is shaped by the preservation list. Everything below question 1 is about the cheaper problem, a reader who has the transcript and attends to it badly. Question 5 is the one that changed in 2026: the threshold at which model recitation stops paying for itself moved, because the models got better at holding a plan without being told to write it down, and Manus's one-third number is the specimen of what it looks like when you cross it.</p>
+
+  <h2><span class="num">5</span>Seen in the wild</h2>
+  <p>Anthropic's long-running coding harness is the best specimen because it was published twice, four months apart, with the second version explaining what it removed and why. The <b>November 2025</b> harness is card three built out in full, on Sonnet 4.5 and then Opus 4.5. An initializer session writes the environment: <code>feature_list.json</code>, all features failing; <code>claude-progress.txt</code>; <code>init.sh</code>; a first commit. Every coding session runs the same four-line ritual: <code>pwd</code>, read the progress file and the git log, read the feature list and pick one, run the dev server and a smoke test, then work one feature, commit, and update the progress file. Between sessions the harness did a hard context reset, not compaction, because Sonnet 4.5 showed what the March post calls "context anxiety," wrapping up prematurely as it believed it was nearing its limit; a summary kept the anxiety, a clean slate did not. The failure-mode table in the post is a note-design table: declared victory early, so a feature list; undocumented progress, so a progress file plus commits; marked done prematurely, so a passes field it may only flip after testing; wasted time figuring out how to run the app, so <code>init.sh</code>. Each note has a named reader and a named field.</p>
+  <p>The <b>March 2026</b> version (Rajasekaran, Anthropic Labs) is what happened when the models moved. Opus 4.5 "largely removed" context anxiety, so the resets went and the build ran as one continuous session under automatic compaction. Opus 4.6 held a plan well enough that the sprint decomposition went too, and the evaluator moved from per-sprint to a single pass at the end. What did not go: the planner (without it the generator under-scoped), the state files (agents communicate by writing a file the other reads), the sprint contract written before any code, and the evaluator, which "is worth the cost when the task sits beyond what the current model does reliably solo." The solo run took 20 minutes and $9 and shipped a game you could not play; the full harness took six hours and $200 and shipped one you could. Read it through 0.4: the hard reset and the sprint chunking were substitutions for a capability the model lacked, and the next two models ate them; the files, the contract, and the skeptical reader survived, because they are continuity and verification, not capability.</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 300" role="img" aria-label="Anthropic's long-running harness in the shared grammar, November 2025 and March 2026">
+      <text class="lbl" x="20" y="22" style="font-weight:600">Nov 2025: resets between sessions, state carried by files</text>
+      <use href="#sym-model" x="20" y="36"/><text class="lbl" x="28" y="96">initializer</text>
+      <g class="delta"><use href="#sym-store" x="160" y="30"/></g>
+      <text class="lbl-d" x="120" y="96">feature_list.json, progress, init.sh, git</text>
+      <path class="edge delta" d="M118 56 H158" style="color:#0f6b5c"/>
+      <use href="#sym-model" x="330" y="36"/><text class="lbl" x="336" y="96">session n</text>
+      <path class="edge" d="M234 56 H328"/><text class="lbl" x="252" y="48">reads first</text>
+      <path class="edge loop delta" d="M378 34 C 378 8, 220 8, 200 28" style="color:#0f6b5c"/><text class="lbl-d" x="230" y="14">flips passes, appends progress, commits</text>
+      <line class="boundary" x1="470" y1="30" x2="470" y2="100"/><text class="lbl" x="440" y="112" style="fill:#a05e0b">hard reset</text>
+      <use href="#sym-model" x="500" y="36"/><text class="lbl" x="504" y="96">session n+1</text>
+      <circle class="fail" cx="520" cy="14" r="5"/><text class="fail-label" x="530" y="18">marks passing without a test</text>
+      <line x1="20" y1="130" x2="620" y2="130" stroke="#e5e0d6"/>
+      <text class="lbl" x="20" y="152" style="font-weight:600">Mar 2026: one continuous session, no resets, a skeptical reader added</text>
+      <g class="delta"><use href="#sym-orch" x="20" y="176"/></g><text class="lbl-d" x="40" y="236">planner</text>
+      <use href="#sym-note" x="160" y="174"/><text class="lbl" x="150" y="236">spec, contract</text>
+      <path class="edge delta" d="M132 196 H158" style="color:#0f6b5c"/>
+      <use href="#sym-model" x="260" y="176"/><text class="lbl" x="268" y="236">generator</text>
+      <path class="edge" d="M228 196 H258"/>
+      <use href="#sym-note" x="390" y="174"/><text class="lbl" x="380" y="236">sprint file</text>
+      <path class="edge" d="M358 196 H388"/>
+      <g class="delta"><use href="#sym-model" x="490" y="176"/></g><text class="lbl-d" x="490" y="236">evaluator, Playwright</text>
+      <path class="edge" d="M458 196 H488"/>
+      <path class="edge loop" d="M538 218 C 538 270, 330 270, 308 218"/><text class="lbl" x="350" y="284">bug list back to the generator</text>
+      <circle class="fail" cx="420" cy="160" r="5"/><text class="fail-label" x="430" y="164">a lenient evaluator approves the stub</text>
+    </svg>
+    <figcaption>Same files, fewer crutches: the second version removed what the model no longer needed and kept every note that a reader still needed.</figcaption>
+  </figure>
+  <p>Aside: Claude Code's Tasks are the state file shipped as a product (on disk, dependency-aware, surviving compaction), and the fact that they now default off on the newest models is the November-to-March story compressed into a config flag.</p>
+
+  <div class="callout"><span class="label">The misconception</span>
+    "The todo list is what keeps an agent on task, so every agent needs one." What kept Manus on task in July 2025 was recency, and recency is a capability substitute: the executor was paying a third of its actions for it by October, and the newest models get most of the effect for free, which is why Claude Code turned the task tools off by default for them. The opposite error is the one to hold in the other hand: "so notes are obsolete." The reader on the far side of a boundary still arrives with nothing, Anthropic's harness still starts every session by reading a file, and Opus 4.6 still missed a blatant attack 31% of the time when it sat behind 800k tokens until a reminder was inserted. Model progress ate the recitation habit. It did not eat the file, the schema, or the reminder, because those serve a reader the model cannot become by getting smarter.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>Overnight coding run on a 400-file repo. The agent has retried the same failing database migration four times; the engineer wants to clear the errors from context "to give it a fresh mind." Approve, modify, or refuse?</summary><p>Modify. Clearing the whole failed attempts is the right instinct; the contamination fit says a retry carrying four wrong diffs and the reasoning that defended them is running at a several-times-higher per-step error rate, and clean restart strictly dominates. But clearing the failures too is how you get attempt five identical to attempt four. Do card five properly: before the reset, write one ruled-out line into the progress file (migration X fails with error Y; hypothesis Z tested and wrong), then reset, then start the next window with the file read first. That is 1.3's fourth preservation class and Anthropic's session ritual doing the same job. Question 3 in the tree routes here because the failure was repetition, not drift.</p></details>
+  <details><summary>Support agent, 30-turn conversations, loses the order number by turn 25 (1.2's question, now with a name). The team proposes having the model rewrite a full "case summary" at the end of every turn. Which card, and what would you change?</summary><p>They proposed card one, and Manus's number is the warning: a full rewrite every turn spends an action and an append per turn on bookkeeping for a model that mostly does not need it. Use card three at short range: a small schema-shaped state block (order number, customer id, decisions made, open question) that the model updates only when a field changes, stored outside the transcript and selected back into a fixed position by the harness each turn. 1.2 called that write-then-select; this lesson adds the schema so the model updates fields rather than prose, and the harness owns the placement so recency is exploited without the model reciting. If the model still drifts on standing rules (tone, refund policy), that is card two, a static reminder, not a rewritten summary.</p></details>
+  <details><summary>This tutor. It has a learner profile, a lesson ledger with open threads, a forward-references section, and a rule that every run starts by fetching the Notion hub and reconciling it against the installed files. Which card is each, who is the reader, and where is the one-third risk?</summary><p>All of it is card three, at the longest distance: the reader is a future instance of the tutor with no memory of this session, so the notes are schema-shaped (mental model verbatim, badges, anchor, sources, open threads with target IDs) and written once per run at the boundary, not every step. The Notion hub cross-check is 1.3's recovery decision: the file is the bet and the archive is the log that catches it losing, which it did this morning, one lesson behind. The one-third risk would be if the tutor rewrote the ledger after every paragraph it drafted; it does not, and it should not, because the reader is not the next step, it is the next session. The open-threads lines are the ruled-out class pointed forward: what this lesson deliberately did not cover, written down so the next reader does not rediscover it.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>
+    Module 1's bar: given any agent misbehavior, your first three hypotheses are all context hypotheses, and they are usually right. This topic's contribution: when an agent "forgot the goal," "declared victory early," "redid finished work," or "retried the same failure," ask who wrote the note it needed, how far away the reader was, and whether the note was rewritten into the window or read back from a file; then name the card the fix lives in. 1.1 supplied the budget, 1.3 the preservation list, 1.4 the locator, 1.6 supplies select for procedures, and 1.7 prices every rewrite.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources">
+    <li>Manus, Context Engineering for AI Agents: Lessons from Building Manus, Jul 2025: <a href="https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus">manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus</a></li>
+    <li>Lance Martin, Context Engineering in Manus (notes on Peak Ji's webinar), Oct 2025 (LangChain, Tier 2): <a href="https://rlancemartin.github.io/2025/10/15/manus/">rlancemartin.github.io/2025/10/15/manus</a></li>
+    <li>Anthropic, Effective harnesses for long-running agents, Nov 26, 2025: <a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">anthropic.com/engineering/effective-harnesses-for-long-running-agents</a></li>
+    <li>Anthropic (Rajasekaran), Harness design for long-running application development, Mar 24, 2026: <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps">anthropic.com/engineering/harness-design-long-running-apps</a></li>
+    <li>Classifier Context Rot: Monitor Performance Degrades with Context Length, arXiv 2605.12366, May 2026: <a href="https://arxiv.org/abs/2605.12366">arxiv.org/abs/2605.12366</a></li>
+    <li>Yang, Why Retrying Fails: Context Contamination in LLM Agent Pipelines, arXiv 2605.08563, May 2026 (a model fit to SWE-bench Verified retries, not an intervention study): <a href="https://arxiv.org/html/2605.08563">arxiv.org/abs/2605.08563</a></li>
+    <li>Claude Code docs, Track todos (Task tools, defaults by model), Sep 2026: <a href="https://code.claude.com/docs/en/agent-sdk/todo-tracking">code.claude.com/docs/en/agent-sdk/todo-tracking</a></li>
+    <li>Phil Schmid, Context Engineering for AI Agents: Part 2, Dec 2025 (Tier 2, for the planner-as-a-tool framing): <a href="https://www.philschmid.de/context-engineering-part-2">philschmid.de/context-engineering-part-2</a></li>
+  </ul>
+
+</div>
+</body>
+</html>

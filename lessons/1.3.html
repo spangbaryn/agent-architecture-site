@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1.3: Compaction and context editing</title>
+<style>
+  :root {
+    --ink: #1a1d21; --ink-soft: #4a5058; --paper: #faf8f4; --card: #ffffff; --line: #e5e0d6;
+    --accent: #0f6b5c; --accent-soft: #e3efec; --amber: #a05e0b; --amber-soft: #f9efdd;
+    --current: #0f6b5c; --ascendant: #1a5fa8; --emerging: #7a4fa3; --legacy: #8a8578; --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker { font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft); border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super; font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+  .mental-model { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-size: 21px; line-height: 1.45; }
+  .mental-model .label { display: block; font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .approach { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge { font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px; }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); }
+  .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); } .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+  .callout { background: var(--amber-soft); border-left: 4px solid var(--amber); padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+  .callout .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px; }
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft); margin-top: 10px; text-align: center; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 20px; margin: 12px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+  .done-when { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace; background: #efece4; padding: 1px 5px; border-radius: 4px; }
+  ul.tight { margin: 0 0 16px; padding-left: 22px; } ul.tight li { margin-bottom: 6px; }
+  .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+  .dg .delta { color: #0f6b5c; }
+  .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+  .dg .loop { stroke-dasharray: 6 4; }
+  .dg .fail { fill: #a05e0b; }
+  .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  .dg .blk { fill: #fff; stroke: currentColor; stroke-width: 2; }
+  .dg .blk-soft { fill: #f1eee7; stroke: currentColor; stroke-width: 1.5; }
+  .dg .lbl { fill: currentColor; font-size: 12px; }
+  .dg .lbl-s { fill: currentColor; font-size: 11px; }
+  .dg .q { fill: #fff; stroke: #4a5058; stroke-width: 1.5; }
+  .dg .leaf { fill: #e3efec; stroke: #0f6b5c; stroke-width: 2; }
+  .dg .leaf-amber { fill: #f9efdd; stroke: #a05e0b; stroke-width: 2; }
+  .dg .qt { fill: #1a1d21; font-size: 12px; }
+  .dg .lt { fill: #0f6b5c; font-size: 12px; font-weight: 600; }
+  .dg .lta { fill: #a05e0b; font-size: 12px; font-weight: 600; }
+  .dg .yn { fill: #4a5058; font-size: 11px; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 1 · Topic 1.3</div>
+    <h1>Compaction and context editing</h1>
+    <p class="standfirst">Why every summary is a bet, what the field learned this year about when to place it, and what you must exempt from it.</p>
+    <div class="meta">Freshness-checked 2026-09-06 · builds on 0.1 to 0.4, 1.1, 1.2 · ~14 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>1.2 left a debt here on purpose. It taught that between two model calls the harness has exactly four moves, that compress is the only one that destroys information, and that the field now recommends it last. Then it named the thing every team builds first anyway, the summarizer that fires when the window is full, "the guillotine," and promised that 1.3 would open on what the guillotine actually cuts. 1.1 made an older promise: it called rot a function of what is in the window, not of room left, and said the mitigation would come here. This is here.</p>
+  <p>The pressure is simple to state. Real work outgrows the window. A single coding session on a hard task now runs to millions of tokens across more than a hundred turns; research agents make hundreds of tool calls per question. And by 1.1, the model degrades long before the wall, so something must shrink the window while the task is still running. The moment the harness shrinks it, someone is deciding, on behalf of a future window that does not exist yet, what that window will need. That decision is the whole topic.</p>
+  <p>Two concrete failures show what is at stake. In a Johns Hopkins and Apple study published in June, an agent hunting a rare fungus on BrowseComp verified four facts, then a fixed-interval summary fired mid-reasoning, wiped them, and the agent guessed the wrong mushroom. On another question the fixed clock fired four times and each summary re-seeded the same list of already-ruled-out rock stars, so the agent looped inside its own dead ends for a hundred turns. A single compaction placed at the right moment, after the lead had been corrected, got the answer. Same model, same summarizer prompt; the only variable was <em>when</em>. The second failure is quieter. Two papers this summer measured what happens to standing rules under compaction: a policy the agent obeys perfectly while it is visible gets summarized at the same rate as a tool log, loses its exact wording, and stops being enforceable. Across seven models, compaction took constraint violations from zero to thirty percent. Nothing in the trace looks wrong. The agent simply no longer knows the rule.</p>
+  <p>The field's response in 2026 was not a better summary prompt. It was to stop treating compaction as one operation and start treating it as three decisions, which is the model below.</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>
+    A compaction is a bet, placed by something that cannot see the future, on what a future window will need. You cannot make the bet safe. You can only decide when it fires, what is exempt from it, and how you find out it lost.</div>
+  <p>Unpack the three decisions, because every card in the landscape is an answer to one of them.</p>
+  <p><b>When it fires.</b> The bettor can be a byte counter, a rule the model checks against its own trajectory, or a policy trained into the weights. 1.2 called this the trigger locus. What 2026 added is evidence that timing dominates: in the study above, the fixed clock's summaries changed a correct answer to a wrong one 40 percent of the times they changed anything at all, and letting the model fire at closed units of work beat the clock on 11 of 12 benchmark cells while spending less. A summary at a task boundary is a bet with good information. A summary at 150,000 tokens is a bet placed blind.</p>
+  <p><b>What is exempt.</b> A summary is not uniformly lossy. It keeps the plot and loses the props. Narrative progress survives well ("we investigated the auth flow and found the bug in token refresh"); four other classes do not, and they are exactly what the next step needs: exact identifiers (paths, IDs, numbers, the order number from 1.2's quiz), standing constraints (policies, safety rules, "never touch prod"), the decisions taken <em>and their reasons</em>, and what was ruled out (the dead ends, which if lost get re-run). The syllabus compresses this to <em>decisions over details</em>. The 2026 refinement is that some details are not details: a constraint that loses its wording loses its force, so it has to be exempted from the bet rather than trusted to it.</p>
+  <p><b>How you find out it lost.</b> A bad compaction does not throw an error. It shows up three turns later as a re-read, a repeated search, a forgotten branch name, a violated policy. 1.2's fourth card, the log-is-truth-window-is-view design, is the strongest answer: if the evicted turns still exist somewhere with a path in the summary, a lost bet is a re-read instead of a loss. Short of that, you get validation (checking a summary against the trajectory it replaced) and instrumentation (compactions marked in the trace, so the operator can see that the drift began at one).</p>
+  <p>One more thing the 1.2 framing did not have room for. Compaction is what the field calls it when the model or harness summarizes. <em>Context editing</em> is the umbrella for the lighter cuts: clearing old tool results, offloading big payloads to files, dropping stale thinking. Those are compress too, but they are structural rather than semantic, and they are the reason the field says "prune before you summarize." The first card is that.</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame">
+    <div class="q">A landscape of: what the compactor knows at the moment it decides.</div>
+    <div class="axis">What varies: the information available to whoever places the bet. A byte count; the shape of the content; the state of the task; the type of each line; the outcomes of past bets. Five answers, ordered from least to most informed, and the cost of being informed rises with the order.</div>
+    <div class="legend">Reading the diagrams: the row of small blocks is the window (turns and tool results), the model box is the compactor, the block after it is what replaces the window. Gray is shared structure; <span style="color:#0f6b5c;font-weight:600">teal</span> is what this approach knows that the one above it did not; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks.</div>
+  </div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-tool"><path d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="40" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">tool</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">store</text></g>
+      <g id="sym-human"><circle cx="20" cy="10" r="8" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M2 40 a18 18 0 0 1 36 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">orchestrator</text></g>
+      <g id="sym-window"><rect class="blk" x="0" y="0" width="34" height="26" fill="#fff" stroke="currentColor" stroke-width="2"/><rect x="40" y="0" width="34" height="26" fill="#fff" stroke="currentColor" stroke-width="2"/><rect x="80" y="0" width="34" height="26" fill="#fff" stroke="currentColor" stroke-width="2"/><rect x="120" y="0" width="34" height="26" fill="#fff" stroke="currentColor" stroke-width="2"/><rect x="160" y="0" width="34" height="26" fill="#fff" stroke="currentColor" stroke-width="2"/><rect x="200" y="0" width="34" height="26" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-summary"><rect x="0" y="0" width="60" height="26" rx="4" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="30" y="17" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="currentColor">summary</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    </defs>
+  </svg>
+
+  <div class="approach">
+    <h3>Threshold summarization <span class="badge b-current">Current</span></h3>
+    <p>A byte counter fires a summarizer. The Claude API's server-side compaction (<code>compact_20260112</code>) defaults to 150,000 input tokens, allows nothing below 50,000, and is Anthropic's recommended strategy for long-running agentic work; Claude Code auto-compacts near the limit and exposes <code>/compact</code>; Deep Agents fires at 85 percent of the model's window; Google's ADK fires every N events with an overlap. Two flavors, and the June paper names how they fail in opposite directions: <em>reactive</em> (near the limit) waits until the window is already saturated with stale tokens that have been polluting generation for many steps; <em>periodic</em> (every k tokens) cuts indiscriminately, often mid-subgoal.</p>
+    <p class="tradeoffs"><b>Wins:</b> predictable, testable, no model judgment required, and shipped as one API parameter; sessions become effectively unbounded. <b>Costs:</b> blind to trajectory state. On 20 production configurations, Claude Code's <code>/compact</code> on Sonnet 4.6 kept 53 percent of safety rules after one round and 10 percent after five (the "compaction cliff"). Fixed-interval summaries were net positive on competition math, but 40 percent of the answer changes they caused were for the worse.</p>
+    <p class="tradeoffs"><b>Done right:</b> a long-lived multi-turn chat product where there is no task boundary to detect and the bloat is uniform, paired with a wrap-up budget (count compactions, ask the model to finish at N) so unbounded does not mean infinite. Also correct as the backstop underneath every other card; SelfCompact keeps a 30 percent-of-window forced trigger behind its rubric.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 130" role="img" aria-label="A row of turn blocks passes a token gauge, which fires the model to write a summary that replaces the window.">
+        <text class="lbl" x="20" y="24">window</text>
+        <use href="#sym-window" x="20" y="34"/>
+        <g class="delta">
+          <path d="M232 14 V80" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
+          <text class="lbl" x="238" y="24" fill="currentColor">150k tokens</text>
+        </g>
+        <path class="edge" d="M256 47 H298"/>
+        <use href="#sym-model" x="300" y="27"/>
+        <path class="edge" d="M398 47 H428"/>
+        <use href="#sym-summary" x="430" y="34"/>
+        <path class="edge" d="M492 47 H508"/>
+        <rect class="blk" x="510" y="34" width="34" height="26"/><rect class="blk" x="550" y="34" width="34" height="26"/>
+        <text class="lbl-s" x="510" y="24">continues</text>
+        <circle class="fail" cx="232" cy="88" r="5"/><text class="fail-label" x="242" y="92">fires mid-unit; the gauge cannot see the task</text>
+      </svg>
+      <figcaption>One parameter and always fires; knows how big the window is and nothing else.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Clearing and offloading <span class="badge b-current">Current</span></h3>
+    <p>Structural cuts that need no summary. Anthropic's context editing clears old tool results while keeping the fact that the call happened; Deep Agents writes any tool input or result over 20,000 tokens to a file and leaves the path plus a ten-line preview in the window; on current Claude models the model's own earlier thinking blocks are simply dropped rather than summarized. Both platforms leave the system prompt untouched. This is compress by <em>shape</em>: the harness knows that a 30k-token file read is re-fetchable and that a decision is not, and cuts only the first kind. Cursor, Aider, OpenHands, Gemini CLI, and Codex CLI all run some version of this before their summarizer.</p>
+    <p class="tradeoffs"><b>Wins:</b> nearly lossless when the payload can be re-fetched; deterministic; the 29 percent eval lift 1.2 cited came from clearing alone; and it delays the summary, often past the end of the task, which is the best compaction of all. <b>Costs:</b> cuts one shape of bloat only; reasoning, decisions, and conversation are untouched; clearing the one result the next step needed becomes a re-read, and clearing it without a path becomes a loss.</p>
+    <p class="tradeoffs"><b>Done right:</b> every coding and computer-use agent, as the first move, before any summarizer is configured. Deep Agents states the ordering plainly: summarize only when nothing is left to offload.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 130" role="img" aria-label="Two oversized tool-result blocks in the window are moved to a file store, leaving small path stubs; the model is not involved.">
+        <text class="lbl" x="20" y="24">window</text>
+        <rect class="blk" x="20" y="34" width="34" height="26"/>
+        <rect class="blk" x="60" y="28" width="34" height="38"/><text class="lbl-s" x="63" y="52">tool</text>
+        <rect class="blk" x="100" y="34" width="34" height="26"/>
+        <rect class="blk" x="140" y="28" width="34" height="38"/><text class="lbl-s" x="143" y="52">tool</text>
+        <rect class="blk" x="180" y="34" width="34" height="26"/>
+        <rect class="blk" x="220" y="34" width="34" height="26"/>
+        <g class="delta">
+          <use href="#sym-store" x="90" y="84"/>
+          <path class="edge" d="M77 66 V84"/>
+          <path class="edge" d="M157 66 V84"/>
+          <text class="lbl-s" x="170" y="106" fill="currentColor">payload moved out; a path stays in the block</text>
+        </g>
+        <path class="edge" d="M256 47 H298"/>
+        <use href="#sym-model" x="300" y="27"/>
+        <text class="lbl-s" x="300" y="24">not consulted</text>
+        <path class="edge" d="M398 47 H428"/>
+        <rect class="blk" x="430" y="34" width="34" height="26"/><rect class="blk-soft" x="470" y="34" width="34" height="26"/><rect class="blk" x="510" y="34" width="34" height="26"/><rect class="blk-soft" x="550" y="34" width="34" height="26"/>
+        <text class="lbl-s" x="430" y="24">same window, smaller</text>
+        <circle class="fail" cx="170" cy="120" r="5"/><text class="fail-label" x="180" y="124">cleared without a path: a loss, not a re-read</text>
+      </svg>
+      <figcaption>Prune before you summarize; knows the shape of the content, not its meaning.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Model-timed compaction <span class="badge b-ascendant">Ascendant</span></h3>
+    <p>The model decides when. LangChain shipped a summarization tool in Deep Agents in April (on by default in the CLI, opt-in in the SDK) and reported agents conservative about firing it but well-timed when they do: task boundaries, right after extracting a result from a large read, right before a complex multi-step stretch. The June SelfCompact paper adds the piece that makes it reliable: a rubric the model answers against its own trajectory before every fire. Has the trajectory reached a closed unit? Can the essentials be stated as three to five citable facts? Has anything progressed since the last compaction? Am I stuck in a way a summary would mask? Fire only when all four pass. The ablation is the finding: tool alone is used unevenly across models (some fire reflexively, some never); rubric alone cannot act; together they add 5 to 9 points on agentic search at 30 to 70 percent lower cost, and the fires land well before the fixed threshold would have.</p>
+    <p class="tradeoffs"><b>Wins:</b> bets placed with information; verified facts crystallize before reasoning continues; the loop-escape effect, where one well-timed compaction clears a dead-end shortlist that a clock kept re-seeding. <b>Costs:</b> the model has to remember, and it forgets under pressure (1.2's card three, again); the rubric is task-specific; the same model is judge, summarizer, and subject; and each probe is a call, cheap only because the prefix is cached.</p>
+    <p class="tradeoffs"><b>Done right:</b> research and search agents with natural sub-question boundaries, and coding agents at a task switch: "the refactor is done, now the tests." SelfCompact's rubric refuses to fire when the trajectory's value is dispersed across many small negative results, which is exactly the case where a summary would erase what was learned.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 130" role="img" aria-label="The model reads its own window through a rubric and emits a summarize call at a closed unit; no gauge is present.">
+        <text class="lbl" x="20" y="24">window</text>
+        <use href="#sym-window" x="20" y="34"/>
+        <g class="delta">
+          <text class="lbl" x="98" y="78" fill="currentColor">unit closed ✓</text>
+          <path d="M136 47 V62" stroke="currentColor" stroke-width="2" fill="none"/>
+          <use href="#sym-model" x="300" y="27"/>
+          <rect x="300" y="4" width="96" height="16" rx="8" fill="#e3efec" stroke="currentColor" stroke-width="1.5"/>
+          <text class="lbl-s" x="348" y="16" text-anchor="middle" fill="currentColor">rubric: 4 gates</text>
+          <path class="edge loop" d="M348 68 C348 100, 200 104, 140 86" />
+          <text class="lbl-s" x="220" y="116" fill="currentColor">emits &lt;summarize&gt; when the gates pass</text>
+        </g>
+        <path class="edge" d="M256 47 H298"/>
+        <path class="edge" d="M398 47 H428"/>
+        <use href="#sym-summary" x="430" y="34"/>
+        <path class="edge" d="M492 47 H508"/>
+        <rect class="blk" x="510" y="34" width="34" height="26"/><rect class="blk" x="550" y="34" width="34" height="26"/>
+        <circle class="fail" cx="404" cy="78" r="5"/><text class="fail-label" x="414" y="82">must remember to fire; judge of itself</text>
+      </svg>
+      <figcaption>Fires at closed units instead of at a number; knows the state of the task.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Typed retention <span class="badge b-emerging">Emerging</span></h3>
+    <p>Not everything is summarized at the same rate. The Governance Decay paper (June) pins constraints so they pass through the rewrite verbatim; the Compaction Cliff paper (August) goes further and classifies each line of an agent's knowledge base by type, then routes each type through its own retention policy: rules kept exact, logs compressed, topics too big to compact safely split with the in-scope rules replicated into each part. The production seed already exists in plain form. The Claude API's <code>pause_after_compaction</code> hands control back after the summary so the harness can re-insert recent messages verbatim; its <code>instructions</code> parameter replaces the default summarizer prompt entirely, and Anthropic's own guidance for Fable 5.1 is to tell the model what the summary must retain. Community <code>/compact</code> rubric skills (keep, compress, drop, pointers) are the same idea by hand.</p>
+    <p class="tradeoffs"><b>Wins:</b> the exemption list becomes architecture instead of hope. In the seven-model study, violation with a surviving constraint was zero and with a dropped one was 38 percent; pinning closed that gap. <b>Costs:</b> something has to classify each line, and a rule misread as a log is a log; per-type policies are more surface to maintain; soft organizational policies decayed 8.3 times more than hard ones, so the classifier must catch the sentence that does not look like a rule.</p>
+    <p class="tradeoffs"><b>Done right:</b> any agent under standing policy that arrived through the conversation or memory rather than the system prompt: a support agent with refund rules loaded per account, a clinical or financial assistant, an agent with a "never do X" list a user typed on turn two.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 130" role="img" aria-label="Two pinned rule blocks bypass the model and arrive verbatim after the summary; the other blocks are summarized.">
+        <text class="lbl" x="110" y="78">window</text>
+        <use href="#sym-window" x="20" y="34"/>
+        <g class="delta">
+          <circle cx="37" cy="34" r="4" fill="currentColor"/>
+          <circle cx="197" cy="34" r="4" fill="currentColor"/>
+          <text class="lbl-s" x="14" y="78" fill="currentColor">typed as rule</text>
+          <text class="lbl-s" x="176" y="78" fill="currentColor">typed as rule</text>
+          <path class="edge" d="M37 30 C37 2, 520 2, 527 30"/>
+          <path class="edge" d="M197 30 C197 10, 520 10, 527 30"/>
+          <rect x="510" y="34" width="34" height="26" fill="#e3efec" stroke="currentColor" stroke-width="2"/>
+          <text class="lbl-s" x="505" y="78" fill="currentColor">verbatim</text>
+        </g>
+        <path class="edge" d="M256 47 H298"/>
+        <use href="#sym-model" x="300" y="27"/>
+        <path class="edge" d="M398 47 H428"/>
+        <use href="#sym-summary" x="430" y="34"/>
+        <path class="edge" d="M492 47 H508"/>
+        <rect class="blk" x="550" y="34" width="34" height="26"/>
+        <circle class="fail" cx="117" cy="100" r="5"/><text class="fail-label" x="127" y="104">a rule read as a log gets summarized</text>
+      </svg>
+      <figcaption>Rules pass through, logs get compressed; knows the type of each line.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Trained self-summarization <span class="badge b-emerging">Emerging</span></h3>
+    <p>The summary is learned, not prompted. Cursor's Composer (March) trains on rollouts that are chains of generations linked by the model's own summaries; the final reward is applied to every token in the chain, so summaries that carried the right information forward are upweighted and summaries that lost it are penalized. Cursor reports the error introduced by compaction cut in half at a fifth of the tokens of a tuned prompt baseline, which is the only number in this landscape about summary <em>quality</em> rather than summary <em>timing</em>. Cognition described the earlier, cheaper form in 2025: a smaller model fine-tuned to compress Devin's history down to key details, events, and decisions.</p>
+    <p class="tradeoffs"><b>Wins:</b> the summary is optimized for what continuations actually needed rather than for what a prompt author guessed; short by construction; improves with every training run. <b>Costs:</b> you need the weights and one task distribution; the preservation list is implicit in the reward, so you can measure it but not read it; a policy learned on coding does not transfer to your support agent; and the vendor owns it, so it improves on their schedule.</p>
+    <p class="tradeoffs"><b>Done right:</b> a vertically integrated product with one task shape and its own model, which is why this card is Cursor and Cognition and not the rest of us. For everyone else, the lesson it teaches is that the bet can be scored, which is what the next card up (typed retention) and 6.2's verifiers do without training.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 130" role="img" aria-label="A chain of window, summary, and continuation ends in a reward that flows back to the summary through training.">
+        <text class="lbl" x="20" y="24">window</text>
+        <use href="#sym-window" x="20" y="34"/>
+        <path class="edge" d="M256 47 H298"/>
+        <use href="#sym-model" x="300" y="27"/>
+        <path class="edge" d="M398 47 H428"/>
+        <use href="#sym-summary" x="430" y="34"/>
+        <path class="edge" d="M492 47 H508"/>
+        <rect class="blk" x="510" y="34" width="34" height="26"/>
+        <g class="delta">
+          <path class="edge" d="M546 47 H562"/>
+          <rect x="564" y="30" width="60" height="34" rx="17" fill="#e3efec" stroke="currentColor" stroke-width="2"/>
+          <text class="lbl-s" x="594" y="51" text-anchor="middle" fill="currentColor">reward</text>
+          <path class="edge loop" d="M594 66 C594 110, 470 112, 460 74"/>
+          <text class="lbl-s" x="440" y="120" fill="currentColor">the outcome trains the summary</text>
+        </g>
+        <circle class="fail" cx="236" cy="82" r="5"/><text class="fail-label" x="20" y="86">needs the weights and one task shape</text>
+      </svg>
+      <figcaption>The bet gets scored and the scorer trains the bettor; knows what past bets cost.</figcaption>
+    </figure>
+  </div>
+
+  <p>Two things the cards share. First, they stack rather than compete: a serious 2026 harness runs clearing first, one of the two summarizers second, and typed retention around whichever summarizer it chose, with the threshold as a forced backstop behind all of it. Second, every one of them is still a bet. The recovery decision (log-is-truth, validation, trace markers) sits underneath the whole landscape, and 1.2 already gave you its cards.</p>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide how the window gets shrunk, who decides when, and what is exempt:</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 720 540" role="img" aria-label="Decision tree: five yes/no questions leading to the five landscape cards and one not-yet leaf.">
+      <!-- Q1 -->
+      <rect class="q" x="230" y="16" width="470" height="56" rx="10"/>
+      <text class="qt" x="465" y="38" text-anchor="middle">1. Can you write down what a future window must have?</text>
+      <text class="yn" x="465" y="56" text-anchor="middle">decisions with reasons, constraints, identifiers, what was ruled out</text>
+      <rect class="leaf-amber" x="16" y="18" width="190" height="52" rx="10"/>
+      <text class="lta" x="111" y="40" text-anchor="middle">Not yet</text>
+      <text class="yn" x="111" y="58" text-anchor="middle">write the preservation list first</text>
+      <path class="edge" d="M230 44 H208"/><text class="yn" x="212" y="36">no</text>
+      <path class="edge" d="M465 72 V106"/><text class="yn" x="472" y="94">yes</text>
+      <!-- Q2 -->
+      <rect class="q" x="230" y="108" width="470" height="56" rx="10"/>
+      <text class="qt" x="465" y="130" text-anchor="middle">2. Is most of the bloat big tool results you could re-fetch or file?</text>
+      <text class="yn" x="465" y="148" text-anchor="middle">file reads, search dumps, build logs</text>
+      <rect class="leaf" x="16" y="110" width="190" height="52" rx="10"/>
+      <text class="lt" x="111" y="132" text-anchor="middle">Clearing and offloading</text>
+      <text class="yn" x="111" y="150" text-anchor="middle">first, before any summarizer</text>
+      <path class="edge" d="M230 136 H208"/><text class="yn" x="210" y="128">yes</text>
+      <path class="edge" d="M465 164 V198"/><text class="yn" x="472" y="186">no, or after that</text>
+      <!-- Q3 -->
+      <rect class="q" x="230" y="200" width="470" height="56" rx="10"/>
+      <text class="qt" x="465" y="222" text-anchor="middle">3. Does the list hold standing rules that must survive word for word?</text>
+      <text class="yn" x="465" y="240" text-anchor="middle">policies, safety constraints, "never do X", loaded from conversation or memory</text>
+      <rect class="leaf" x="16" y="202" width="190" height="52" rx="10"/>
+      <text class="lt" x="111" y="224" text-anchor="middle">Typed retention</text>
+      <text class="yn" x="111" y="242" text-anchor="middle">around the trigger you pick next</text>
+      <path class="edge" d="M230 228 H208"/><text class="yn" x="210" y="220">yes</text>
+      <path class="edge loop" d="M111 254 V320 H228"/>
+      <path class="edge" d="M465 256 V290"/><text class="yn" x="472" y="278">no</text>
+      <!-- Q4 -->
+      <rect class="q" x="230" y="292" width="470" height="56" rx="10"/>
+      <text class="qt" x="465" y="314" text-anchor="middle">4. Does the work have closed units the model can recognize?</text>
+      <text class="yn" x="465" y="332" text-anchor="middle">a sub-question answered, a test passed, a task switched</text>
+      <rect class="leaf" x="16" y="376" width="190" height="52" rx="10"/>
+      <text class="lt" x="111" y="398" text-anchor="middle">Model-timed compaction</text>
+      <text class="yn" x="111" y="416" text-anchor="middle">rubric-gated, threshold as backstop</text>
+      <path class="edge" d="M230 340 C200 340, 150 350, 111 374"/><text class="yn" x="190" y="362">yes</text>
+      <path class="edge" d="M465 348 V382"/><text class="yn" x="472" y="370">no</text>
+      <!-- Q5 -->
+      <rect class="q" x="230" y="384" width="470" height="56" rx="10"/>
+      <text class="qt" x="465" y="406" text-anchor="middle">5. Do you own the model's training and a single task shape?</text>
+      <text class="yn" x="465" y="424" text-anchor="middle">you are Cursor or Cognition</text>
+      <rect class="leaf" x="16" y="470" width="190" height="52" rx="10"/>
+      <text class="lt" x="111" y="492" text-anchor="middle">Trained self-summarization</text>
+      <text class="yn" x="111" y="510" text-anchor="middle">summary quality from the reward</text>
+      <path class="edge" d="M230 432 C200 432, 150 444, 111 468"/><text class="yn" x="190" y="456">yes</text>
+      <rect class="leaf" x="330" y="470" width="270" height="52" rx="10"/>
+      <text class="lt" x="465" y="492" text-anchor="middle">Threshold summarization</text>
+      <text class="yn" x="465" y="510" text-anchor="middle">with a wrap-up budget; the common default</text>
+      <path class="edge" d="M465 440 V468"/><text class="yn" x="472" y="458">no</text>
+    </svg>
+    <figcaption>Question 1 does the work: it is the one nobody asks, and every card below it is a bet placed on its answer.</figcaption>
+  </figure>
+  <p>Question 1 is load-bearing because it turns the mental model into a deliverable. Every card is a bettor; none of them can be briefed without a list of what the stakes are. Teams that skip it end up with a summarizer prompt written by whoever was on call, and Anthropic's own docs now say the same thing from the other side: custom instructions replace the default entirely, so if you write them, say what must be retained. Questions 2 and 3 are the cheap wins (structural cuts and exemptions cost almost nothing and remove most of the risk), which is why they come before the interesting question 4. Question 5 exists so that you recognize the trained card as someone else's move.</p>
+
+  <h2><span class="num">5</span>Seen in the wild</h2>
+  <p><b>Amp, the coding agent from Sourcegraph, changed its answer to this topic twice in seven months, and both answers were right when made.</b> That makes it a better anchor than any single system, because you get to watch the bettor change.</p>
+  <p><b>October 2025: "Handoff (No More Compaction)."</b> Amp removed automatic compaction. The post's reasoning reads like this lesson's section 2: compaction is lossy, whether the summary contains what you think it should is up to the agent, and, the part nobody else had said out loud, compaction <em>encourages long meandering threads</em>, because you just compact when you run out and stack summary on summary. The replacement, Handoff, made the user the bettor: you state a goal for the next task, Amp extracts from the current thread what that goal needs, and you review the extraction before it seeds a fresh thread. In this lesson's terms: model-timed timing (the human picks the closed unit), typed retention by inspection (the human reads the exemption list), and recovery by construction (the old thread is still there on the server; a bad handoff is a re-read). They also shipped Fork (duplicate the window at a point) and thread references (pull from another thread on demand), which is 1.2's reversible-context card built for a person instead of a harness.</p>
+  <p><b>May 2026: "Amp, Rebuilt."</b> Handoff is gone. The stated principle: build for what frontier models can do now, not for what once was, and "today's leading frontier models are great at handling compaction." Amp now compacts automatically when the window fills, and the post lists the babysitting it removed: watching context percentages, deciding when to hand off, extracting information in a panic. The human bettor was scaffolding that substituted for a model capability, and 0.4 told you what happens to that kind of scaffolding: "scaffolding that substitutes for model capability gets eaten by the next model release, while scaffolding that contains consequences survives every one of them." The server-side thread store survived; the handoff ritual did not.</p>
+  <p>Read the two posts against the three decisions and something sharper appears. Amp did not reverse on <em>timing</em> (it went from human-timed to threshold-timed, which by the June evidence is a step down in information) or on <em>exemptions</em> (the review step was the exemption list, and it is gone). It reversed because the <em>recovery</em> decision made the other two cheap: with every thread stored server-side and referenceable, a lost bet costs a re-read, so the value of a careful bettor fell below the value of not making the user be one. That is the 2026 pattern in one product: invest in recovery, and the timing and exemption decisions can be handed to whichever bettor is cheapest.</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 215" role="img" aria-label="Two rows: Amp's October 2025 handoff with a human choosing the goal and reviewing the extraction, and Amp's May 2026 automatic compaction with a threshold and model; both rows share a server-side thread store.">
+      <text class="lbl" x="20" y="22" font-weight="600">Oct 2025 · Handoff</text>
+      <use href="#sym-window" x="20" y="34"/>
+      <path class="edge" d="M256 47 H290"/>
+      <g class="delta">
+        <use href="#sym-human" x="292" y="27"/>
+        <text class="lbl-s" x="336" y="40" fill="currentColor">states the goal,</text>
+        <text class="lbl-s" x="336" y="54" fill="currentColor">reviews the extraction</text>
+      </g>
+      <path class="edge" d="M462 47 H488"/>
+      <rect class="blk" x="490" y="34" width="60" height="26" rx="4"/><text class="lbl-s" x="497" y="51">extract</text>
+      <path class="edge" d="M552 47 H568"/>
+      <rect class="blk" x="570" y="34" width="34" height="26"/>
+      <text class="lbl-s" x="560" y="24">new thread</text>
+      <circle class="fail" cx="26" cy="78" r="5"/><text class="fail-label" x="36" y="82">user must watch the percentage and decide</text>
+
+      <text class="lbl" x="20" y="112" font-weight="600">May 2026 · Neo</text>
+      <use href="#sym-window" x="20" y="124"/>
+      <path d="M232 106 V160" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
+      <path class="edge" d="M256 137 H298"/>
+      <use href="#sym-model" x="300" y="117"/>
+      <path class="edge" d="M398 137 H428"/>
+      <use href="#sym-summary" x="430" y="124"/>
+      <path class="edge" d="M492 137 H508"/>
+      <rect class="blk" x="510" y="124" width="34" height="26"/><rect class="blk" x="550" y="124" width="34" height="26"/>
+      <circle class="fail" cx="26" cy="168" r="5"/><text class="fail-label" x="36" y="172">the bet is back on the model, blind</text>
+
+      <g class="delta">
+        <use href="#sym-store" x="556" y="168"/>
+        <path class="edge loop" d="M592 168 V152"/>
+        <path class="edge loop" d="M592 168 C640 120, 640 80, 604 62"/>
+        <text class="lbl-s" x="290" y="188" fill="currentColor">every thread kept server-side and referenceable:</text>
+        <text class="lbl-s" x="290" y="203" fill="currentColor">recovery is the part that survived both designs</text>
+      </g>
+    </svg>
+    <figcaption>Same store underneath; the bettor moved from the person to the threshold once a lost bet became a re-read.</figcaption>
+  </figure>
+  <p>Aside: Claude Code is threshold summarization with a user-tunable exemption list (<code>/compact &lt;instructions&gt;</code>), and it is the system the August paper measured to get the 53-to-10-percent cliff. The cliff is not a Claude Code bug; it is what card one does to card four's content when card four is absent.</p>
+
+  <div class="callout"><span class="label">The misconception</span>
+    "Compaction loss is a summarizer-quality problem, so the fix is a better prompt or a smarter model." Half of the 2026 evidence says timing, not prose, decided the outcome: same summarizer, same model, and the fixed clock turned right answers wrong 40 percent of the times it changed one, while a rubric-timed fire with the identical summary prompt won. The other half says the loss is structural: a rule and a log compete for the same tokens, seven different models dropped rules at the same rate, and Cursor's trained summarizer, the best in the landscape, halved the error rather than removing it. The fix lives in the harness's three decisions, not in the summary's wording. Then hold the opposite error in the other hand: Amp did retire its human bettor because the models got better, and it was right to. What model progress buys is a cheaper bettor; what it does not buy is an exemption list or a recovery path, and those are yours to build.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>A support agent loads each customer's refund rules from a policy database into the conversation on turn two, then runs 150-turn sessions with server-side compaction at the default trigger. Compliance audits show rule violations clustering late in sessions. The engineer proposes lowering the trigger to 80k. Which card, and why is the proposal the wrong decision?</summary><p>Typed retention. The rules arrived through the conversation, not the system prompt, so the API's protection of the system prompt does not cover them; they are summarized at the same rate as the chat log and lose the exact wording that makes them enforceable (the seven-model study: zero violations while the constraint survives, 38 percent once it is dropped). Lowering the trigger is a <em>timing</em> change; the failure is an <em>exemption</em> failure, and more frequent compactions would drop the rules sooner, not later. Fix: pin the policy lines, either by re-inserting them verbatim after the summary with <code>pause_after_compaction</code> or by giving the summarizer instructions that name them as must-retain, and instrument compactions in the trace so the next audit can see whether the drift begins at one.</p></details>
+  <details><summary>A research agent runs 80-search hunts. It hits the window on hard questions. The engineer proposes summarizing every 40k tokens. You have seen the June evidence; what do you say, and what does the summarizer have to be told to keep?</summary><p>Model-timed compaction with a threshold backstop, not a clock. Search has natural closed units (a sub-question resolved, a lead corrected), and the June cases show the fixed clock freezing a wrong lead into every summary or wiping four verified facts mid-derivation. Give the model a summarize tool and a rubric (closed unit, three to five citable facts, progress since last, not stuck), and keep the 40k as the forced fallback. The preservation list for this task has an item people miss: <em>what was ruled out</em>. Dead-end queries are dispersed low-value lines that a summarizer drops first, and dropping them is why the clock-driven run re-searched the same rock stars for a hundred turns. SelfCompact's rubric refuses to fire when the trajectory's value is that kind of dispersal; your instructions should say the same.</p></details>
+  <details><summary>Your coding product runs on the Claude API with server-side compaction. A user reports that after a long session the agent "forgot which branch it was on" and started editing main. Give your first three hypotheses, in the order you would check them, and name the move each one implies.</summary><p>All three are context hypotheses, which is the Module 1 bar. (1) An identifier was lost in the summary: branch names are props, and the default summarizer keeps the plot. Check the compaction block in the trace; fix with custom instructions that name identifiers and current git state as must-retain, or re-insert the last few turns verbatim after the pause. (2) The summary never happened: the docs note that with tools defined the model occasionally calls a tool during the summarization step and returns a compaction block with null content; the window then continues from nothing. Check for null; fix with an instruction that forbids tool calls in the summary. (3) The compaction fired too early because tool results were bloating the window: big file reads should have been cleared or offloaded first (card two), so the summarizer fires less often and later, and a task-switch fire would have had a clean unit to summarize. Only after these would you consider the model.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>
+    Module 1's bar is "given any agent misbehavior, your first three hypotheses are all context hypotheses, and they are usually right." 1.3's contribution: when a system gets worse right after it got smaller, you reach for three questions in order, what did the summary miss, when did it fire, and could the loss be recovered, and you can name the card that answers each. 1.1 gave you the budget, 1.2 the four moves; 1.4 and 1.6 own select, 1.5 owns write, and 1.7 sends the bill for all of them, including the cache miss every compaction pays.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources">
+    <li>Li, Zhang, Jurayj, et al. (JHU, Apple), Self-Compacting Language Model Agents, arXiv 2606.23525, Jun 2026: <a href="https://arxiv.org/abs/2606.23525">arxiv.org/abs/2606.23525</a></li>
+    <li>Zerhoudi et al., The Compaction Cliff in Long-Running AI Agent Memory (CIKM '26), arXiv 2608.22752, Aug 2026: <a href="https://arxiv.org/abs/2608.22752">arxiv.org/abs/2608.22752</a></li>
+    <li>Governance Decay: How Context Compaction Silently Erases Safety Constraints, arXiv 2606.22528, Jun 2026: <a href="https://arxiv.org/abs/2606.22528">arxiv.org/abs/2606.22528</a></li>
+    <li>Cursor, Training Composer for longer horizons, Mar 2026: <a href="https://cursor.com/blog/self-summarization">cursor.com/blog/self-summarization</a></li>
+    <li>LangChain, Autonomous context compression, Apr 2026: <a href="https://www.langchain.com/blog/autonomous-context-compression">langchain.com/blog/autonomous-context-compression</a></li>
+    <li>Claude Platform docs, Compaction (compact_20260112), current as of Sep 2026: <a href="https://platform.claude.com/docs/en/build-with-claude/compaction">platform.claude.com/docs/en/build-with-claude/compaction</a></li>
+    <li>Amp, Handoff (No More Compaction), Oct 2025: <a href="https://ampcode.com/news/handoff">ampcode.com/news/handoff</a>; Amp, Rebuilt, May 2026: <a href="https://ampcode.com/news/neo">ampcode.com/news/neo</a></li>
+    <li>Cognition, Don't Build Multi-Agents, Jun 2025 (the fine-tuned compressor): <a href="https://cognition.ai/blog/dont-build-multi-agents">cognition.ai/blog/dont-build-multi-agents</a></li>
+    <li>Inside the Scaffold: A Source-Code Taxonomy of Coding Agent Architectures, arXiv 2604.03515, Apr 2026 (prevention vs cure across shipped agents): <a href="https://arxiv.org/abs/2604.03515">arxiv.org/abs/2604.03515</a></li>
+  </ul>
+
+</div>
+</body>
+</html>

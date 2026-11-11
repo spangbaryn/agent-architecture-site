@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<!--
+TUTORIAL TEMPLATE for agent-architecture-tutor.
+Copy this file's CSS and structure for every tutorial. Replace bracketed
+placeholders. Keep it a single self-contained file: no external fonts,
+scripts, or images. Diagrams are inline SVG using the palette variables.
+Section order matches SKILL.md: why > mental model > landscape > anchor >
+choosing (decision tree) > anchor > misconception > check yourself > done when + sources.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0.1: The agentic loop</title>
+<style>
+  :root {
+    --ink: #1a1d21;
+    --ink-soft: #4a5058;
+    --paper: #faf8f4;
+    --card: #ffffff;
+    --line: #e5e0d6;
+    --accent: #0f6b5c;        /* deep teal: links, headings, accents */
+    --accent-soft: #e3efec;
+    --amber: #a05e0b;         /* callouts, misconception */
+    --amber-soft: #f9efdd;
+    /* status badge colors */
+    --current: #0f6b5c;  --ascendant: #1a5fa8;  --emerging: #7a4fa3;
+    --legacy: #8a8578;   --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker {
+    font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--accent);
+  }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft);
+          border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super;
+            font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+
+  /* The one-sentence mental model, displayed like a pull quote */
+  .mental-model {
+    background: var(--accent-soft); border-left: 4px solid var(--accent);
+    padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0;
+    font-size: 21px; line-height: 1.45;
+  }
+  .mental-model .label {
+    display: block; font: 700 12px/1 -apple-system, sans-serif;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+
+  /* Landscape cards: one per approach */
+  .approach {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 24px; margin: 16px 0;
+  }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em;
+    text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px;
+  }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); }
+  .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); }
+  .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  /* Landscape frame: what the cards are a landscape OF. Required before the first card. */
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+
+  /* Amber callout: misconception, warnings, "watch out" */
+  .callout {
+    background: var(--amber-soft); border-left: 4px solid var(--amber);
+    padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0;
+  }
+  .callout .label {
+    font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px;
+  }
+
+  /* Diagram block */
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line);
+           border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft);
+               margin-top: 10px; text-align: center; }
+
+  /* Check-yourself questions with collapsible answers */
+  details {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 20px; margin: 12px 0;
+  }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+
+  .done-when { background: var(--card); border: 2px solid var(--accent);
+               border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+                      text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace;
+         background: #efece4; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 0 · Topic 0.1</div>
+    <h1>The agentic loop</h1>
+    <p class="standfirst">Sketch any agent as loop plus tools plus context, and know which part you actually get to design.</p>
+    <div class="meta">Freshness-checked 2026-08-21 · landscape rebuilt 2026-08-22 with per-card diagrams · ~12 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>Single model calls plateau. Give a model a task with more than a few steps, or one whose shape depends on what it finds along the way, and a one-shot answer either guesses or gives up. The pressure that created agents was not "make the model smarter." It was "let the model look, act, and look again." That requires a loop, and a loop requires someone to decide what the model sees each time around.</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>An agent is a model running in a loop with tools. Everything in the system that is not the model is the harness, and the harness is what you get to design.</div>
+  <p>LangChain's formulation, March 2026: <b>Agent = Model + Harness</b>. If you are not the model, you are the harness.</p><p>The loop has four beats, each one a design decision. <b>Gather context</b> (what the model sees this turn, where most cost and most failures live). <b>Act</b> (parse the tool call, check it is allowed, run it). <b>Verify</b> (the test output, the stack trace, the ground truth; this is what separates an agent from a confident text generator). <b>Repeat or stop</b> (models are bad at this; they stop early and declare victory).</p><p>Nothing else is required. No planner, no reflection module, no memory subsystem. Add only what a specific failure forces you to add.</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame"><div class="q">A landscape of: who builds the loop around the model, and what sits between the model and its tools?</div><div class="axis">What varies: how much the harness does between turns, from nothing (a bare while loop) to everything (a harness that rewrites itself). Five answers, ordered by how much harness each adds; the last one is the exception, where the harness is hidden rather than absent.</div><div class="legend">Reading the diagrams: gray is structure every approach shares; <span style="color:#0f6b5c;font-weight:600">teal</span> is the element that makes this approach different from the one above it; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks.</div></div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-tool"><path d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="40" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">tool</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">store</text></g>
+      <g id="sym-human"><circle cx="20" cy="10" r="8" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M2 40 a18 18 0 0 1 36 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">orchestrator</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    </defs>
+  </svg>
+  <style>
+    .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+    .dg .delta { color: #0f6b5c; }
+    .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .dg .loop { stroke-dasharray: 6 4; }
+    .dg .fail { fill: #a05e0b; }
+    .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  </style>
+
+  
+  <div class="approach">
+    <h3>The minimal loop <span class="badge b-current">Current</span></h3>
+    <p>Model, a few general tools, a while loop. The shape Anthropic describes in <i>Building Effective Agents</i> and the one Claude Code still has underneath.</p>
+    <p class="tradeoffs"><b>Wins:</b> nothing to maintain, improves for free as models do. <b>Costs:</b> no audit trail, no policy enforcement, unpredictable cost per task.</p>
+    <p class="tradeoffs"><b>Done right:</b> A coding agent pointed at a repo with a real test suite. The tests are the verifier, so the loop needs nothing added: run, read the failure, edit, run again. Claude Code is this at its core.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="A model calls a tool, observes, and repeats until it decides to stop"><g class="delta"><use href="#sym-model" x="200" y="55"/></g><use href="#sym-tool" x="380" y="55"/><g class="delta"><path class="edge" d="M296 68 H378"/><text x="337" y="62" text-anchor="middle" font-size="12" fill="currentColor">act</text></g><g class="delta"><path class="edge loop" d="M380 88 H296"/><text x="337" y="104" text-anchor="middle" font-size="12" fill="currentColor">observe</text></g><g class="delta"><path class="edge loop" d="M248 55 C 248 10, 140 10, 140 75 C 140 120, 200 120, 200 95"/><text x="130" y="36" text-anchor="middle" font-size="12" fill="currentColor">repeat</text></g><g><path transform="translate(520 55)" d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="556" cy="63" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="556" y="85" text-anchor="middle" font-size="12" fill="currentColor">context</text></g><path class="edge" d="M476 75 H518"/><text x="497" y="70" text-anchor="middle" font-size="12" fill="currentColor">grows</text><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">no stop rule, no trace: cost per task is whatever it is</text></svg><figcaption>Thirty lines of code; the entire product is what goes into the context each turn.</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>The scaffolded control plane <span class="badge b-current">Current</span></h3>
+    <p>Bounded plan-execute-verify, a policy engine in front of tools, approval gates, checkpoints, tracing. The enterprise answer to "who let the model do that."</p>
+    <p class="tradeoffs"><b>Wins:</b> governable and auditable. <b>Costs:</b> every piece of scaffolding bets the model will not outgrow it, and that bet keeps losing.</p>
+    <p class="tradeoffs"><b>Done right:</b> An agent that executes production runbooks (restart a service, scale a cluster). A policy engine allowlists the commands, a human approves anything destructive, and the trace exists for the postmortem. The scaffolding is there because the actions are irreversible, not because the model is weak.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="A policy gate and human approval sit between model and tool; every step is traced and checkpointed"><use href="#sym-model" x="150" y="55"/><use href="#sym-tool" x="470" y="55"/><g class="delta"><g><path transform="translate(320 55)" d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="360" y="80" text-anchor="middle" fill="currentColor">policy</text></g></g><path class="edge" d="M246 68 H318"/><path class="edge" d="M400 68 H468"/><path class="edge loop" d="M470 88 H246"/><g class="delta"><use href="#sym-human" x="340" y="0"/></g><g class="delta"><path class="edge" d="M360 42 V53"/><text x="410" y="30" text-anchor="middle" font-size="12" fill="currentColor">approve</text></g><g class="delta"><g><path transform="translate(40 95)" d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="76" cy="103" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="76" y="125" text-anchor="middle" font-size="12" fill="currentColor">trace</text></g></g><g class="delta"><path class="edge" d="M160 95 H114"/></g><g class="delta"><g><path transform="translate(540 90)" d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="576" cy="98" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="576" y="120" text-anchor="middle" font-size="12" fill="currentColor">checkpoint</text></g></g><g class="delta"><path class="edge" d="M510 88 V100 H538"/></g><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">the fences were sized for last year's model</text></svg><figcaption>Contains consequences well; organizes cognition badly.</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>The outer loop <span class="badge b-ascendant">Ascendant</span></h3>
+    <p>A loop above the session that asks whether the agent is actually done and re-injects the goal into a fresh context, with state carried on the filesystem. Ronacher's "coming loop."</p>
+    <p class="tradeoffs"><b>Wins:</b> multi-session work, sidesteps context limits. <b>Costs:</b> needs a completion oracle.</p>
+    <p class="tradeoffs"><b>Done right:</b> A multi-day codebase migration: "make the suite pass on the new framework." Each session writes progress to a file, the outer loop restarts a fresh context from it, and "done?" is answered by the test suite, which is exactly the oracle this approach requires.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="A session loop sits inside an outer loop that restarts it with a fresh context and state on disk"><rect x="100" y="45" width="280" height="70" rx="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="108" y="39" font-size="12" fill="currentColor">session</text><use href="#sym-model" x="120" y="60"/><use href="#sym-tool" x="270" y="60"/><path class="edge" d="M216 73 H268"/><path class="edge loop" d="M270 93 H216"/><g class="delta"><g><path transform="translate(430 60)" d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="470" y="85" text-anchor="middle" fill="currentColor">done?</text></g></g><g class="delta"><path class="edge" d="M380 80 H428"/></g><g class="delta"><path class="edge loop" d="M470 60 C 470 22, 60 22, 60 60 V 80 H98"/><text x="265" y="14" text-anchor="middle" font-size="12" fill="currentColor">not done: fresh context, same goal</text></g><g class="delta"><g><path transform="translate(540 125)" d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="576" cy="133" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="576" y="155" text-anchor="middle" font-size="12" fill="currentColor">filesystem</text></g></g><g class="delta"><path class="edge" d="M380 130 H538"/><text x="460" y="125" text-anchor="middle" font-size="12" fill="currentColor">state survives restarts</text></g><g class="delta"><path class="edge loop" d="M540 135 C 500 150, 150 150, 100 135"/></g><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">"done?" needs an oracle the task may not have</text></svg><figcaption>Moves the stop decision out of the model; only as good as the thing that answers "done?"</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>Auto-evolved harnesses <span class="badge b-emerging">Emerging</span></h3>
+    <p>Harness components live as files and a closed observability loop edits them (arXiv 2604.25850; Weng's "harness engineering for self-improvement").</p>
+    <p class="tradeoffs"><b>Wins:</b> makes harness quality measurable. <b>Costs:</b> research stage, documented reward hacking.</p>
+    <p class="tradeoffs"><b>Done right:</b> A benchmark-driven harness lab: run a fixed eval suite, let an editor model propose edits to the system prompt and tool descriptions, keep only edits that raise the pass rate on a held-out set. Right when you have a trustworthy eval and the budget to run it hundreds of times; wrong anywhere else.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="Traces from the agent feed an editor model that rewrites the harness files the agent runs on"><rect x="30" y="35" width="230" height="70" rx="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="38" y="29" font-size="12" fill="currentColor">agent</text><use href="#sym-model" x="50" y="50"/><use href="#sym-tool" x="160" y="50"/><path class="edge" d="M146 63 H158"/><path class="edge loop" d="M160 83 H146"/><g class="delta"><g><path transform="translate(300 45)" d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="336" cy="53" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="336" y="75" text-anchor="middle" font-size="12" fill="currentColor">traces</text></g></g><g class="delta"><path class="edge" d="M260 70 H298"/></g><g class="delta"><g><rect x="410" y="50" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="458" y="75" text-anchor="middle" fill="currentColor">editor</text></g></g><g class="delta"><path class="edge" d="M372 70 H408"/></g><g class="delta"><g><path transform="translate(550 50)" d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="586" cy="58" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="586" y="80" text-anchor="middle" font-size="12" fill="currentColor">harness</text></g></g><g class="delta"><path class="edge" d="M506 70 H548"/></g><g class="delta"><path class="edge loop" d="M586 95 V135 H145 V107"/><text x="370" y="130" text-anchor="middle" font-size="12" fill="currentColor">rewrites the scaffolding the agent runs on</text></g><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">editor optimizes the score, not the job</text></svg><figcaption>The harness becomes a thing you can measure and mutate; the reward is the new attack surface.</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>Agent frameworks as the loop <span class="badge b-legacy">Legacy</span></h3>
+    <p>Import a framework, get a loop. The 2023 to 2024 default.</p>
+    <p class="tradeoffs"><b>Wins:</b> fast to a demo. <b>Costs:</b> the loop was the easy part, and the framework hid the part that mattered.</p>
+    <p class="tradeoffs"><b>Done right:</b> A Friday prototype to show a stakeholder that the idea works at all. Import the framework, wire three tools, demo Monday, then throw it away before anyone asks what the context looks like on turn five.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="The loop is wrapped in an opaque framework box with context assembly hidden inside"><g class="delta"><rect x="150" y="35" width="340" height="85" rx="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="158" y="29" font-size="12" fill="currentColor">framework</text></g><use href="#sym-model" x="200" y="55"/><use href="#sym-tool" x="360" y="55"/><path class="edge" d="M296 68 H358"/><path class="edge loop" d="M360 88 H296"/><g class="delta"><rect x="230" y="100" width="180" height="16" rx="4" fill="#0f6b5c" opacity=".15"/><text x="320" y="112" text-anchor="middle" font-size="11">context assembly: ???</text></g><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">turn five's context is a black box you did not design</text></svg><figcaption>Same loop as the first card, but the one decision that matters is behind a box you cannot open.</figcaption></figure>
+  </div>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide how much harness to build around the model:</p>
+  <figure><svg class="dg" viewBox="0 0 680 430" role="img" aria-label="decision tree"><rect x="245" y="10" width="190" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="340.0" y="28" text-anchor="middle" font-size="12.5" fill="currentColor">Is there a mechanical verifier</text><text x="340.0" y="44" text-anchor="middle" font-size="12.5" fill="currentColor">(tests, CI, a checkable result)?</text><path class="edge" d="M245 35 H160 V70"/><text x="195" y="28" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><rect x="40" y="70" width="240" height="48" rx="8" fill="#f9efdd" stroke="#a05e0b" stroke-width="2"/><text x="160.0" y="87" text-anchor="middle" font-size="12.5" font-weight="600" fill="#a05e0b">Not yet: build the verifier first,</text><text x="160.0" y="103" text-anchor="middle" font-size="12.5" font-weight="600" fill="#a05e0b">or stay at a single call (0.2)</text><path class="edge" d="M435 35 H520 V70"/><text x="480" y="28" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="420" y="70" width="200" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="520.0" y="88" text-anchor="middle" font-size="12.5" fill="currentColor">Are the actions irreversible</text><text x="520.0" y="104" text-anchor="middle" font-size="12.5" fill="currentColor">or expensive to undo?</text><path class="edge" d="M520 120 V155"/><text x="545" y="142" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="435" y="155" width="170" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="520.0" y="172" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Scaffolded control plane</text><path class="edge" d="M420 95 H300 V155"/><text x="355" y="88" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><rect x="200" y="155" width="200" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="300.0" y="173" text-anchor="middle" font-size="12.5" fill="currentColor">Does the work outlive one</text><text x="300.0" y="189" text-anchor="middle" font-size="12.5" fill="currentColor">context window or one session?</text><path class="edge" d="M300 205 V240"/><text x="325" y="228" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="215" y="240" width="170" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="300.0" y="257" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Outer loop</text><path class="edge" d="M200 180 H100 V240"/><text x="145" y="173" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><rect x="20" y="240" width="160" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="100.0" y="257" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Minimal loop</text><rect x="20" y="310" width="300" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="170.0" y="328" text-anchor="middle" font-size="12.5" fill="currentColor">Bonus: do you have an eval you trust and</text><text x="170.0" y="344" text-anchor="middle" font-size="12.5" fill="currentColor">budget to run it hundreds of times?</text><path class="edge" d="M320 335 H360"/><text x="340" y="328" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="362" y="315" width="250" height="48" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="487.0" y="332" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Auto-evolved harness, on top of</text><text x="487.0" y="348" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">whichever shape you chose above</text><rect x="20" y="385" width="180" height="34" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="110.0" y="403" text-anchor="middle" font-size="12.5" fill="currentColor">Is this a throwaway demo?</text><path class="edge" d="M200 407 H240"/><text x="220" y="400" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="242" y="387" width="260" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="372.0" y="404" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Framework as the loop, then delete it</text></svg><figcaption>The verifier question comes first because every other branch assumes one exists.</figcaption></figure>
+  <p>The first question does most of the work. Without a mechanical verifier none of the loops can tell success from a confident stop, so the honest answer is to build the verifier or stay at a single call. After that the two questions are about consequences and duration: irreversible actions buy scaffolding, work that outlives a session buys an outer loop, and the minimal loop is what is left when neither applies.</p>
+
+  <h2><span class="num">5</span>Seen in the wild</h2>
+  <p>Claude Code. Small general tool set, standing context in CLAUDE.md, skills loading instructions on demand, subagents as a context pressure valve, permissions on irreversible actions, compaction for long runs. Almost every item on that list is a decision about what is in the context window at a given moment, which is why harness design and context engineering are two names for mostly the same discipline.</p><p>2026 work reports accuracy gaps of up to roughly six-fold across harnesses running the same model.</p>
+
+  <div class="callout"><span class="label">The misconception</span>That the loop is plumbing and the model does the real work. The six-fold spread says otherwise. But the opposite error is more seductive: assuming more harness is better harness. Structure that compensates for a weak model becomes a cage for a strong one. The skill is knowing which of the two mistakes you are currently making.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>Your agent stops after four turns and reports success on obviously incomplete work. Which beat is broken?</summary><p>Verification, then stopping. The fix is not a better prompt, it is a mechanical completion check. Adding an outer loop first just makes the agent do wrong work more times.</p></details><details><summary>An internal agent that files expense reports: minimal loop or scaffolded control plane?</summary><p>Scaffolded, for one reason: the actions are irreversible and touch money. That justifies approval gates and an audit trail. It does not justify a planner or a state machine over the reasoning. Scaffolding earns its place by containing consequences, not by organizing cognition.</p></details><details><summary>Someone says their framework "handles the loop for you." What is the follow-up question?</summary><p>Show me exactly what goes into the context window on turn five. The loop is thirty lines. The context assembly is the product.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>You can sketch any agent product you use (Claude Code, Deep Research, a support bot) as loop plus tools plus context. This topic supplies the loop and the harness vocabulary; 0.2 supplies the workflow-vs-agent distinction and 0.3 the tools.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources"><li>Anthropic, Building Effective Agents (Dec 2024)</li><li>Vivek Trivedy, The anatomy of an agent harness, LangChain (Mar 2026)</li><li>Armin Ronacher, The Coming Loop (Jun 2026)</li><li>Lilian Weng, Harness Engineering for Self-Improvement (Jul 2026)</li><li>Agentic Harness Engineering, arXiv 2604.25850 (rev. May 2026)</li></ul>
+
+</div>
+</body>
+</html>

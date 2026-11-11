@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1.1: The attention budget</title>
+<style>
+  :root {
+    --ink: #1a1d21; --ink-soft: #4a5058; --paper: #faf8f4; --card: #ffffff; --line: #e5e0d6;
+    --accent: #0f6b5c; --accent-soft: #e3efec; --amber: #a05e0b; --amber-soft: #f9efdd;
+    --current: #0f6b5c; --ascendant: #1a5fa8; --emerging: #7a4fa3; --legacy: #8a8578; --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker { font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft); border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super; font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+  .mental-model { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-size: 21px; line-height: 1.45; }
+  .mental-model .label { display: block; font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .callback { border-left: 3px solid var(--line); padding: 6px 18px; margin: 18px 0; color: var(--ink-soft); font-size: 16px; }
+  .callback b { color: var(--ink); }
+  .approach { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge { font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px; }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); } .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); } .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+  .callout { background: var(--amber-soft); border-left: 4px solid var(--amber); padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+  .callout .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px; }
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft); margin-top: 10px; text-align: center; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 20px; margin: 12px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+  .done-when { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace; background: #efece4; padding: 1px 5px; border-radius: 4px; }
+  .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+  .dg .delta { color: #0f6b5c; }
+  .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+  .dg .loop { stroke-dasharray: 6 4; }
+  .dg .fail { fill: #a05e0b; }
+  .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  .dg .lbl { fill: currentColor; }
+  .dg .muted { opacity: .45; }
+  ul.tight li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 1 · Topic 1.1</div>
+    <h1>The attention budget</h1>
+    <p class="standfirst">After this you will treat every token you put in front of a model as a purchase, and you will know the four ways the field pays for it.</p>
+    <div class="meta">Freshness-checked 2026-08-30 · builds on 0.1, 0.2, 0.3 · ~13 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+
+  <p>Module 0 kept arriving at the same wall from different directions. 0.1 ended with the note that harness design and context engineering are two names for the same discipline. 0.3 found that a tool surface is a context-budget decision wearing an API costume. Every open thread in the ledger pointed at the window. Module 1 is where we stop treating that as a coincidence and name it: <b>nearly every architecture decision is a decision about what goes in the context window, when.</b> This topic is the reason that sentence is true.</p>
+
+  <p>The engineering pressure is simple. Windows got big, and teams did the obvious thing: they put everything in. Full repos, full histories, every tool definition, every document. The results were worse, not better, and they were worse in a way that was hard to see, because the model kept producing fluent output while quietly getting less accurate. Chroma put numbers on this in July 2025 across 18 frontier models: performance falls as input grows, on tasks as simple as finding a sentence or repeating a list, and it falls non-uniformly, long before the window is full. Anthropic's September 2025 guide gave the field its vocabulary: the model has a finite <em>attention budget</em>, every token depletes it, and the job is to find the smallest set of high-signal tokens that produces the behavior you want.</p>
+
+  <p>So the problem is not "will it fit." The problem is that fitting is free and attention is not.</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>
+    Every token in the window spends from a finite attention budget, so the question is never "does it fit" but "does this token pay for its seat."</div>
+
+  <p>Three things follow, and each one is a design rule.</p>
+
+  <p><b>Attention is not storage.</b> A transformer relates every token to every other token. Add a token and you have not added a fact to a shelf; you have added a row and a column to a relationship matrix, and thinned the attention available to every existing pair. That is why degradation is gradual and why it starts immediately rather than at the limit. "Lost in the middle" (Liu et al., 2023) was the first sighting: accuracy on the same fact drops sharply when it sits in the middle of the input rather than at either end. Chroma's report generalized it: length hurts, but distractors that look like the answer hurt more, and a coherent, well-structured haystack hurts more than a shuffled one, because the model follows the narrative instead of finding the needle.</p>
+
+  <p><b>The budget is spent by everything, not just the task.</b> System prompt, tool definitions, examples, conversation history, tool results, retrieved documents: they all draw from the same account. This is where 0.3's "errors are prompts" thread pays off. That lesson promised the idea would generalize, and here it is: <em>every string the model sees is a prompt, and every prompt has a price.</em> A verbose tool result and a bloated system prompt are the same mistake at different addresses.</p>
+
+  <div class="callback">Verbatim from 0.3, now with its second half: <b>"A tool is two things at once: a contract with a deterministic system, and a prompt aimed at a non-deterministic one."</b> In 1.1 the second half gets a budget line.</div>
+
+  <p><b>Altitude is the budget rule for instructions.</b> Anthropic's framing for system prompts is a Goldilocks zone: hardcoded if-then rules are brittle and expensive (they buy behavior one case at a time), vague guidance is cheap and useless (it buys nothing). The right altitude is the smallest set of instructions that fully outlines expected behavior and leaves the model room to generalize. You already know this move from 0.2's autonomy dial. Altitude is the same dial applied to the prompt: how much of the decision do you write down versus delegate.</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame">
+    <div class="q">A landscape of: who decides what enters the window, and when?</div>
+    <div class="axis">What varies: the locus of the decision. Nobody decides (put it all in); the designer decides at build time; the harness decides at run time; the model decides at run time over a context it can program. Four answers, ordered from least to most runtime judgment.</div>
+    <div class="legend">Reading the diagrams: gray is shared structure; <span style="color:#0f6b5c;font-weight:600">teal</span> is what makes this approach different from the one above it; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks. The wide bracketed box is the context window; its fill shows how much of the budget the approach spends.</div>
+  </div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-tool"><path d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="40" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">tool</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">store</text></g>
+      <g id="sym-human"><circle cx="20" cy="10" r="8" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M2 40 a18 18 0 0 1 36 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">orchestrator</text></g>
+      <!-- context window: bracketed box, 200 wide -->
+      <g id="sym-window"><path d="M8 0 H0 V40 H8 M192 0 H200 V40 H192" fill="none" stroke="currentColor" stroke-width="2"/><text x="100" y="52" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="currentColor">context window</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    </defs>
+  </svg>
+
+  <div class="approach">
+    <h3>Stuff the window <span class="badge b-contested">Contested</span></h3>
+    <p>Put the whole corpus in and let the model sort it out. Champions: the long-context roadmaps of every lab (1M-token Claude and GPT-4.1, 2M Gemini, Llama 4's 10M claim), and any team whose first instinct on "the agent forgot" is "give it more." The bet is that the model's attention is uniform enough that curation is wasted effort.</p>
+    <p class="tradeoffs"><b>Wins:</b> zero infrastructure, no retrieval to get wrong, single-pass reasoning over everything at once. <b>Costs:</b> rot begins long before the limit and is invisible in the output; cost and latency scale with the whole corpus every call; coherent documents actively mislead the model into following their structure.</p>
+    <p class="tradeoffs"><b>Done right:</b> a single 60k-token contract review where nearly every clause bears on the question and there is no distractor material. When the task genuinely needs all the tokens and the total sits well inside the window's reliable zone, curation would only lose information.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 120" role="img" aria-label="Store dumps everything into a full context window feeding the model">
+        <use href="#sym-store" x="40" y="30"/>
+        <g class="delta">
+          <use href="#sym-window" x="180" y="30"/>
+          <rect x="190" y="34" width="180" height="32" fill="#0f6b5c" opacity=".18"/>
+          <text x="280" y="55" text-anchor="middle" font-size="12">everything</text>
+        </g>
+        <use href="#sym-model" x="440" y="30"/>
+        <path class="edge" d="M112 50 H178"/>
+        <path class="edge" d="M380 50 H438"/>
+        <text class="lbl" x="118" y="42" font-size="11">all of it</text>
+        <circle class="fail" cx="280" cy="94" r="5"/><text class="fail-label" x="290" y="98">middle goes unread; fluent output hides it</text>
+      </svg>
+      <figcaption>Nothing to build and nothing to trust; degrades silently.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Curate at build time <span class="badge b-current">Current</span></h3>
+    <p>The designer decides, before any run, what the model should see: a system prompt at the right altitude, a minimal tool set with token-efficient descriptions, a few canonical examples rather than an exhaustive list of edge cases. Champion: Anthropic's context engineering guide, which is really this card written long. The bet is that a human who understands the task can pick a high-signal set once and reuse it.</p>
+    <p class="tradeoffs"><b>Wins:</b> cheapest per call; fully inspectable; the stable prefix caches (1.7 will price this). <b>Costs:</b> brittle when the task drifts from what the designer imagined; every new case tempts another rule, and the prompt slides down the altitude scale into if-then rot.</p>
+    <p class="tradeoffs"><b>Done right:</b> a support agent for one product with a known policy surface. The designer knows the fifty things that matter, writes them at policy altitude ("refunds within 30 days, escalate anything involving a chargeback"), and the model handles phrasing. The task is bounded, so build-time judgment is enough.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 120" role="img" aria-label="A designer selects a small set of tokens into a mostly empty window">
+        <use href="#sym-store" x="40" y="30" class="muted"/>
+        <g class="delta">
+          <use href="#sym-human" x="130" y="20"/>
+          <text x="150" y="82" text-anchor="middle" font-size="11">designer</text>
+          <rect x="190" y="34" width="54" height="32" fill="#0f6b5c" opacity=".18"/>
+          <text x="217" y="55" text-anchor="middle" font-size="11">prompt</text>
+        </g>
+        <use href="#sym-window" x="180" y="30"/>
+        <use href="#sym-model" x="440" y="30"/>
+        <path class="edge" d="M112 50 H128"/>
+        <path class="edge" d="M172 50 H182"/>
+        <path class="edge" d="M380 50 H438"/>
+        <text class="lbl" x="300" y="55" font-size="11" text-anchor="middle">room left</text>
+        <circle class="fail" cx="150" cy="100" r="5"/><text class="fail-label" x="160" y="104">judgment frozen at build time; drifts as the task does</text>
+      </svg>
+      <figcaption>Cheap and legible; cannot adapt.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Budgeted retrieval at run time <span class="badge b-current">Current</span></h3>
+    <p>The harness decides per step. Identifiers stay in context (paths, IDs, queries); the payload is fetched through a tool when needed, and only a bounded slice of it enters the window. This is 0.3's "signal, not payload" rule promoted to the whole architecture, and it is the mid-2026 production default for coding agents (grep and file reads over embedded snapshots) and the hybrid "retrieve a bounded set, then reason over it" shape most RAG products converged on. Champions: Anthropic, Manus, every serious coding agent.</p>
+    <p class="tradeoffs"><b>Wins:</b> spends budget on what this step needs; the window stays inside its reliable range for arbitrarily large corpora; the model can course-correct by fetching more. <b>Costs:</b> needs a locator that works (an index, a naming scheme, a grep-able repo); each fetch is latency; the model can miss what it never thinks to ask for. 1.4 owns the locator question.</p>
+    <p class="tradeoffs"><b>Done right:</b> a coding agent on a 400k-line repo. It reads the file tree (identifiers, cheap), greps for the symbol, opens two files, and never sees the other 398k lines. The verifier (tests) tells it when it fetched the wrong thing, so misses are recoverable.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 120" role="img" aria-label="A retrieval tool loads bounded slices from the store into the window each step, with a loop back from the model">
+        <use href="#sym-store" x="20" y="30"/>
+        <g class="delta">
+          <use href="#sym-tool" x="112" y="30"/>
+          <path class="edge loop" d="M488 76 C 488 108, 152 108, 152 74"/>
+          <text x="320" y="112" text-anchor="middle" font-size="11">fetch the next thing</text>
+          <rect x="190" y="34" width="70" height="32" fill="#0f6b5c" opacity=".18"/>
+        </g>
+        <text x="225" y="55" text-anchor="middle" font-size="11">ids + slice</text>
+        <use href="#sym-window" x="180" y="30"/>
+        <use href="#sym-model" x="440" y="30"/>
+        <path class="edge" d="M92 50 H110"/>
+        <path class="edge" d="M194 50 H182"/>
+        <path class="edge" d="M380 50 H438"/>
+        <circle class="fail" cx="112" cy="18" r="5"/><text class="fail-label" x="122" y="22">misses what has no locator</text>
+      </svg>
+      <figcaption>Scales past the window; only as good as the locator.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Context as an environment the model programs <span class="badge b-emerging">Emerging</span></h3>
+    <p>The model decides, over a context it never fully reads. Recursive Language Models (MIT, Zhang, Kraska and Khattab, Dec 2025, revised May 2026) put the entire prompt in a variable inside a Python REPL. The model inspects it with code, slices it, and calls fresh copies of itself on the slices, then assembles the answers. The window holds the program and the returns, never the corpus. On their long-context benchmarks an RLM built on GPT-5-mini beat plain GPT-5, and RLMs on GPT-5 beat compaction by a median of 26% while handling inputs two orders of magnitude past the window. Prime Intellect has called it the paradigm of 2026; the field has not decided yet.</p>
+    <p class="tradeoffs"><b>Wins:</b> effectively unbounded input; degradation stops being a function of total size; no designer or index needed up front. <b>Costs:</b> many sub-calls, so latency and cost are variable; a reproduction (Wang, Mar 2026) found deeper recursion makes models overthink and score worse; it is research infrastructure, not a product surface, as of this month.</p>
+    <p class="tradeoffs"><b>Done right:</b> an aggregation task over ten million tokens of support transcripts ("how many tickets in Q2 mention billing and were unresolved") where the answer requires touching nearly every record and no index exists. Neither stuffing nor retrieval can do this; recursion over slices can.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 120" role="img" aria-label="Model uses a REPL tool to slice a store and recursively call sub-models; window stays small">
+        <use href="#sym-store" x="20" y="30"/>
+        <use href="#sym-tool" x="112" y="30"/>
+        <text x="152" y="82" text-anchor="middle" font-size="11">REPL</text>
+        <rect x="190" y="34" width="50" height="32" fill="#4a5058" opacity=".12"/>
+        <text x="215" y="55" text-anchor="middle" font-size="11">program</text>
+        <use href="#sym-window" x="180" y="30"/>
+        <use href="#sym-model" x="440" y="30"/>
+        <path class="edge" d="M92 50 H110"/>
+        <path class="edge" d="M194 50 H182"/>
+        <path class="edge" d="M380 50 H438"/>
+        <g class="delta">
+          <use href="#sym-model" x="270" y="76" transform="scale(.7)"/>
+          <use href="#sym-model" x="420" y="76" transform="scale(.7)"/>
+          <path class="edge" d="M152 72 C 160 100, 190 108, 212 100"/>
+          <path class="edge" d="M152 72 C 170 112, 260 118, 300 104"/>
+          <text x="330" y="86" font-size="11">sub-calls on slices</text>
+        </g>
+        <circle class="fail" cx="460" cy="100" r="5"/><text class="fail-label" x="470" y="104">cost varies; depth overthinks</text>
+      </svg>
+      <figcaption>Unbounded input; unbounded bill until proven otherwise.</figcaption>
+    </figure>
+  </div>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide how the task's information gets into the window:</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 400" role="img" aria-label="Decision tree from four yes/no questions to the four landscape cards plus a not-yet leaf">
+      <style>.q{fill:#fff;stroke:#4a5058;stroke-width:2;rx:8} .qt{font-size:12.5px;fill:#1a1d21} .leaf{fill:#e3efec;stroke:#0f6b5c;stroke-width:2;rx:8} .lt{font-size:12.5px;fill:#0f6b5c;font-weight:600} .ny{fill:#f9efdd;stroke:#a05e0b;stroke-width:2;rx:8} .nyt{font-size:12.5px;fill:#a05e0b;font-weight:600} .yn{font-size:11px;fill:#4a5058}</style>
+      <rect class="q" x="170" y="10" width="300" height="44"/>
+      <text class="qt" x="320" y="28" text-anchor="middle">Does the task need nearly every token of the input?</text>
+      <text class="qt" x="320" y="44" text-anchor="middle">(aggregate, summarize, count across all of it)</text>
+
+      <path class="edge" d="M320 54 V90"/><text class="yn" x="326" y="76">yes</text>
+      <rect class="q" x="330" y="92" width="290" height="44"/>
+      <text class="qt" x="475" y="110" text-anchor="middle">Is the whole input comfortably inside the</text>
+      <text class="qt" x="475" y="126" text-anchor="middle">window's reliable zone (well under the limit)?</text>
+      <path class="edge" d="M320 54 C 320 70, 150 70, 150 92"/><text class="yn" x="220" y="66">no</text>
+      <rect class="q" x="20" y="92" width="270" height="44"/>
+      <text class="qt" x="155" y="110" text-anchor="middle">Can you know at build time what</text>
+      <text class="qt" x="155" y="126" text-anchor="middle">the model will need for any run?</text>
+
+      <path class="edge" d="M475 136 V176"/><text class="yn" x="481" y="160">yes</text>
+      <rect class="leaf" x="400" y="178" width="150" height="34"/>
+      <text class="lt" x="475" y="200" text-anchor="middle">Stuff the window</text>
+      <path class="edge" d="M620 136 C 620 160, 620 176, 610 176"/><text class="yn" x="600" y="158">no</text>
+      <rect class="leaf" x="470" y="240" width="160" height="48"/>
+      <text class="lt" x="550" y="259" text-anchor="middle">Context as an</text>
+      <text class="lt" x="550" y="276" text-anchor="middle">environment (RLM)</text>
+      <path class="edge" d="M610 176 C 600 200, 580 220, 560 238"/>
+
+      <path class="edge" d="M155 136 V176"/><text class="yn" x="161" y="160">yes</text>
+      <rect class="leaf" x="70" y="178" width="170" height="34"/>
+      <text class="lt" x="155" y="200" text-anchor="middle">Curate at build time</text>
+      <path class="edge" d="M290 136 C 300 160, 300 220, 300 238"/><text class="yn" x="304" y="190">no</text>
+      <rect class="q" x="180" y="240" width="250" height="44"/>
+      <text class="qt" x="305" y="258" text-anchor="middle">Is there a locator (index, grep, naming</text>
+      <text class="qt" x="305" y="274" text-anchor="middle">scheme) that can fetch it at run time?</text>
+
+      <path class="edge" d="M240 284 C 220 310, 200 320, 190 336"/><text class="yn" x="200" y="316">yes</text>
+      <rect class="leaf" x="60" y="338" width="200" height="34"/>
+      <text class="lt" x="160" y="360" text-anchor="middle">Budgeted retrieval</text>
+      <path class="edge" d="M370 284 C 390 310, 410 320, 420 336"/><text class="yn" x="410" y="316">no</text>
+      <rect class="ny" x="300" y="338" width="260" height="34"/>
+      <text class="nyt" x="430" y="360" text-anchor="middle">Not yet: build the locator first</text>
+    </svg>
+    <figcaption>The build-time question does most of the work; the first question only exists to catch the aggregation edge case.</figcaption>
+  </figure>
+  <p>The load-bearing question is the second one on the left: <em>can you know at build time what the model will need?</em> If yes, you are in the cheap, cacheable, inspectable world and you should stay there as long as the task lets you. If no, you need runtime judgment, and the only question left is whether the harness has a locator good enough to exercise it. The "not yet" leaf is the one people skip: an agent with retrieval but no reliable way to find things is a stuff-the-window agent with extra steps.</p>
+
+  <h2><span class="num">5</span>Seen in the wild</h2>
+  <p>Cursor is a useful anchor because it exposes all three production cards in one product you have touched, and because it lets the user see the budget being spent.</p>
+  <p><b>Build-time curation</b> is the rules layer: <code>.cursor/rules</code> files with scoping (always-on, or auto-attached by file glob). A rule file is a designer's decision about what every run in that part of the repo should see, made once. Notice the altitude problem in the wild: rules files that grow into fifty if-then lines are the brittle end of the dial, and good ones read like policy.</p>
+  <p><b>Budgeted retrieval</b> is everything else: the codebase index (embeddings over the repo, one retrieval signal among several), plus the agent's own grep and file reads. Identifiers stay in context; payload comes in per step. The <code>@file</code> mention is the user manually overriding the locator, which is exactly the "not yet" leaf handled by a human: when the index cannot find it, you point.</p>
+  <p><b>Stuffing</b> is the failure the product design is built to prevent, and you can watch it happen anyway. Drag a whole directory into a chat, or let a session run to the context limit, and the agent starts re-implementing things it already wrote and losing the goal. That is not a model getting dumber. It is the rot curve, and the product's compaction (1.3) is the mitigation.</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 170" role="img" aria-label="Cursor drawn in the landscape grammar: rules file as build-time curation, index and grep as budgeted retrieval, window bounded">
+      <use href="#sym-human" x="30" y="20"/>
+      <text x="50" y="80" text-anchor="middle" font-size="11">rules author</text>
+      <use href="#sym-store" x="20" y="100"/>
+      <text x="56" y="160" text-anchor="middle" font-size="11">repo + index</text>
+      <use href="#sym-tool" x="130" y="100"/>
+      <text x="170" y="160" text-anchor="middle" font-size="11">grep / read / @file</text>
+      <use href="#sym-window" x="250" y="60"/>
+      <rect x="260" y="64" width="50" height="32" fill="#4a5058" opacity=".12"/>
+      <text x="285" y="85" text-anchor="middle" font-size="11">rules</text>
+      <rect x="315" y="64" width="80" height="32" fill="#0f6b5c" opacity=".18"/>
+      <text x="355" y="85" text-anchor="middle" font-size="11">this step's slices</text>
+      <use href="#sym-model" x="500" y="60"/>
+      <path class="edge" d="M72 50 C 110 50, 200 60, 252 76"/>
+      <path class="edge" d="M92 120 H128"/>
+      <path class="edge" d="M212 120 C 230 120, 240 100, 252 88"/>
+      <path class="edge" d="M450 80 H498"/>
+      <path class="edge loop" d="M548 102 C 548 150, 170 160, 170 142"/>
+      <text x="360" y="152" font-size="11" text-anchor="middle">fetch more</text>
+      <circle class="fail" cx="440" cy="64" r="5"/><text class="fail-label" x="450" y="56">let this fill and rot begins</text>
+    </svg>
+    <figcaption>Cursor is the "curate at build time" card feeding the "budgeted retrieval" card, with a human-operated locator override.</figcaption>
+  </figure>
+  <p>One more sighting, because it is fresh and it is not a coding tool. A May 2026 paper tested AI-control monitors, a model reading an agent's transcript to catch a covert dangerous action. With Claude Opus 4.6 as the monitor, recall fell from 98.6% to 88% as transcripts approached 800k tokens. The same rot curve, in a safety system, on a frontier model, this year. Their partial fix was periodic reminders of the instructions throughout the transcript, which is 1.5's recitation pattern arriving early. Hold that thought; it is a debt this lesson will pay there.</p>
+
+  <div class="callout"><span class="label">The misconception</span>
+    "Million-token windows make context engineering obsolete." Wrong for two reasons stacked on each other. First, rot is a function of what is in the window, not how much room is left: Chroma measured degradation at fractions of the limit, distractors hurt more than length, and coherent input hurts more than shuffled. A bigger window moves the wall; it does not remove the slope. Second, look at what actually scales: Recursive Language Models process inputs a hundred times larger than the window, and they do it by <em>keeping the corpus out of the window</em>. The frontier answer to "how do I handle more context" is "read less of it at a time." Long windows are a capability. Attention budgeting is the discipline that decides whether the capability helps.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>You are building an agent that answers questions over a company's 2,000-page internal wiki. Your engineer says "the model has a 1M window, just load the whole thing." Which card, and what do you say?</summary><p>Budgeted retrieval. The wiki is far bigger than any window's reliable zone, most questions touch a handful of pages, and a wiki is full of distractors that look like the answer (three pages on "expense policy" from different years). Loading it all is the stuff-the-window card in the exact conditions Chroma showed it failing: long, coherent, and full of near-misses. What you say: "It fits, but it will not pay for its seat. We need a locator: search over titles and sections, page IDs in context, load the two pages that matter." If the engineer pushes back with "but retrieval misses things," the honest answer is yes, so we build a verifier (cite the page, let the user check) rather than trade a visible miss for an invisible rot.</p></details>
+  <details><summary>Your support agent's system prompt has grown to 40 rules over six months, and it still gets edge cases wrong. A teammate proposes adding rules 41 through 55. What is happening, and what is the alternative?</summary><p>The prompt has slid down the altitude scale. Each rule was a build-time fix for one run-time surprise, and the accumulated rules now spend budget on cases that rarely occur while crowding the ones that do. This is curate-at-build-time hitting its failure point: the designer's judgment froze, and the task kept moving. Two alternatives: rewrite at policy altitude (ten principles, not fifty cases), or admit that this part of the task needs run-time judgment and move the case-specific material into something retrieved when relevant (1.6 will call this progressive disclosure). Adding rules 41 to 55 is the one option that makes both problems worse.</p></details>
+  <details><summary>A product needs "count every customer email from Q2 that mentions a competitor by name." Ten million tokens of email, no index, answer due tonight. Which card?</summary><p>This is the rare case where the first question in the tree is yes: the task needs nearly every token (you cannot count what you do not read). The whole input is nowhere near a reliable window, so stuffing is out. Retrieval fails because there is no locator and you are aggregating, not looking something up. That leaves the emerging card: treat the corpus as an environment, slice it, run sub-calls on slices, sum the counts. If you cannot stand up an RLM tonight, the pragmatic equivalent is a fixed-workflow fan-out from 0.2 (chunk, classify each chunk in a fresh context, aggregate), which is the same idea with the recursion written by hand. Either way, the corpus never enters one window.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>
+    Module 1's bar is "given any agent misbehavior, your first three hypotheses are all context hypotheses, and they are usually right." This topic gives you the first hypothesis: <em>the window is spending attention on tokens that are not paying for their seat.</em> You should be able to look at any agent, name which of the four cards it is running, and say whether its budget is being spent by a designer, a harness, a model, or nobody. 1.2 will give you the vocabulary for the other hypotheses (the four operations and the four failure modes), and 1.3 through 1.7 supply the specific mechanisms.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources">
+    <li>Hong, Troynikov, Huber, Context Rot: How Increasing Input Tokens Impacts LLM Performance, Chroma, July 2025: https://research.trychroma.com/context-rot</li>
+    <li>Anthropic, Effective context engineering for AI agents, September 2025: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents</li>
+    <li>Liu et al., Lost in the Middle: How Language Models Use Long Contexts, July 2023: https://arxiv.org/abs/2307.03172</li>
+    <li>Zhang, Kraska, Khattab, Recursive Language Models, MIT CSAIL, December 2025 (v3 May 2026): https://arxiv.org/abs/2512.24601</li>
+    <li>Classifier Context Rot: Monitor Performance Degrades with Context Length, May 2026: https://arxiv.org/abs/2605.12366</li>
+  </ul>
+
+</div>
+</body>
+</html>

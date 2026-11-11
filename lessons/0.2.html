@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<!--
+TUTORIAL TEMPLATE for agent-architecture-tutor.
+Copy this file's CSS and structure for every tutorial. Replace bracketed
+placeholders. Keep it a single self-contained file: no external fonts,
+scripts, or images. Diagrams are inline SVG using the palette variables.
+Section order matches SKILL.md: why > mental model > landscape > anchor >
+choosing (decision tree) > anchor > misconception > check yourself > done when + sources.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0.2: The workflow-vs-agent spectrum</title>
+<style>
+  :root {
+    --ink: #1a1d21;
+    --ink-soft: #4a5058;
+    --paper: #faf8f4;
+    --card: #ffffff;
+    --line: #e5e0d6;
+    --accent: #0f6b5c;        /* deep teal: links, headings, accents */
+    --accent-soft: #e3efec;
+    --amber: #a05e0b;         /* callouts, misconception */
+    --amber-soft: #f9efdd;
+    /* status badge colors */
+    --current: #0f6b5c;  --ascendant: #1a5fa8;  --emerging: #7a4fa3;
+    --legacy: #8a8578;   --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker {
+    font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--accent);
+  }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft);
+          border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super;
+            font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+
+  /* The one-sentence mental model, displayed like a pull quote */
+  .mental-model {
+    background: var(--accent-soft); border-left: 4px solid var(--accent);
+    padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0;
+    font-size: 21px; line-height: 1.45;
+  }
+  .mental-model .label {
+    display: block; font: 700 12px/1 -apple-system, sans-serif;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+
+  /* Landscape cards: one per approach */
+  .approach {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 24px; margin: 16px 0;
+  }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em;
+    text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px;
+  }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); }
+  .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); }
+  .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  /* Landscape frame: what the cards are a landscape OF. Required before the first card. */
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+
+  /* Amber callout: misconception, warnings, "watch out" */
+  .callout {
+    background: var(--amber-soft); border-left: 4px solid var(--amber);
+    padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0;
+  }
+  .callout .label {
+    font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px;
+  }
+
+  /* Diagram block */
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line);
+           border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft);
+               margin-top: 10px; text-align: center; }
+
+  /* Check-yourself questions with collapsible answers */
+  details {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 20px; margin: 12px 0;
+  }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+
+  .done-when { background: var(--card); border: 2px solid var(--accent);
+               border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+                      text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace;
+         background: #efece4; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 0 · Topic 0.2</div>
+    <h1>The workflow-vs-agent spectrum</h1>
+    <p class="standfirst">Place any system on the autonomy dial and say what each notch to the right costs.</p>
+    <div class="meta">Freshness-checked 2026-08-21 · landscape rebuilt 2026-08-22 with per-card diagrams · builds on 0.1 · ~12 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>Teams shipped "agents" in 2025 that were, on inspection, three prompts in a trench coat, and other teams shipped open loops that burned budget on tasks a router would have handled. Both groups argued about whether their thing was really an agent. The argument was the problem. Anthropic's <i>Building Effective Agents</i> replaced it with a spectrum: predefined code paths on one end, model-directed loops on the other. The question underneath is how much control flow you write and how much you hand to the model.</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>The question is never "is this an agent." It is "how much control flow did I delegate to the model, and can I verify what it does with it?"</div>
+  <p>Two consequences. <b>Autonomy is not a property of the model</b>, it is a property of your deployment; the same model is a workflow step in one system and an autonomous agent in another. And <b>verification is the ceiling</b>: you can safely delegate exactly as much control flow as you can mechanically check. Coding agents run hot because tests are ground truth. Research agents run cooler because "is this analysis good" has no cheap oracle.</p><p>The correction the field made in 2026 was not a retreat from agents. It was recognizing that autonomy is a dial, that most production value sits well below maximum, and that turning it up has a price you can state in advance. Carnegie Mellon and Salesforce measured roughly seventy percent failure on realistic office tasks; Gartner projects over forty percent of agentic projects cancelled by 2027. Those were failures of predictability, not intelligence.</p><p>Read the five cards below left to right as the dial turning up. Watch what happens to the loop arrow: absent, then owned by you, then shared, then fenced, then the model's alone.</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame"><div class="q">A landscape of: how much control flow is handed to the model, and how is it fenced?</div><div class="axis">What varies: the position of the autonomy dial, from no loop at all to a loop the model owns end to end. Five notches, read left to right as the dial turns up; each notch trades predictability for adaptability.</div><div class="legend">Reading the diagrams: gray is structure every approach shares; <span style="color:#0f6b5c;font-weight:600">teal</span> is the element that makes this approach different from the one above it; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks.</div></div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-tool"><path d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="40" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">tool</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">store</text></g>
+      <g id="sym-human"><circle cx="20" cy="10" r="8" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M2 40 a18 18 0 0 1 36 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">orchestrator</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    </defs>
+  </svg>
+  <style>
+    .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+    .dg .delta { color: #0f6b5c; }
+    .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .dg .loop { stroke-dasharray: 6 4; }
+    .dg .fail { fill: #a05e0b; }
+    .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  </style>
+
+  
+  <div class="approach">
+    <h3>The augmented single call <span class="badge b-current">Current</span></h3>
+    <p>One model call with retrieval, tools, and a tight output contract. No loop at all. Anthropic's own guidance says to reach for this first and stop here if it passes your evals.</p>
+    <p class="tradeoffs"><b>Wins:</b> one unit of latency, one unit of cost, trivially testable, and it fails in ways you can read. <b>Costs:</b> cannot recover from its own mistakes, and cannot handle tasks whose shape you do not know in advance. <b>Reach for it when:</b> more often than you want to. A large share of shipped "agents" are this with extra steps.</p>
+    <p class="tradeoffs"><b>Done right:</b> Support-ticket triage: retrieve the tag taxonomy and three similar tickets, one call, JSON out with category and priority. It passes the eval set, so it ships as a single call and stays one.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="Retrieval feeds one model call which calls a tool once and emits a contracted output, with no loop back"><g><path transform="translate(60 55)" d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="96" cy="63" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="96" y="85" text-anchor="middle" font-size="12" fill="currentColor">retrieval</text></g><g class="delta"><use href="#sym-model" x="220" y="55"/></g><use href="#sym-tool" x="380" y="55"/><path class="edge" d="M134 75 H218"/><text x="176" y="70" text-anchor="middle" font-size="12" fill="currentColor">retrieve</text><path class="edge" d="M316 75 H378"/><text x="347" y="70" text-anchor="middle" font-size="12" fill="currentColor">call once</text><g class="delta"><rect x="500" y="55" width="90" height="40" rx="4" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="545" y="80" text-anchor="middle" fill="currentColor">output</text></g><g class="delta"><path class="edge" d="M462 75 H498"/><text x="480" y="112" text-anchor="middle" font-size="12" fill="currentColor">contract</text></g><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">no path back: a wrong call is the answer</text></svg><figcaption>Cheap and legible; cannot recover. Reach for it more often than you want to.</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>Fixed workflows: chaining, routing, parallelization <span class="badge b-current">Current</span></h3>
+    <p>You write the graph, the model fills the nodes. Chaining is a line, routing is a fork, parallelization is a fan-out.</p>
+    <p class="tradeoffs"><b>Wins:</b> priceable, cacheable, testable per node. <b>Costs:</b> novel inputs fall off the graph. Routing is underused; a cheap classifier in front of three specialized paths beats one prompt covering all three.</p>
+    <p class="tradeoffs"><b>Done right:</b> A weekly pipeline-recap email: pull CRM data, summarize per rep in parallel, merge, format to the template. The graph is identical every Monday, so every node is priced, cached, and tested on its own.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="A router model fans out to three fixed chains that merge into one output; the model fills nodes, you own the edges"><g><rect x="30" y="55" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="78" y="80" text-anchor="middle" fill="currentColor">router</text></g><g class="delta"><path class="edge" d="M126 68 C 170 68, 170 20, 210 20"/></g><g class="delta"><path class="edge" d="M126 75 H208"/></g><g class="delta"><path class="edge" d="M126 82 C 170 82, 170 130, 210 130"/></g><g><rect x="210" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="258" y="25" text-anchor="middle" fill="currentColor">path A</text></g><g><rect x="210" y="55" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="258" y="80" text-anchor="middle" fill="currentColor">path B</text></g><g><rect x="210" y="110" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="258" y="135" text-anchor="middle" fill="currentColor">path C</text></g><g class="delta"><path class="edge" d="M306 20 H348"/></g><g class="delta"><path class="edge" d="M306 75 H348"/></g><g class="delta"><path class="edge" d="M306 130 H348"/></g><g><rect x="350" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="398" y="25" text-anchor="middle" fill="currentColor">step 2</text></g><g><rect x="350" y="55" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="398" y="80" text-anchor="middle" fill="currentColor">step 2</text></g><g><rect x="350" y="110" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="398" y="135" text-anchor="middle" fill="currentColor">step 2</text></g><g class="delta"><path class="edge" d="M446 20 C 490 20, 490 75, 528 75"/></g><g class="delta"><path class="edge" d="M446 75 H528"/></g><g class="delta"><path class="edge" d="M446 130 C 490 130, 490 75, 528 75"/></g><rect x="530" y="55" width="90" height="40" rx="4" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="575" y="80" text-anchor="middle">output</text><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">an input that matches none of the paths</text></svg><figcaption>You own every edge; the model only ever owns a node.</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>Evaluator-optimizer <span class="badge b-current">Current</span></h3>
+    <p>Generate, evaluate, revise. The model owns the iteration count; you own the exit condition.</p>
+    <p class="tradeoffs"><b>Wins:</b> the cheapest reliability you can buy, when the evaluation is grounded. <b>Costs:</b> ungrounded self-critique converges on confident garbage.</p>
+    <p class="tradeoffs"><b>Done right:</b> Generating a SQL query where the evaluator actually runs it against a sample database and compares row counts to the expected answer. The referee is grounded, so each revision moves toward something real. Marketing copy graded by "does this sound good" is the same loop with no referee.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="A generator and an evaluator model loop; the evaluator is anchored to ground truth and you set the exit rule"><g><rect x="120" y="55" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="168" y="80" text-anchor="middle" fill="currentColor">generate</text></g><g class="delta"><g><rect x="340" y="55" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="388" y="80" text-anchor="middle" fill="currentColor">evaluate</text></g></g><path class="edge" d="M216 68 H338"/><text x="277" y="62" text-anchor="middle" font-size="12" fill="currentColor">draft</text><g class="delta"><path class="edge loop" d="M340 88 H216"/><text x="277" y="104" text-anchor="middle" font-size="12" fill="currentColor">critique</text></g><g class="delta"><g><path transform="translate(470 100)" d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="510" y="125" text-anchor="middle" fill="currentColor">ground truth</text></g></g><g class="delta"><path class="edge" d="M436 95 C 450 110, 455 115, 468 118"/><text x="420" y="150" text-anchor="middle" font-size="12" fill="currentColor">checks against</text></g><g><path transform="translate(470 10)" d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="510" y="35" text-anchor="middle" fill="currentColor">exit rule</text></g><path class="edge" d="M436 55 C 450 40, 455 35, 468 30"/><text x="470" y="62" text-anchor="middle" font-size="12" fill="currentColor">you own</text><rect x="560" y="55" width="70" height="40" rx="4" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="595" y="80" text-anchor="middle">output</text><path class="edge" d="M436 75 H558"/><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">an evaluator with nothing to check against</text></svg><figcaption>A loop, but a loop between two roles with a referee. Remove the referee and it spirals.</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>The bounded agent step <span class="badge b-ascendant">Ascendant</span></h3>
+    <p>A workflow shell with one genuinely agentic node inside fences: max iterations, cost cap, tool allowlist, a human gate on the irreversible. The shape of most production systems that work.</p>
+    <p class="tradeoffs"><b>Wins:</b> adaptive where the task needs judgment, deterministic everywhere else, blast radius bounded by construction. <b>Costs:</b> someone has to set the fences per step, and the defaults are never right.</p>
+    <p class="tradeoffs"><b>Done right:</b> The refunds path of a support agent: a router decides it is a refund case, then the model works freely among lookup and policy tools, capped at eight turns, with a human gate on any refund above a threshold. Judgment where the case is messy; a hard fence where the money moves.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="A fixed chain where the middle node is an agent loop inside a dashed fence with a human gate"><g><rect x="20" y="60" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="68" y="85" text-anchor="middle" fill="currentColor">step 1</text></g><path class="edge" d="M116 80 H158"/><g class="delta"><rect x="160" y="40" width="330" height="100" rx="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="168" y="34" font-size="12" fill="currentColor">fences: max iters, cost cap, tool allowlist</text></g><use href="#sym-model" x="180" y="60"/><use href="#sym-tool" x="300" y="60"/><path class="edge" d="M276 73 H298"/><path class="edge loop" d="M300 93 H276"/><g class="delta"><use href="#sym-human" x="420" y="92"/></g><g class="delta"><path class="edge" d="M380 100 H412"/></g><g class="delta"><text x="440" y="64" text-anchor="middle" font-size="12" fill="currentColor">gate on the</text></g><g class="delta"><text x="440" y="78" text-anchor="middle" font-size="12" fill="currentColor">irreversible</text></g><path class="edge" d="M490 80 H528"/><g><rect x="530" y="60" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="578" y="85" text-anchor="middle" fill="currentColor">step 3</text></g><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">fences set once, never re-sized per step</text></svg><figcaption>Exactly one node gets to improvise, and it improvises inside a box you drew.</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>The open agent loop <span class="badge b-contested">Contested</span></h3>
+    <p>The model owns control flow end to end. Decides what to do, how many times, when to stop.</p>
+    <p class="tradeoffs"><b>Wins:</b> the only thing that handles tasks whose shape depends on what gets discovered. <b>Costs:</b> unpredictable spend, early errors poison the trajectory, near-zero auditability. <b>Reach for it when:</b> you cannot hardcode the path but can still verify the result.</p>
+    <p class="tradeoffs"><b>Done right:</b> "Make the failing CI green" on an unfamiliar repo. Nobody can write the steps in advance, but CI is a binary verifier, so the loop can run open and the result still gets checked. Both halves of the test hold.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="A bare model and tool loop with no fences; the only check is whether the final result can be verified"><g class="delta"><use href="#sym-model" x="200" y="55"/></g><use href="#sym-tool" x="380" y="55"/><g class="delta"><path class="edge" d="M296 68 H378"/></g><g class="delta"><path class="edge loop" d="M380 88 H296"/></g><g class="delta"><path class="edge loop" d="M248 55 C 248 10, 140 10, 140 75 C 140 120, 200 120, 200 95"/><text x="110" y="22" text-anchor="middle" font-size="12" fill="currentColor">stops when it decides to</text></g><g class="delta"><rect x="500" y="55" width="110" height="40" rx="4" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/><text x="555" y="80" text-anchor="middle">verify result?</text></g><g class="delta"><path class="edge" d="M460 75 H498"/></g><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">a turn-2 error steers every later turn</text></svg><figcaption>Reach for it when you cannot hardcode the path but can still verify the result. That conjunction is the whole test.</figcaption></figure>
+  </div>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide how far to turn the autonomy dial for a given step:</p>
+  <figure><svg class="dg" viewBox="0 0 680 370" role="img" aria-label="decision tree"><rect x="230" y="10" width="220" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="340.0" y="28" text-anchor="middle" font-size="12.5" fill="currentColor">Can you write the steps</text><text x="340.0" y="44" text-anchor="middle" font-size="12.5" fill="currentColor">in advance?</text><path class="edge" d="M230 35 H130 V78"/><text x="180" y="28" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><rect x="20" y="80" width="220" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="130.0" y="98" text-anchor="middle" font-size="12.5" fill="currentColor">Can you verify the result</text><text x="130.0" y="114" text-anchor="middle" font-size="12.5" fill="currentColor">mechanically (tests, CI, a number)?</text><path class="edge" d="M130 130 V163"/><text x="155" y="150" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="45" y="165" width="170" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="130.0" y="182" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Open agent loop</text><path class="edge" d="M240 105 H262 V255 H242"/><text x="262" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><rect x="20" y="230" width="220" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="130.0" y="248" text-anchor="middle" font-size="12.5" fill="currentColor">Can you build a grounded</text><text x="130.0" y="264" text-anchor="middle" font-size="12.5" fill="currentColor">evaluator (runs it, checks it)?</text><path class="edge" d="M130 280 V308"/><text x="155" y="300" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="20" y="310" width="190" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="115.0" y="327" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Evaluator-optimizer</text><path class="edge" d="M240 255 H285 V308"/><text x="300" y="250" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><rect x="215" y="310" width="160" height="48" rx="8" fill="#f9efdd" stroke="#a05e0b" stroke-width="2"/><text x="295.0" y="327" text-anchor="middle" font-size="12.5" font-weight="600" fill="#a05e0b">Not yet: narrow the</text><text x="295.0" y="343" text-anchor="middle" font-size="12.5" font-weight="600" fill="#a05e0b">task until you can</text><path class="edge" d="M450 35 H560 V78"/><text x="505" y="28" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="450" y="80" width="220" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="560.0" y="98" text-anchor="middle" font-size="12.5" fill="currentColor">Does some step need judgment</text><text x="560.0" y="114" text-anchor="middle" font-size="12.5" fill="currentColor">that varies per input?</text><path class="edge" d="M560 130 V163"/><text x="585" y="150" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="475" y="165" width="170" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="560.0" y="182" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Bounded agent step</text><path class="edge" d="M450 105 H428 V255 H448"/><text x="428" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><rect x="450" y="230" width="220" height="34" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="560.0" y="248" text-anchor="middle" font-size="12.5" fill="currentColor">Is it one step?</text><path class="edge" d="M480 280 V308"/><text x="458" y="300" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="395" y="310" width="150" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="470.0" y="327" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Augmented single call</text><path class="edge" d="M620 280 V308"/><text x="640" y="300" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><rect x="555" y="310" width="120" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="615.0" y="327" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Fixed workflow</text></svg><figcaption>Two questions decide almost everything: can you write the steps, and can you verify the result.</figcaption></figure>
+  <p>Ask this per step, not per product. The left branch is the agent side of the dial and its gate is verification: an open loop is only safe when a mechanical check exists, and an evaluator-optimizer only works when the evaluator is grounded in something other than the text. The right branch is the workflow side; the only reason to let a node improvise is judgment that changes with the input, and when it does, fence it.</p>
+
+  <h2><span class="num">5</span>Seen in the wild</h2>
+  <p>Deep research products occupy several positions at once. The outer shape is a workflow: decompose, search, synthesize, cite, write. Nobody lets the model decide whether to include citations. Inside the search step autonomy goes up sharply, because each subagent picks its own queries and the work is read-only, so the worst outcome is a wasted subagent rather than a deleted database. In the grammar above, that is a fixed chain whose "search" node is a bounded agent step.</p><p>The transferable habit: set the dial per step, not per product. Grant autonomy where actions are reversible and parallelism is real, withhold it where the output contract matters.</p>
+
+  <div class="callout"><span class="label">The misconception</span>That the spectrum is a maturity ladder with agents as the advanced version. It is a trade, not a ladder. Every step right sells predictability to buy adaptability, and if the task did not need adaptability you paid for nothing. The mature move is usually leftward: find the one step that genuinely needs judgment, make that agentic, hardcode the rest.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>Support product routes tickets to four paths; inside the refunds path the model picks among six tools freely. Where is this, and what must you check?</summary><p>Routing outside, bounded agent step inside, which is a good shape. Check whether any of the six tools moves money irreversibly. If so it needs a human gate or a reversible staging step. The check is about blast radius, not the model's competence.</p></details><details><summary>Your evaluator-optimizer loop produces worse output the longer it runs. Why?</summary><p>The evaluator is not grounded, so it rewards qualities visible in the text rather than qualities the task requires, and each round amplifies the last. Fix the oracle before the prompt. If no oracle exists, delete the loop and take the single call.</p></details><details><summary>A colleague says go fully autonomous because scaffolding will be obsolete in six months. Where does that break?</summary><p>The strong version is often right: structure that compensates for a weak model becomes a cage for a strong one. But not all structure is compensation. Approval gates and cost caps exist because some actions are irreversible, not because the model is dumb. Model improvements dissolve scaffolding that substitutes for judgment, not scaffolding that contains consequences.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>You can point at any product and say which parts are workflow and which are agent, and why the dial sits where it does. 0.1 supplied the loop; 0.3 supplies what the tools inside the nodes should look like.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources"><li>Anthropic, Building Effective Agents (Dec 2024)</li><li>Anthropic, Measuring AI agent autonomy in practice (2026)</li><li>MachineLearningMastery, Agentic Workflow vs Autonomous Agent (Jun 2026) [Tier 3]</li><li>Agents vs Workflows: A Decision Framework for 2026, dev.to (Mar 2026) [Tier 3]</li></ul>
+
+</div>
+</body>
+</html>

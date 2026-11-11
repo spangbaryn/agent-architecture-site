@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1.6: Progressive disclosure and Skills</title>
+<style>
+  :root {
+    --ink: #1a1d21; --ink-soft: #4a5058; --paper: #faf8f4; --card: #ffffff; --line: #e5e0d6;
+    --accent: #0f6b5c; --accent-soft: #e3efec; --amber: #a05e0b; --amber-soft: #f9efdd;
+    --current: #0f6b5c; --ascendant: #1a5fa8; --emerging: #7a4fa3; --legacy: #8a8578; --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker { font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft); border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super; font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+  .mental-model { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-size: 21px; line-height: 1.45; }
+  .mental-model .label { display: block; font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .approach { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge { font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px; }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); } .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); } .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; padding: 12px; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+  .callout { background: var(--amber-soft); border-left: 4px solid var(--amber); padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+  .callout .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px; }
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft); margin-top: 10px; text-align: center; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 20px; margin: 12px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+  .done-when { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace; background: #efece4; padding: 1px 5px; border-radius: 4px; }
+  table.levels { width: 100%; border-collapse: collapse; font-size: 15px; margin: 8px 0 20px; }
+  table.levels th, table.levels td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.levels th { font: 600 12px/1.3 -apple-system, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+  .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+  .dg .delta { color: #0f6b5c; }
+  .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+  .dg .loop { stroke-dasharray: 6 4; }
+  .dg .fail { fill: #a05e0b; }
+  .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  .dg .lbl { fill: currentColor; font-size: 12px; }
+  .dg .win { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-dasharray: 3 3; }
+  .dg .q { fill: #fff; stroke: #4a5058; stroke-width: 1.5; }
+  .dg .leaf { fill: #e3efec; stroke: #0f6b5c; stroke-width: 1.5; }
+  .dg .leaf-amber { fill: #f9efdd; stroke: #a05e0b; stroke-width: 1.5; }
+  .dg .t { font-size: 12px; fill: #1a1d21; }
+  .dg .yn { font-size: 11px; fill: #4a5058; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 1 · Topic 1.6</div>
+    <h1>Progressive disclosure and Skills</h1>
+    <p class="standfirst">Decide where every piece of procedural knowledge should live, and defend why the description is the only part that pays rent.</p>
+    <div class="meta">Freshness-checked 2026-09-20 · builds on 0.3, 1.1, 1.2, 1.4, 1.5 · ~14 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>By the middle of 2025 the system prompt had become a landfill. Every team that shipped an agent learned the same thing in the same order: the model does a task wrong, someone writes the correct procedure into the prompt, it works, and six months later the prompt is nine thousand tokens of "if the user asks for a spreadsheet, do this; if the ticket mentions billing, do that." Each rule was added for a good reason and each rule is irrelevant on almost every turn. 1.1 named the bill: every one of those tokens spends from the attention budget on every step, whether or not this step is the one it was written for. 1.1's open thread said this rot "pushes case material into retrieved skills." This is where that thread lands.</p>
+  <p>Tools had the same disease with bigger numbers. Anthropic measured a five-server MCP setup at roughly 55,000 tokens of tool definitions for 58 tools before the agent had done anything, and reported internal cases where definitions alone consumed 134,000 tokens. 0.3 taught you that a tool surface is "a context-budget decision wearing an API costume." In October 2025 Simon Willison looked at this and wrote that Claude Skills were "maybe a bigger deal than MCP," and his stated reason was exactly the token bill: GitHub's official MCP server "famously consumes tens of thousands of tokens of context."</p>
+  <p>0.3 promised we would come back to this. Its ledger records that Claude Code kept its tool list short "below the level of the task" and moved specificity "into skills loaded on demand." 1.2 left "tool loadout vs progressive disclosure" for here. 1.4 and 1.5 both said "select for procedures" belongs to 1.6. Four debts, one answer: procedural knowledge is a payload, and 1.4 already told you what to do with payloads.</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>
+    A skill is the locator-and-payload move applied to instructions instead of data: the description stays in the window as a locator, the procedure stays on disk as a payload, and the whole design lives or dies on whether the description fires at the right moment.</div>
+  <p>1.4's sentence was: "Keep the locator in the window and the payload in the store: a pre-loaded payload is a relevance bet placed before step one, and a locator lets each step place that bet at the moment the need is actually knowable." Read it again with "procedure" in place of "data" and you have this whole topic. A nine-thousand-token system prompt is a pre-loaded payload of procedures: a relevance bet on every one of them, placed before step one, on every turn. A catalog of one-line descriptions is a set of locators. The model reads the catalog, recognises that this task is the spreadsheet one, and pulls the spreadsheet procedure in. The procedure pays for its seat only on the turns that use it.</p>
+  <p>The field calls this <b>progressive disclosure</b>, and the Agent Skills format made it concrete as three levels. It is worth seeing them as five, because the two ends are where the design decisions hide:</p>
+  <table class="levels">
+    <tr><th>Level</th><th>What it is</th><th>When it enters the window</th><th>Cost</th></tr>
+    <tr><td>0</td><td>Always-on layer: system prompt, CLAUDE.md, AGENTS.md</td><td>Every turn</td><td>Paid every step, forever</td></tr>
+    <tr><td>1</td><td>Catalog: <code>name</code> plus <code>description</code> from every skill's frontmatter</td><td>Every turn</td><td>About 100 tokens per skill</td></tr>
+    <tr><td>2</td><td>Body: the SKILL.md instructions</td><td>When the skill fires</td><td>Under 5k tokens, once, then it persists</td></tr>
+    <tr><td>3</td><td>References: extra files the body points at</td><td>When the body says to read them</td><td>Zero until read</td></tr>
+    <tr><td>4</td><td>Scripts: code the body tells the model to run</td><td>Never; only the output enters</td><td>The output's size, not the code's</td></tr>
+  </table>
+  <p>Level 4 is the one people miss and it is the sharpest form of the idea. A 400-line script that renders a chart never costs 400 lines of context. The model sees a one-line instruction to run it and then sees the result. That is 0.3's "code execution over tool preloading" arriving as a file in a folder. Level 0 is the one people overuse, and the entire discipline reduces to a rule about what has earned a permanent seat there: standing constraints and conventions, the material 1.1 called altitude. Procedures almost never qualify, because a procedure is by definition relevant to some turns and not others.</p>
+  <p>Two things follow. First, the description is not documentation. It is the trigger, and the only part of a skill that is in the window when the decision to load it gets made. The Claude Platform docs require it to say both what the skill does and when to use it, and Claude Code truncates description plus <code>when_to_use</code> at 1,536 characters, so it is a locator with a hard size cap. Second, "skills versus MCP" was never a rivalry over what the model can do. It was a rivalry over how much sits in the window before step one, and by November 2025 the MCP side had made the same move: mark tools <code>defer_loading</code> and give the model a search tool, which cut one setup from about 77,000 tokens to about 8,700. Same move, different payload.</p>
+  <p>This tutor is itself the thing it is teaching, which is why you are reading it at all. Its description fired when you typed "next lesson." Its body loaded the workflow. Its <code>references/</code> folder held your profile and the ledger until the workflow said to read them. Nothing about lesson 1.6 was in the window when you said hello.</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame">
+    <div class="q">A landscape of: where a procedure lives between uses, and what decides the moment it enters the window.</div>
+    <div class="axis">What varies: how much of the procedure is in the window before it is needed (all of it, one line, none of it), and who resolves that line into the full procedure (nobody, the model, a harness rule, a search tool, a separate agent). Five answers, ordered from most pre-loaded to most isolated.</div>
+    <div class="legend">Reading the diagrams: the dashed box is the context window; gray is shared structure; <span style="color:#0f6b5c;font-weight:600">teal</span> is what makes this approach different from the one above it; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks.</div>
+  </div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-tool"><path d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="40" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">tool</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">disk</text></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">subagent</text></g>
+      <g id="sym-doc"><path d="M0 0 H44 L60 16 V72 H0 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M44 0 V16 H60" fill="none" stroke="currentColor" stroke-width="2"/><line x1="10" y1="30" x2="50" y2="30" stroke="currentColor" stroke-width="2"/><line x1="10" y1="42" x2="50" y2="42" stroke="currentColor" stroke-width="2"/><line x1="10" y1="54" x2="36" y2="54" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-catalog"><rect x="0" y="0" width="84" height="44" rx="4" fill="#fff" stroke="currentColor" stroke-width="2"/><line x1="8" y1="12" x2="76" y2="12" stroke="currentColor" stroke-width="2"/><line x1="8" y1="22" x2="76" y2="22" stroke="currentColor" stroke-width="2"/><line x1="8" y1="32" x2="60" y2="32" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-rule"><path d="M0 20 L20 0 L40 20 L20 40 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="20" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="currentColor">rule</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    </defs>
+  </svg>
+
+  <div class="approach">
+    <h3>Always-on instructions <span class="badge b-contested">Contested</span></h3>
+    <p>Every procedure lives in the system prompt or a CLAUDE.md-style file and is in the window on every turn. Nobody resolves anything because nothing was ever taken out. This is the default every team starts with, and it is the correct home for one class of material: standing constraints and conventions that apply to every turn. The contest is over where that class ends, and in practice it ends far earlier than the file does.</p>
+    <p class="tradeoffs"><b>Wins:</b> zero mechanism, zero trigger risk, the model cannot fail to load what is already there. <b>Costs:</b> the bill from 1.1, paid on every step by every rule that does not apply to this step; the if-then rot that 1.1 flagged; and no way to add procedures without diluting the ones already there.</p>
+    <p class="tradeoffs"><b>Done right:</b> a two-hundred-line CLAUDE.md that says how the repo is laid out, what the test command is, and three things the team never does. Every line applies to every turn, which is the test. The moment a line starts with "when the user asks for," it has failed the test and belongs one card down.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="All procedures sit inside the context window with the model; disk is empty.">
+        <rect class="win" x="20" y="14" width="400" height="122" rx="10"/>
+        <text class="lbl" x="30" y="32">window</text>
+        <g class="delta"><use href="#sym-doc" x="40" y="46"/><use href="#sym-doc" x="110" y="46"/><use href="#sym-doc" x="180" y="46"/><text class="lbl" x="40" y="136" style="fill:#0f6b5c">every procedure, every turn</text></g>
+        <use href="#sym-model" x="290" y="62"/>
+        <use href="#sym-store" x="500" y="60"/>
+        <text class="lbl" x="506" y="122">nothing here</text>
+        <circle class="fail" cx="250" cy="82" r="5"/><text class="fail-label" x="240" y="108" text-anchor="end">rots as it grows</text>
+      </svg>
+      <figcaption>Nothing to trigger, nothing to miss; every line pays rent forever.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Catalog plus on-demand body (Skills) <span class="badge b-current">Current</span></h3>
+    <p>Each procedure is a folder with a SKILL.md. Only the frontmatter's name and description stay in the window; the model reads the catalog, decides a skill applies, and loads the body, which may point at further files and scripts. Anthropic shipped it in October 2025, published it as an open specification at agentskills.io in December 2025, and within days Cursor, Amp, Letta, goose, GitHub, VS Code, OpenCode and OpenAI's Codex had adopted the format. The model is the resolver: the same "the model is the retriever" consequence 1.4 drew for data.</p>
+    <p class="tradeoffs"><b>Wins:</b> procedures cost about 100 tokens each until used; the unit of improvement is a file you can diff, version and permission-gate (5.2 will make this the safe self-improvement channel); scripts run without their code ever entering context. <b>Costs:</b> the description is a bet the model places on every turn, and a mis-fire is silent: a skill that never triggers looks identical to a skill that does not exist. SkillsBench (Feb 2026, Li, Song et al.) found curated skills raised average pass rate 16.2 points but 16 of 84 tasks got worse, and skills the model wrote for itself added nothing on average.</p>
+    <p class="tradeoffs"><b>Done right:</b> the document skills Anthropic ships (pptx, xlsx, docx, pdf). Each is a whole domain's worth of gotchas plus scripts, none of it relevant until someone asks for a spreadsheet, at which point all of it is. The description "create, read, edit spreadsheets" is exactly as long as the trigger needs to be.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="Only a catalog is in the window; the model resolves a catalog line into a procedure loaded from disk.">
+        <rect class="win" x="20" y="14" width="400" height="122" rx="10"/>
+        <text class="lbl" x="30" y="32">window</text>
+        <g class="delta"><use href="#sym-catalog" x="40" y="60"/><text class="lbl" x="40" y="124" style="fill:#0f6b5c">names + descriptions</text></g>
+        <use href="#sym-model" x="180" y="62"/>
+        <use href="#sym-doc" x="330" y="46"/>
+        <text class="lbl" x="322" y="132">body, on fire</text>
+        <use href="#sym-store" x="500" y="60"/>
+                <g class="delta"><path class="edge" d="M276 82 H326"/><path class="edge loop" d="M500 82 H392"/><text class="lbl" x="440" y="74" style="fill:#0f6b5c">load</text></g>
+        <path class="edge" d="M126 82 H178"/>
+        <circle class="fail" cx="150" cy="60" r="5"/><text class="fail-label" x="150" y="48" text-anchor="middle">did it fire?</text>
+      </svg>
+      <figcaption>Cheap until used, versionable, and silent when the trigger misses.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Harness-triggered loading <span class="badge b-ascendant">Ascendant</span></h3>
+    <p>The same folder of procedures, but a deterministic rule in the harness decides when a body enters, not the model. Claude Code's <code>paths:</code> frontmatter loads a skill only when the model touches matching files; nested <code>.claude/skills/</code> directories load when work moves into that subtree; VS Code's <code>.instructions.md</code> files carry an <code>applyTo</code> glob; hooks fire on lifecycle events. This is 1.2's harness-triggered card wearing procedure clothes, and it is ascendant for the reason 1.5's harness reminders survived: a rule cannot forget.</p>
+    <p class="tradeoffs"><b>Wins:</b> triggering is exact and testable; nothing depends on the model reading a description well; it composes with the catalog card (a skill can have both a description and a path rule). <b>Costs:</b> the rule sees the file, not the intent. Editing <code>billing.py</code> to fix a typo loads the whole billing procedure. And there is no rule for procedures whose trigger is a kind of request rather than a kind of file.</p>
+    <p class="tradeoffs"><b>Done right:</b> a migration-safety skill with <code>paths: "db/migrations/**"</code>. The moment any agent, on any model, opens a migration file, the checklist is in the window, and no description had to be good enough to make that happen.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="A harness rule between disk and window decides when a procedure enters, based on paths or events.">
+        <rect class="win" x="20" y="14" width="400" height="122" rx="10"/>
+        <text class="lbl" x="30" y="32">window</text>
+        <use href="#sym-catalog" x="40" y="60"/>
+        <use href="#sym-model" x="180" y="62"/>
+        <use href="#sym-doc" x="330" y="46"/>
+        <use href="#sym-store" x="540" y="60"/>
+        <path class="edge" d="M126 82 H178"/>
+        <g class="delta"><use href="#sym-rule" x="440" y="62"/><path class="edge" d="M540 82 H482"/><path class="edge" d="M440 82 H392"/><text class="lbl" x="424" y="126" style="fill:#0f6b5c">path / event match</text></g>
+        <circle class="fail" cx="460" cy="48" r="5"/><text class="fail-label" x="460" y="36" text-anchor="middle">blind to intent</text>
+      </svg>
+      <figcaption>Exact and unforgetting; loads the whole procedure for a one-line edit.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Deferred tool definitions <span class="badge b-ascendant">Ascendant</span></h3>
+    <p>Progressive disclosure applied to capabilities instead of procedures. Tool definitions are marked deferred; the window holds only a search tool (about 500 tokens) and whichever tools are used constantly; the model searches for the rest by name or description and the matches expand into full definitions. Anthropic's Tool Search Tool (Nov 2025) reported the 77k-to-8.7k reduction above and, more interesting, an accuracy jump on MCP evals from 49% to 74% on Opus 4, because fewer definitions in the window means fewer near-identical names to confuse. That is 1.2's confusion failure mode fixed by its select move.</p>
+    <p class="tradeoffs"><b>Wins:</b> a large tool library with a small standing footprint; better tool choice, not just cheaper. <b>Costs:</b> a search miss means the tool does not exist for the model on this turn, and unlike a skill mis-fire this one can block the task outright. The tool is still a contract plus a prompt (0.3); deferring it moves the prompt half behind a search, so the one-line searchable summary now carries the load the full description used to.</p>
+    <p class="tradeoffs"><b>Done right:</b> an enterprise agent wired to GitHub, Slack, Jira and three observability servers. Nobody uses more than a handful of those 100-plus tools per task, and the handful changes per task, which is precisely the case where the standing footprint should be a search box, not a library.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="Tool definitions live on disk; a search tool in the window resolves the model's request into a loaded tool definition.">
+        <rect class="win" x="20" y="14" width="400" height="122" rx="10"/>
+        <text class="lbl" x="30" y="32">window</text>
+        <use href="#sym-model" x="180" y="62"/>
+        <use href="#sym-store" x="540" y="60"/>
+        <g class="delta"><use href="#sym-tool" x="40" y="62"/><text class="lbl" x="34" y="124" style="fill:#0f6b5c">tool search</text><use href="#sym-tool" x="320" y="62"/><text class="lbl" x="316" y="124" style="fill:#0f6b5c">found tool</text><path class="edge loop" d="M540 82 H402"/></g>
+        <path class="edge" d="M122 82 H178"/><path class="edge" d="M276 82 H318"/>
+        <text class="lbl" x="455" y="74">expand</text>
+        <circle class="fail" cx="150" cy="60" r="5"/><text class="fail-label" x="150" y="48" text-anchor="middle">search miss = no tool</text>
+      </svg>
+      <figcaption>Same move, different payload; a miss here blocks rather than degrades.</figcaption>
+    </figure>
+  </div>
+
+  <div class="approach">
+    <h3>Forked skills <span class="badge b-emerging">Emerging</span></h3>
+    <p>The procedure never enters the main window at all. Claude Code's <code>context: fork</code> makes the skill body the task of a fresh subagent, with its own tool set and no conversation history; only the result returns. VS Code's custom agents have the same shape. This is 1.2's isolate move, and it is the endpoint of the axis: not "load it late" but "load it somewhere else."</p>
+    <p class="tradeoffs"><b>Wins:</b> a noisy procedure (a 40-step review that reads half the repo) cannot poison the parent's window; the subagent can have a narrower tool set and a different model or effort level. <b>Costs:</b> the handoff loses context, in both directions. The subagent does not know what the conversation already decided, and the parent gets a summary, which 1.3 taught you is a bet. Module 4 sends this card its full bill.</p>
+    <p class="tradeoffs"><b>Done right:</b> a code-review skill that runs in a forked Explore agent while the main session keeps working. The review needs to read widely and the parent needs none of that reading, only the verdict, which is the verification-subagent shape 4.3 will formalise.</p>
+    <figure>
+      <svg class="dg" viewBox="0 0 640 150" role="img" aria-label="The skill body runs inside a separate subagent with its own window; only a result returns to the main window.">
+        <rect class="win" x="20" y="14" width="250" height="122" rx="10"/>
+        <text class="lbl" x="30" y="32">main window</text>
+        <use href="#sym-catalog" x="40" y="60"/>
+        <use href="#sym-model" x="150" y="62"/>
+        <path class="edge" d="M126 82 H148"/>
+        <g class="delta">
+          <rect class="win" x="330" y="14" width="290" height="122" rx="10" style="stroke:#0f6b5c"/>
+          <text class="lbl" x="340" y="32" style="fill:#0f6b5c">forked window</text>
+          <use href="#sym-orch" x="350" y="62"/>
+          <use href="#sym-doc" x="490" y="46"/>
+          <text class="lbl" x="484" y="132" style="fill:#0f6b5c">body as task</text>
+          <path class="edge" d="M248 76 H348"/>
+          <path class="edge loop" d="M348 90 H250"/>
+          <text class="lbl" x="280" y="110" style="fill:#0f6b5c">result</text>
+        </g>
+        <path class="edge" d="M462 82 H488"/>
+        <circle class="fail" cx="300" cy="62" r="5"/><text class="fail-label" x="300" y="50" text-anchor="middle">no shared history</text>
+      </svg>
+      <figcaption>Nothing leaks in either direction, including the things that should have.</figcaption>
+    </figure>
+  </div>
+
+  <p>These nest rather than compete. The production default in 2026 is a short always-on layer, a catalog of skills under it, path rules on the skills whose trigger is a file, deferred tools once the tool count passes a few dozen, and a fork for the one or two procedures that read more than they decide. One thing that does not nest: a second catalog level. He et al. (Jul 2026) ran the first controlled comparison and found single-level progressive disclosure pulled ahead on multi-document tasks while "adding a second routing level provided no benefit and sometimes reduced accuracy." A skill whose job is to list other skills is a description that has to fire twice.</p>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide where a piece of procedural knowledge should live:</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 720 560" role="img" aria-label="Decision tree from five yes/no questions to the five landscape cards plus a not-yet leaf.">
+      <rect class="q" x="200" y="10" width="320" height="44" rx="8"/><text class="t" x="360" y="30" text-anchor="middle">1. Does it apply on every turn, whatever the task?</text><text class="t" x="360" y="46" text-anchor="middle" style="font-size:11px;fill:#4a5058">(a convention, a standing constraint, the repo layout)</text>
+      <path class="edge" d="M270 54 L120 90"/><text class="yn" x="180" y="66">yes</text>
+      <rect class="leaf" x="20" y="90" width="200" height="40" rx="8"/><text class="t" x="120" y="115" text-anchor="middle">Always-on instructions (keep it short)</text>
+      <path class="edge" d="M400 54 V90"/><text class="yn" x="408" y="76">no</text>
+
+      <rect class="q" x="240" y="90" width="320" height="44" rx="8"/><text class="t" x="400" y="110" text-anchor="middle">2. Is it a capability the model lacks, not a way of working?</text><text class="t" x="400" y="126" text-anchor="middle" style="font-size:11px;fill:#4a5058">(an API, a system it must call)</text>
+      <path class="edge" d="M560 134 L640 170"/><text class="yn" x="606" y="146">yes</text>
+      <rect class="leaf" x="540" y="170" width="170" height="52" rx="8"/><text class="t" x="625" y="191" text-anchor="middle">Deferred tool definitions</text><text class="t" x="625" y="207" text-anchor="middle" style="font-size:11px;fill:#4a5058">plus a skill for the "how"</text>
+      <path class="edge" d="M400 134 V170"/><text class="yn" x="408" y="156">no</text>
+
+      <rect class="q" x="240" y="170" width="320" height="44" rx="8"/><text class="t" x="400" y="190" text-anchor="middle">3. Can the harness detect the moment mechanically?</text><text class="t" x="400" y="206" text-anchor="middle" style="font-size:11px;fill:#4a5058">(a file path, a directory, a lifecycle event)</text>
+      <path class="edge" d="M240 214 L120 250"/><text class="yn" x="170" y="226">yes</text>
+      <rect class="leaf" x="20" y="250" width="200" height="40" rx="8"/><text class="t" x="120" y="275" text-anchor="middle">Harness-triggered loading</text>
+      <path class="edge" d="M400 214 V250"/><text class="yn" x="408" y="236">no</text>
+
+      <rect class="q" x="240" y="250" width="320" height="44" rx="8"/><text class="t" x="400" y="270" text-anchor="middle">4. Can you write one line the model will recognise</text><text class="t" x="400" y="286" text-anchor="middle">in the request, and not recognise in the others?</text>
+      <path class="edge" d="M560 294 L640 330"/><text class="yn" x="606" y="306">no</text>
+      <rect class="leaf-amber" x="540" y="330" width="170" height="66" rx="8"/><text class="t" x="625" y="350" text-anchor="middle">Not yet: write the trigger</text><text class="t" x="625" y="366" text-anchor="middle">line first, or make it</text><text class="t" x="625" y="382" text-anchor="middle">user-invoked only</text>
+      <path class="edge" d="M400 294 V330"/><text class="yn" x="408" y="316">yes</text>
+
+      <rect class="q" x="240" y="330" width="320" height="44" rx="8"/><text class="t" x="400" y="350" text-anchor="middle">5. Will running it fill the window with reading</text><text class="t" x="400" y="366" text-anchor="middle">the main task does not need afterwards?</text>
+      <path class="edge" d="M240 374 L120 410"/><text class="yn" x="170" y="386">yes</text>
+      <rect class="leaf" x="20" y="410" width="200" height="40" rx="8"/><text class="t" x="120" y="435" text-anchor="middle">Forked skill</text>
+      <path class="edge" d="M400 374 V410"/><text class="yn" x="408" y="396">no</text>
+      <rect class="leaf" x="270" y="410" width="260" height="40" rx="8"/><text class="t" x="400" y="435" text-anchor="middle">Catalog plus on-demand body (a Skill)</text>
+
+      <path class="edge loop" d="M625 396 V470 H400 V450" style="marker-end:url(#arrow)"/><text class="t" x="520" y="486" text-anchor="middle" style="font-size:11px;fill:#4a5058">once the line exists, it is an ordinary skill</text>
+      <path class="edge loop" d="M60 290 V312 H400 V294" style="marker-end:none"/><text class="t" x="70" y="326" style="font-size:11px;fill:#4a5058">a path rule and a description can coexist</text>
+    </svg>
+    <figcaption>Question 4 does the work: a skill is only as good as the one line that decides when it loads.</figcaption>
+  </figure>
+  <p>Question 4 is the load-bearing one because it is the bet. Questions 1 through 3 route material to places where nothing has to be recognised: it is always there, it is a tool the model searches for by need, or a rule fires on a path. Everything that survives to question 4 will enter the window only if the model reads a one-line description on a busy turn and decides this is the moment. If you cannot write that line so that it fires on the right requests and stays quiet on the rest, you do not have a skill yet; you have a document, and the honest options are to keep working on the line or to let a human invoke it by name (<code>disable-model-invocation</code>) until you can. Question 5 is the one that changed in 2026: forks were a subagent feature and became a frontmatter field, which turns "should this run in isolation" from an orchestration decision into a per-procedure one.</p>
+
+  <h2><span class="num">5</span>Seen in the wild</h2>
+  <p>VS Code's Copilot agent is the cleanest place to watch this landscape, because Microsoft shipped every card as a separate file type and then, in 2026, retired one of them in favour of another. Read its customisation layer as the five levels and the five cards at once:</p>
+  <figure>
+    <svg class="dg" viewBox="0 0 640 250" role="img" aria-label="VS Code Copilot customization layers drawn as the landscape: always-on instructions, applyTo instruction files, skills catalog, deprecated prompt files folded into skills, custom agents as forks.">
+      <rect class="win" x="20" y="14" width="330" height="220" rx="10"/>
+      <text class="lbl" x="30" y="32">agent window</text>
+      <use href="#sym-doc" x="40" y="50"/><text class="lbl" x="34" y="140">copilot-instructions.md</text><text class="lbl" x="34" y="154" style="font-size:11px">AGENTS.md, CLAUDE.md: always</text>
+      <use href="#sym-catalog" x="130" y="64"/><text class="lbl" x="134" y="128">skills catalog</text>
+      <use href="#sym-model" x="240" y="66"/>
+      <path class="edge" d="M216 86 H238"/>
+      <use href="#sym-store" x="540" y="30"/><text class="lbl" x="546" y="100">.github/skills/</text>
+      <path class="edge loop" d="M540 52 H340"/><text class="lbl" x="360" y="44">model fires a description</text>
+      <use href="#sym-rule" x="400" y="130"/><text class="lbl" x="360" y="196">*.instructions.md, applyTo</text>
+      <path class="edge" d="M400 150 H340"/>
+      <use href="#sym-orch" x="520" y="190"/><text class="lbl" x="522" y="248">custom agents: fork</text>
+      <circle class="fail" cx="380" cy="112" r="5"/><text class="fail-label" x="392" y="116">prompt files: folded in</text>
+    </svg>
+    <figcaption>One product, all five cards, and a badge change you can date.</figcaption>
+  </figure>
+  <p><b>Always-on:</b> <code>copilot-instructions.md</code>, and the same slot now reads <code>AGENTS.md</code> and <code>CLAUDE.md</code>, which tells you the always-on layer has become a cross-vendor convention rather than a product feature. Card one, and Microsoft's own guidance is the card's rule: use the narrowest scope that fits.</p>
+  <p><b>Harness-triggered:</b> <code>.instructions.md</code> files carry an <code>applyTo</code> glob and enter the context only when a matching file is in play. Card three, shipped before the skills format existed, which is a small piece of evidence that path rules are the older and more conservative half of progressive disclosure.</p>
+  <p><b>Catalog plus body:</b> Agent Skills, in the open SKILL.md format, discovered by the model from their descriptions. Card two.</p>
+  <p><b>The badge change:</b> VS Code had a separate "prompt files" type, invocable by slash command, with its own description-based triggering. In 2026 the docs marked them deprecated for agent sessions and told users to convert them to skills. Claude Code did the same with custom slash commands, folding <code>.claude/commands/</code> into skills. Two vendors independently collapsed "a reusable prompt you invoke" into "a folder the model can load," and the difference between the two things was never the prompt. It was the directory: references and scripts at levels 3 and 4, and frontmatter that can carry a trigger rule. A prompt file is a skill with only level 2.</p>
+  <p><b>Fork:</b> custom agents, selected explicitly, with their own tool sets. Card five, the endpoint of the axis, and in VS Code it is still a user choice rather than a skill's own frontmatter, which is why the card is emerging and not current.</p>
+  <p>Read the whole layer through 0.4's rule. The parts that substituted for model capability, a separate prompt-file type and its separate trigger, got absorbed. The parts that shape what enters the window and when, the always-on file, the glob rule, the catalog, the fork, survived and converged across vendors. Claude Code, as a one-line aside: the same convergence from the other direction, with the extra data point that after auto-compaction it re-attaches the last 5,000 tokens of each loaded skill under a shared 25,000 token budget, which is 1.3's exemption list applied to procedures.</p>
+
+  <div class="callout"><span class="label">The misconception</span>
+    "Skills replaced MCP." Willison's line launched a thousand takes, and almost all of them read a token-cost comparison as a capability comparison. A skill tells the model how to do something. A tool lets it do something it otherwise cannot. The pptx skill is useless without a shell; the GitHub MCP server is expensive without a skill that says which six of its tools matter for a release. What Willison actually attacked was pre-loading, and MCP fixed that within six weeks by deferring definitions behind a search tool. Progressive disclosure is a move, not a product; skills are the move applied to procedures and deferred tools are the move applied to capabilities. The opposite error, held in the other hand: "progressive disclosure makes the agent smarter." He et al. found its gains were "near zero when a strong agent harness already divides and retrieves on its own," and SkillsBench found models cannot write the skills they benefit from. It buys context, not intelligence. What it does with the context it buys depends entirely on what someone curated into the body.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>You are building a support agent with forty internal procedures (refund rules, escalation paths, tone guides, the outage playbook). An engineer says "it's 30k tokens, it fits, put it in the system prompt." Which cards, and why not the single card he proposed?</summary><p>Split it by question 1. The tone guide and the three things the agent must never promise apply on every turn: always-on. The thirty-odd procedures do not; each applies to some tickets and rots the rest, so they become skills with descriptions written as triggers ("use when the customer disputes a charge"). The outage playbook is the interesting one: its trigger is not in the customer's words but in the system's state, so give it a harness trigger (an incident flag) rather than a description. "It fits" answers the wrong question; 1.1's question is whether each token pays for its seat on this turn, and a refund procedure loaded into a password-reset ticket does not. Bonus: the refund procedure is the one whose action is irreversible, so it is also the one to mark user-invoked-only until 4.7 gives you a better gate.</p></details>
+  <details><summary>Your agent has 120 tools across six MCP servers and one skill that describes the release process. It is slow before it starts and it keeps picking <code>create_issue</code> when it should pick <code>create_pr</code>. What do you change first, and what stays?</summary><p>Defer the tools. The 120 definitions are the pre-loaded payload and the near-identical names are 1.2's confusion failure mode; Anthropic's numbers say deferring both cuts the standing footprint by most of its size and improves selection, not just cost. The release skill stays, and it gets better: its body can now name the six tools the release needs, which turns the skill into the map and the tool search into the territory, 1.4's card three around card four. What you do not do is delete the skill because "the tools are the capability." The skill is what stops the model from having to rediscover the release procedure from 120 tool names every time.</p></details>
+  <details><summary>A team's skills fire too often on some requests and never on others. One proposal is a "router" skill whose body lists all the other skills and says when to use each. The other is to rewrite the descriptions. Which, and what evidence?</summary><p>Rewrite the descriptions, and measure them. He et al. tested exactly the router idea as a second routing level and found no benefit and sometimes worse accuracy; a router skill is a description that has to fire correctly twice, and the second firing happens with the first skill's body already spending budget. The description is the only thing in the window when the decision is made, so it is the only lever. Treat it as a trigger to be tested, not prose to be polished: build a small set of requests that should and should not fire it, and run them. If some skills still will not trigger reliably, that is question 3 or question 4's not-yet leaf: give them a path rule, or make them user-invoked until the line is right.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>
+    Module 1's bar is that any agent misbehaviour produces three context hypotheses first, and they are usually right. 1.6's contribution: when the complaint is "it ignored our process," "it is expensive before it starts," or "it picked the wrong tool," you reach for the procedure's address before its wording. Was it always-on and rotted? Was it a skill whose description never fired? Were a hundred tool definitions in the window competing with the six that mattered? And you can say, for any procedure someone hands you, which of the five cards it belongs in and which frontmatter line makes that true. 1.7 supplies the missing half of the bill: what each of these loads and reloads does to the cache.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources">
+    <li>Anthropic, Equipping agents for the real world with Agent Skills (Oct 16, 2025): anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills</li>
+    <li>Claude Platform docs, Agent Skills overview (the three levels, token figures, security note): platform.claude.com/docs/en/agents-and-tools/agent-skills/overview</li>
+    <li>Claude Code docs, Skills (frontmatter reference: paths, context: fork, disable-model-invocation, the 1,536-character description budget, post-compaction re-attachment): code.claude.com/docs/en/skills</li>
+    <li>Simon Willison, Claude Skills are awesome, maybe a bigger deal than MCP (Oct 16, 2025) and Agent Skills (Dec 19, 2025, the open spec and its first adopters): simonwillison.net</li>
+    <li>Agent Skills specification (Dec 2025): agentskills.io/specification</li>
+    <li>Anthropic, Advanced tool use: the Tool Search Tool (Nov 24, 2025): anthropic.com/engineering/advanced-tool-use</li>
+    <li>Li, Song et al., SkillsBench (arXiv 2602.12670, Feb 2026, v2 Jun 2026): curated +16.2pp, self-generated no gain, 16 of 84 tasks worse, focused skills beat exhaustive ones</li>
+    <li>He, Zhao, Wang, Chen, Is Progressive Disclosure All You Need for Long-Context Agents? (arXiv 2607.17598, Jul 20, 2026): single level wins on multi-document tasks, second routing level does not help</li>
+    <li>Xu and Yan, Agent Skills for Large Language Models: Architecture, Acquisition, Security (arXiv 2602.12430, Feb 2026, v2 Jun 2026): the survey; 26.1% of community skills carried a vulnerability</li>
+    <li>Under the Hood of SKILL.md: Semantic Supply-chain Attacks on AI Agent Skill Registry (arXiv 2605.11418, May 2026): "SKILL.md is not passive documentation but operational text," which is 0.3's rule for a new file type. 7.2 will use it.</li>
+    <li>VS Code docs, Create and manage agent customizations (2026): code.visualstudio.com/docs/agent-customization/overview</li>
+  </ul>
+
+</div>
+</body>
+</html>

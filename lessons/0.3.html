@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<!--
+TUTORIAL TEMPLATE for agent-architecture-tutor.
+Copy this file's CSS and structure for every tutorial. Replace bracketed
+placeholders. Keep it a single self-contained file: no external fonts,
+scripts, or images. Diagrams are inline SVG using the palette variables.
+Section order matches SKILL.md: why > mental model > landscape > anchor >
+choosing (decision tree) > anchor > misconception > check yourself > done when + sources.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0.3: Tools and tool design</title>
+<style>
+  :root {
+    --ink: #1a1d21;
+    --ink-soft: #4a5058;
+    --paper: #faf8f4;
+    --card: #ffffff;
+    --line: #e5e0d6;
+    --accent: #0f6b5c;        /* deep teal: links, headings, accents */
+    --accent-soft: #e3efec;
+    --amber: #a05e0b;         /* callouts, misconception */
+    --amber-soft: #f9efdd;
+    /* status badge colors */
+    --current: #0f6b5c;  --ascendant: #1a5fa8;  --emerging: #7a4fa3;
+    --legacy: #8a8578;   --contested: #a05e0b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 17px/1.65 Charter, Georgia, 'Times New Roman', serif;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  .kicker {
+    font: 600 13px/1 -apple-system, 'Segoe UI', sans-serif;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--accent);
+  }
+  h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -.01em; }
+  .standfirst { font-size: 20px; color: var(--ink-soft); font-style: italic; margin: 0 0 8px; }
+  .meta { font: 13px/1.5 -apple-system, 'Segoe UI', sans-serif; color: var(--ink-soft);
+          border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 40px; }
+  h2 { font-size: 26px; margin: 52px 0 14px; letter-spacing: -.01em; }
+  h2 .num { color: var(--accent); font-size: 15px; vertical-align: super;
+            font-family: -apple-system, 'Segoe UI', sans-serif; margin-right: 6px; }
+  h3 { font-size: 19px; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  p { margin: 0 0 16px; }
+
+  /* The one-sentence mental model, displayed like a pull quote */
+  .mental-model {
+    background: var(--accent-soft); border-left: 4px solid var(--accent);
+    padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0;
+    font-size: 21px; line-height: 1.45;
+  }
+  .mental-model .label {
+    display: block; font: 700 12px/1 -apple-system, sans-serif;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+
+  /* Landscape cards: one per approach */
+  .approach {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 24px; margin: 16px 0;
+  }
+  .approach h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    font: 700 11px/1 -apple-system, sans-serif; letter-spacing: .08em;
+    text-transform: uppercase; color: #fff; padding: 4px 9px; border-radius: 99px;
+  }
+  .b-current { background: var(--current); } .b-ascendant { background: var(--ascendant); }
+  .b-emerging { background: var(--emerging); } .b-legacy { background: var(--legacy); }
+  .b-contested { background: var(--contested); }
+  .tradeoffs { font-size: 15.5px; color: var(--ink-soft); }
+  .tradeoffs b { color: var(--ink); }
+  /* Landscape frame: what the cards are a landscape OF. Required before the first card. */
+  .landscape-frame { background: var(--accent-soft); border-radius: 10px; padding: 16px 22px; margin: 0 0 20px; font-size: 16px; }
+  .landscape-frame .q { font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .landscape-frame .axis { color: var(--ink-soft); margin-bottom: 8px; }
+  .landscape-frame .legend { font-size: 14px; color: var(--ink-soft); }
+  .approach figure { margin: 14px 0 0; }
+  .approach figure svg { width: 100%; height: auto; display: block; }
+  .approach figcaption { font: italic 13.5px/1.4 Georgia, serif; color: var(--ink-soft); margin-top: 6px; }
+
+  /* Amber callout: misconception, warnings, "watch out" */
+  .callout {
+    background: var(--amber-soft); border-left: 4px solid var(--amber);
+    padding: 16px 22px; margin: 24px 0; border-radius: 0 8px 8px 0;
+  }
+  .callout .label {
+    font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--amber); display: block; margin-bottom: 6px;
+  }
+
+  /* Diagram block */
+  figure { margin: 28px 0; background: var(--card); border: 1px solid var(--line);
+           border-radius: 10px; padding: 20px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: 13px/1.5 -apple-system, sans-serif; color: var(--ink-soft);
+               margin-top: 10px; text-align: center; }
+
+  /* Check-yourself questions with collapsible answers */
+  details {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 20px; margin: 12px 0;
+  }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+
+  .done-when { background: var(--card); border: 2px solid var(--accent);
+               border-radius: 10px; padding: 18px 24px; margin: 24px 0; }
+  .done-when .label { font: 700 12px/1 -apple-system, sans-serif; letter-spacing: .1em;
+                      text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+  .sources { font-size: 15px; color: var(--ink-soft); }
+  .sources li { margin-bottom: 6px; }
+  code { font: 14.5px/1.5 ui-monospace, 'SF Mono', Menlo, monospace;
+         background: #efece4; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Agent Architecture · Module 0 · Topic 0.3</div>
+    <h1>Tools and tool design</h1>
+    <p class="standfirst">Decide what an agent's hands should look like, and why fewer is usually more.</p>
+    <div class="meta">Freshness-checked 2026-08-21 · landscape rebuilt 2026-08-22 with per-card diagrams · builds on 0.1, 0.2 · ~12 min read</div>
+  </header>
+
+  <h2><span class="num">1</span>Why this exists</h2>
+  <p>A model that can only emit text cannot check anything. Tool calling closed that gap, and then opened a new one: every tool you hand the model is text it reads every turn before it does anything, and a surprising share of agent failures turn out to be the model picking the wrong tool, calling it wrong, or drowning in what it returned. Tool design exists because the interface between a deterministic system and a non-deterministic one has two sides, and most teams only design one.</p>
+
+  <h2><span class="num">2</span>The mental model</h2>
+  <div class="mental-model"><span class="label">Carry this out of the room</span>A tool is two things at once: a contract with a deterministic system, and a prompt aimed at a non-deterministic one. Most bad tools are bad because someone only designed the first half.</div>
+  <p>The contract half is ordinary API design. The prompt half is the one that gets skipped: descriptions, parameter names, example values, and error text are all tokens the model reads while deciding what to do. An error saying <code>400 Bad Request</code> teaches nothing; one saying <code>start_date must precede end_date; you passed 2026-08-21 and 2026-08-01</code> lets the model fix itself next turn.</p><p>Three rules follow. <b>Consolidate</b>: if the model must reliably call three tools in a fixed order, that ordering is your job, not its judgment call. <b>Namespace</b>: ambiguity between two tools called <code>send</code> is a coin flip you paid for. <b>Return signal, not payload</b>: a tool that dumps 40,000 tokens of JSON has spent the attention budget on fields nobody reads.</p>
+
+  <h2><span class="num">3</span>The landscape</h2>
+  <div class="landscape-frame"><div class="q">A landscape of: what the agent's tool surface looks like: what sits between the model and the world, and what it costs in context per turn.</div><div class="axis">What varies: how general the tools are and where the composition happens, from a short hand-curated list, to one universal tool, to tools called from generated code. Four answers, three of them live; the fourth is the anti-pattern most teams start with.</div><div class="legend">Reading the diagrams: gray is structure every approach shares; <span style="color:#0f6b5c;font-weight:600">teal</span> is the element that makes this approach different from the one above it; the <span style="color:#a05e0b;font-weight:600">amber dot</span> marks where it breaks.</div></div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="sym-model"><rect x="0" y="0" width="96" height="40" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="48" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">model</text></g>
+      <g id="sym-tool"><path d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="40" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">tool</text></g>
+      <g id="sym-store"><path d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="36" cy="8" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="36" y="30" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="currentColor">store</text></g>
+      <g id="sym-human"><circle cx="20" cy="10" r="8" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M2 40 a18 18 0 0 1 36 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/></g>
+      <g id="sym-orch"><rect x="0" y="0" width="110" height="40" rx="20" fill="#fff" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/><text x="55" y="25" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="currentColor">orchestrator</text></g>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    </defs>
+  </svg>
+  <style>
+    .dg { color: #4a5058; font-family: -apple-system, sans-serif; font-size: 13px; }
+    .dg .delta { color: #0f6b5c; }
+    .dg .edge { stroke: currentColor; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .dg .loop { stroke-dasharray: 6 4; }
+    .dg .fail { fill: #a05e0b; }
+    .dg .fail-label { fill: #a05e0b; font-size: 12px; font-style: italic; }
+  </style>
+
+  
+  <div class="approach">
+    <h3>The curated tool set <span class="badge b-current">Current</span></h3>
+    <p>Five to fifteen tools, each shaped around a complete job, descriptions rewritten by watching the agent misuse them. Anthropic's "writing effective tools" guidance.</p>
+    <p class="tradeoffs"><b>Wins:</b> predictable, enumerable, fits behind approval gates. <b>Costs:</b> every new capability is human work.</p>
+    <p class="tradeoffs"><b>Done right:</b> A customer-support agent with eight tools: look up order, check policy, issue refund, escalate, and so on. Each one is a whole job, each description was rewritten after watching the agent misuse it, and the irreversible ones sit behind approval. The surface is small enough to audit line by line.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="A model with a small fenced set of hand-designed tools, each maintained by a human"><use href="#sym-model" x="30" y="60"/><path class="edge" d="M126 80 H168"/><g class="delta"><rect x="170" y="30" width="290" height="110" rx="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="178" y="24" font-size="12" fill="currentColor">5 to 15 tools, each a whole job</text></g><g class="delta"><path transform="translate(185 45)" d="M0 6 L6 0 H50 L56 6 V24 L50 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(249 45)" d="M0 6 L6 0 H50 L56 6 V24 L50 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(313 45)" d="M0 6 L6 0 H50 L56 6 V24 L50 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(377 45)" d="M0 6 L6 0 H50 L56 6 V24 L50 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/></g><g class="delta"><path transform="translate(185 95)" d="M0 6 L6 0 H50 L56 6 V24 L50 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(249 95)" d="M0 6 L6 0 H50 L56 6 V24 L50 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(313 95)" d="M0 6 L6 0 H50 L56 6 V24 L50 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(377 95)" d="M0 6 L6 0 H50 L56 6 V24 L50 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/></g><g class="delta"><text x="315" y="86" text-anchor="middle" font-size="11" fill="currentColor">"search_orders" not "get" + "filter" + "sort"</text></g><use href="#sym-human" x="560" y="60"/><path class="edge" d="M460 80 H550"/><text x="505" y="72" text-anchor="middle" font-size="12" fill="currentColor">a person</text><text x="505" y="102" text-anchor="middle" font-size="12" fill="currentColor">designs each</text><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">every new capability waits on a person</text></svg><figcaption>Small, legible, gated; grows only as fast as you do.</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>Filesystem plus bash as the universal tools <span class="badge b-current">Current</span></h3>
+    <p>Give the agent a computer instead of an API surface. Microsoft's SRE agent moved from over a hundred bespoke tools to files and raised intent-met on novel incidents from 45% to 75%.</p>
+    <p class="tradeoffs"><b>Wins:</b> unreasonably general, composes without anyone designing the composition, doubles as memory. <b>Costs:</b> enormous blast radius, so sandboxing is mandatory.</p>
+    <p class="tradeoffs"><b>Done right:</b> Incident investigation on a cloud service. Microsoft's SRE agent replaced over a hundred bespoke query tools with a filesystem and a shell: the agent greps logs, runs ad-hoc scripts, and leaves notes for the next turn, inside a sandbox with read-only production access.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="A model with one bash tool over a filesystem inside a sandbox; the filesystem doubles as memory"><use href="#sym-model" x="30" y="60"/><path class="edge" d="M126 80 H188"/><g class="delta"><g><path transform="translate(190 60)" d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="230" y="85" text-anchor="middle" fill="currentColor">bash</text></g></g><g class="delta"><g><path transform="translate(320 60)" d="M0 8 a36 8 0 0 1 72 0 v26 a36 8 0 0 1 -72 0 z" fill="#fff" stroke="currentColor" stroke-width="2"/><ellipse cx="356" cy="68" rx="36" ry="8" fill="none" stroke="currentColor" stroke-width="2"/><text x="356" y="90" text-anchor="middle" font-size="12" fill="currentColor">filesystem</text></g></g><g class="delta"><path class="edge" d="M270 80 H318"/></g><g class="delta"><path class="edge loop" d="M356 100 C 356 135, 80 135, 78 101"/><text x="215" y="148" text-anchor="middle" font-size="12" fill="currentColor">reads its own notes back: memory for free</text></g><rect x="170" y="30" width="240" height="100" rx="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="178" y="24" font-size="12" fill="currentColor">sandbox (mandatory)</text><g class="delta"><text x="430" y="60" font-size="12">anything a shell can do:</text><text x="430" y="78" font-size="12">grep, curl, git, python...</text><text x="430" y="96" font-size="12">nobody designed</text><text x="430" y="112" font-size="12">the composition</text></g><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">a shell can delete the database</text></svg><figcaption>One tool that is every tool; the sandbox is the real design work.</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>Code execution and programmatic tool calling <span class="badge b-ascendant">Ascendant</span></h3>
+    <p>The agent writes code that calls your tools; definitions live as importable files, results are processed in the runtime and only conclusions return to context. Roughly 98% token reduction on tool-heavy workloads.</p>
+    <p class="tradeoffs"><b>Wins:</b> loops and joins happen in code where they are cheap and correct. <b>Costs:</b> needs a sandboxed runtime; debugging shifts to reading generated code.</p>
+    <p class="tradeoffs"><b>Done right:</b> An analytics question that spans three APIs: the agent writes one script that pulls ten thousand rows, joins and aggregates them in the runtime, and returns a five-line summary. The context never sees the rows, only the answer.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="The model writes a script that runs inside a runtime holding the tools; only conclusions return to the model"><use href="#sym-model" x="20" y="60"/><g class="delta"><path class="edge" d="M116 70 H178"/><text x="147" y="64" text-anchor="middle" font-size="12" fill="currentColor">writes code</text></g><g class="delta"><rect x="180" y="30" width="330" height="115" rx="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="188" y="24" font-size="12" fill="currentColor">runtime</text></g><g class="delta"><g><path transform="translate(200 55)" d="M0 8 L8 0 H72 L80 8 V32 L72 40 H8 L0 32 Z" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="240" y="80" text-anchor="middle" fill="currentColor">script</text></g></g><path transform="translate(310 45)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(366 45)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(422 45)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(310 85)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(366 85)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(422 85)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><g class="delta"><path class="edge" d="M280 75 H308"/></g><g class="delta"><path class="edge" d="M280 81 C 295 81, 295 100, 308 100"/></g><g class="delta"><text x="395" y="134" text-anchor="middle" font-size="11" fill="currentColor">definitions load on import, not every turn</text></g><g class="delta"><path class="edge" d="M180 95 C 160 95, 160 90, 118 90"/><text x="147" y="115" text-anchor="middle" font-size="12" fill="currentColor">conclusions only</text></g><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">the bug is now in generated code</text></svg><figcaption>The loop moved from the context window into a program, where loops are cheap.</figcaption></figure>
+  </div>
+  <div class="approach">
+    <h3>Preload every MCP server you have <span class="badge b-legacy">Legacy</span></h3>
+    <p>Connect everything and let the model sort it out. The 2025 default, and the source of most "our agent got worse when we gave it more capabilities" reports.</p>
+    <p class="tradeoffs"><b>Wins:</b> none worth naming. <b>Costs:</b> pays for every definition every turn, invites confusion between near-duplicate tools, burns the budget before the task starts.</p>
+    <p class="tradeoffs"><b>Done right:</b> As a discovery spike only: connect everything for an afternoon, run the real task twenty times, and log which six tools the agent actually reaches for. Then disconnect the rest and curate those six. The pattern is correct for one afternoon and wrong for one deployment.</p>
+    <figure><svg class="dg" viewBox="0 0 640 175" role="img" aria-label="A model whose context window is filled with rows of tool definitions, several near-duplicates"><use href="#sym-model" x="30" y="65"/><path class="edge" d="M126 85 H178"/><g class="delta"><rect x="180" y="25" width="440" height="120" rx="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="188" y="19" font-size="12" fill="currentColor">context window, every turn</text></g><g class="delta"><path transform="translate(190 35)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(246 35)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(302 35)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(358 35)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(414 35)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(470 35)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(526 35)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/></g><g class="delta"><path transform="translate(190 70)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(246 70)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(302 70)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(358 70)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(414 70)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(470 70)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(526 70)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/></g><g class="delta"><path transform="translate(190 105)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(246 105)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(302 105)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(358 105)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(414 105)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(470 105)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/><path transform="translate(526 105)" d="M0 6 L6 0 H44 L50 6 V24 L44 30 H6 L0 24 Z" fill="#fff" stroke="currentColor" stroke-width="1.5"/></g><g class="delta"><text x="215" y="90" text-anchor="middle" font-size="10" font-weight="700">send</text><text x="271" y="90" text-anchor="middle" font-size="10" font-weight="700">send</text><text x="327" y="90" text-anchor="middle" font-size="10" font-weight="700">send_msg</text></g><circle class="fail" cx="20" cy="162" r="5"/><text class="fail-label" x="30" y="166">budget spent before the task starts; three tools named send</text></svg><figcaption>Capability and tool count came apart long before you connected the fortieth server.</figcaption></figure>
+  </div>
+
+  <h2><span class="num">4</span>Choosing</h2>
+  <p>When designing an agent, ask yourself these questions to decide what the agent's tool surface should be:</p>
+  <figure><svg class="dg" viewBox="0 0 680 400" role="img" aria-label="decision tree"><rect x="230" y="10" width="260" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="360.0" y="28" text-anchor="middle" font-size="12.5" fill="currentColor">Do the tools touch money or</text><text x="360.0" y="44" text-anchor="middle" font-size="12.5" fill="currentColor">irreversible actions that need per-tool gating?</text><path class="edge" d="M230 35 H120 V90"/><text x="175" y="28" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="40" y="90" width="170" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="125.0" y="107" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Curated tool set</text><path class="edge" d="M490 35 H580 V90"/><text x="535" y="28" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><rect x="440" y="90" width="250" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="565.0" y="108" text-anchor="middle" font-size="12.5" fill="currentColor">Do tasks vary in shape, so</text><text x="565.0" y="124" text-anchor="middle" font-size="12.5" fill="currentColor">the tool composition is unknown?</text><path class="edge" d="M440 115 H320 V90"/><text x="380" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><path class="edge" d="M320 90 H212"/><text x="0" y="0" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor"></text><path class="edge" d="M565 140 V175"/><text x="590" y="162" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="450" y="175" width="230" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="565.0" y="193" text-anchor="middle" font-size="12.5" fill="currentColor">Is the work data-heavy:</text><text x="565.0" y="209" text-anchor="middle" font-size="12.5" fill="currentColor">joins, loops over many results?</text><path class="edge" d="M565 225 V260"/><text x="590" y="247" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="470" y="260" width="180" height="32" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="560.0" y="277" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Code execution</text><path class="edge" d="M450 200 H330 V260"/><text x="390" y="193" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">no</text><rect x="230" y="260" width="190" height="48" rx="8" fill="#e3efec" stroke="#0f6b5c" stroke-width="2"/><text x="325.0" y="277" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">Filesystem + bash</text><text x="325.0" y="293" text-anchor="middle" font-size="12.5" font-weight="600" fill="#0f6b5c">(in a sandbox)</text><rect x="20" y="260" width="190" height="50" rx="8" fill="#fff" stroke="currentColor" stroke-width="2"/><text x="115.0" y="278" text-anchor="middle" font-size="12.5" fill="currentColor">Do you not know yet</text><text x="115.0" y="294" text-anchor="middle" font-size="12.5" fill="currentColor">which tools matter?</text><path class="edge" d="M115 305 V335"/><text x="140" y="325" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">yes</text><rect x="20" y="335" width="210" height="48" rx="8" fill="#f9efdd" stroke="#a05e0b" stroke-width="2"/><text x="125.0" y="352" text-anchor="middle" font-size="12.5" font-weight="600" fill="#a05e0b">Preload everything for</text><text x="125.0" y="368" text-anchor="middle" font-size="12.5" font-weight="600" fill="#a05e0b">one afternoon, then curate</text></svg><figcaption>Gating needs come first because they force a small, enumerable surface regardless of anything else.</figcaption></figure>
+  <p>The gating question wins because approval gates need a tool you can name; you cannot put a human in front of "bash." If nothing needs gating, the question becomes whether you can predict the composition: when you can, curate; when you cannot, give the agent a computer, and move to code execution once the work is dominated by data the context should never see. Preloading everything survives only as a way to discover the curated set.</p>
+
+  <h2><span class="num">5</span>Seen in the wild</h2>
+  <p>Claude Code's tool list is short and deliberately below the level of the task: read, write, edit, bash, grep, glob, web fetch. There is no <code>create_pull_request</code> primitive, because a shell already does that and each such tool would be a bet about how a specific project works. The specificity moved into skills instead: procedural knowledge in files, loaded when relevant, rather than tools in context loaded always. In the cards above, that is the second shape with a thin layer of the first.</p><p>The question to ask before adding any tool: is this a capability the agent lacks, or a workflow I am encoding because I do not trust it to figure the workflow out? The second is usually a skill, a prompt, or a piece of your own harness.</p>
+
+  <div class="callout"><span class="label">The misconception</span>That more tools mean a more capable agent. Past a small number, each tool costs attention every turn and adds a chance of picking the wrong one, so capability and tool count come apart quickly. A tool surface is a context-budget decision wearing an API costume. Ask what it costs per turn, not just what it unlocks.</div>
+
+  <h2><span class="num">6</span>Check yourself</h2>
+  <details><summary>Your agent reliably calls list_customers, get_customer, get_orders, and get_order_items in sequence to answer one question. Fix?</summary><p>Consolidate. That fixed sequence is a join you made the model perform across four turns, paying context for each intermediate. If the joins vary too much to fold into one tool, move to code execution and let the agent write the join.</p></details><details><summary>You are adding a payments MCP server with forty tools to an agent that has eight. What first?</summary><p>Do not connect all forty. Expose the few it needs, or put the server behind code execution so definitions load on demand. Separately, treat the irreversible ones as a permissions problem: gate the actions, not the reasoning. Two distinct failure modes, context dilution and blast radius, needing different fixes.</p></details><details><summary>An agent keeps passing malformed arguments to one tool. You have rewritten the description twice. What else?</summary><p>The error message and the parameter shape. Errors are prompts. And if a parameter is easy to get wrong, that is a design smell: constrain the type, supply an enum, take a natural key instead of an opaque ID. Make the wrong call hard to express rather than explaining it again.</p></details>
+
+  <div class="done-when"><span class="label">Done when</span>You can look at any agent's tool list and say which of the four shapes it is, what it costs per turn, and which tools are really workflows in disguise. With 0.1 and 0.2 this completes the Module 0 bar: loop plus tools plus context, workflow vs agent.</div>
+
+  <h2><span class="num">7</span>Go deeper</h2>
+  <ul class="sources"><li>Anthropic, Writing effective tools for agents (2025)</li><li>Anthropic, Code execution with MCP (Nov 2025)</li><li>Claude Platform docs, Programmatic tool calling (2026)</li><li>Microsoft, Context Engineering for Reliable AI Agents: Azure SRE Agent (2026)</li><li>MCP spec, 2026-07-28 revision</li></ul>
+
+</div>
+</body>
+</html>
